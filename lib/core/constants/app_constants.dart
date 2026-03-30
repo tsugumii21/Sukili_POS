@@ -28,7 +28,6 @@ class AppConstants {
   static const String orderPrefix = 'ORD';
   
   // Supabase Configuration
-  // Note: Replace these with your actual Supabase dashboard details.
-  static const String supabaseUrl = 'YOUR_SUPABASE_URL';
-  static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+  static const String supabaseUrl = 'https://nszgseyzrnpwgwbjwyfg.supabase.co';
+  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zemdzZXl6cm5wd2d3Ymp3eWZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4NjQwMTMsImV4cCI6MjA5MDQ0MDAxM30.kWXB7bCde17afEEgcA025JwWbTydfBGKKnFO6NYubKg';
 }
