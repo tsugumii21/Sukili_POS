@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 
 /// AppTextField — themed text input widget for Sukli POS.
+/// Redesigned with Inter for maximum modern readability.
 class AppTextField extends StatelessWidget {
   const AppTextField({
     super.key,
@@ -43,15 +45,10 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final fillColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
-    final focusedBorderColor =
-        isDark ? AppColors.accentDark : AppColors.accentLight;
-    final errorBorderColor =
-        isDark ? AppColors.errorDark : AppColors.errorLight;
-    final hintColor =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-    final labelColor =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final fillColor = isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
+    final focusedBorderColor = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final labelColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
     return Opacity(
       opacity: isReadOnly ? 0.6 : 1.0,
@@ -67,10 +64,10 @@ class AppTextField extends StatelessWidget {
         maxLines: obscureText ? 1 : maxLines,
         focusNode: focusNode,
         autofocus: autofocus,
-        style: TextStyle(
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+        style: GoogleFonts.inter(
+          color: labelColor,
           fontSize: 15,
-          fontFamily: 'DMSans',
+          fontWeight: FontWeight.w500,
         ),
         decoration: InputDecoration(
           labelText: label,
@@ -80,46 +77,42 @@ class AppTextField extends StatelessWidget {
           filled: true,
           fillColor: fillColor,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: 14,
+            horizontal: AppSpacing.lg,
+            vertical: 18,
           ),
-          hintStyle: TextStyle(
-            color: hintColor,
-            fontSize: 14,
-            fontFamily: 'DMSans',
+          hintStyle: GoogleFonts.inter(
+            color: hintColor.withValues(alpha: 0.5),
+            fontSize: 15,
           ),
-          labelStyle: TextStyle(
-            color: labelColor,
+          labelStyle: GoogleFonts.inter(
+            color: labelColor.withValues(alpha: 0.7),
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            fontFamily: 'DMSans',
           ),
-          floatingLabelStyle: TextStyle(
+          floatingLabelStyle: GoogleFonts.plusJakartaSans(
             color: focusedBorderColor,
             fontSize: 14,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'DMSans',
+            fontWeight: FontWeight.w700,
           ),
           border: OutlineInputBorder(
-            borderRadius: AppRadius.mediumBR,
-            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.05)),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: AppRadius.mediumBR,
-            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.05)),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: AppRadius.mediumBR,
-            borderSide:
-                BorderSide(color: focusedBorderColor, width: 1.5),
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: focusedBorderColor, width: 2.0),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: AppRadius.mediumBR,
-            borderSide: BorderSide(color: errorBorderColor, width: 1.5),
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: AppColors.errorLight, width: 1.5),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: AppRadius.mediumBR,
-            borderSide: BorderSide(color: errorBorderColor, width: 1.5),
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: AppColors.errorLight, width: 2.0),
           ),
         ),
       ),

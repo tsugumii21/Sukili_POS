@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -10,7 +11,7 @@ import '../../../../shared/widgets/app_text_field.dart';
 import '../providers/admin_auth_provider.dart';
 
 /// AdminLoginScreen — Supabase email/password auth for admin users.
-/// Displays a centered card (max 400px) with Snackbar error handling.
+/// Redesigned with the modern fintech design system.
 class AdminLoginScreen extends ConsumerStatefulWidget {
   const AdminLoginScreen({super.key});
 
@@ -37,7 +38,6 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
-    // Dismiss keyboard
     FocusScope.of(context).unfocus();
 
     try {
@@ -63,19 +63,18 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(AppSpacing.md),
         backgroundColor: AppColors.errorLight,
-        shape: RoundedRectangleBorder(borderRadius: AppRadius.smallBR),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: Row(
           children: [
-            const Icon(Icons.error_outline_rounded,
-                color: AppColors.white, size: 18),
-            const SizedBox(width: AppSpacing.xs),
+            const Icon(Icons.error_outline_rounded, color: AppColors.white, size: 20),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Invalid email or password. Please try again.',
-                style: const TextStyle(
+                'Invalid login credentials. Please try again.',
+                style: GoogleFonts.inter(
                   color: AppColors.white,
-                  fontSize: 13,
-                  fontFamily: 'DMSans',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -94,10 +93,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
     final cardBg = isDark ? AppColors.cardDark : AppColors.white;
-    final textPrimary =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSecondary =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
     return Scaffold(
       backgroundColor: bg,
@@ -106,11 +102,10 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
           children: [
             // ── Back button ────────────────────────────────────────────────
             Positioned(
-              top: AppSpacing.xs,
-              left: AppSpacing.xs,
+              top: AppSpacing.sm,
+              left: AppSpacing.sm,
               child: IconButton(
-                icon: Icon(Icons.arrow_back_ios_new_rounded,
-                    color: textPrimary, size: 20),
+                icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 22),
                 onPressed: () => context.go(RouteConstants.cashierSelect),
               ),
             ),
@@ -125,82 +120,83 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: cardBg,
-                        borderRadius: AppRadius.largeBR,
-                        boxShadow: AppShadow.level3,
+                        borderRadius: BorderRadius.circular(32),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 40,
+                            offset: const Offset(0, 16),
+                          ),
+                        ],
                       ),
-                      padding: const EdgeInsets.all(AppSpacing.xl),
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
                       child: Form(
                         key: _formKey,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // ── Logo ────────────────────────────────────────
-                            Image.asset(
-                              'assets/images/sukli_logo_transparent.png',
-                              width: 80,
-                              height: 80,
+                            // ── Logo in rounded box ────────────────────────
+                            Container(
+                              width: 100,
+                              height: 100,
+                              padding: const EdgeInsets.all(18),
+                              decoration: BoxDecoration(
+                                color: AppColors.backgroundLight,
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+                              ),
+                              child: Image.asset(
+                                'assets/images/sukli_logo.png',
+                                fit: BoxFit.contain,
+                              ),
                             )
                                 .animate()
-                                .fadeIn(duration: 400.ms)
-                                .scaleXY(
-                                    begin: 0.8,
-                                    end: 1.0,
-                                    duration: 400.ms,
-                                    curve: Curves.easeOutBack),
+                                .fadeIn(duration: 600.ms)
+                                .scaleXY(begin: 0.9, end: 1.0, duration: 600.ms, curve: Curves.easeOutBack),
 
-                            const SizedBox(height: AppSpacing.sm),
+                            const SizedBox(height: 32),
 
                             // ── App name ────────────────────────────────────
                             Text(
-                              'Sukli POS',
-                              style: TextStyle(
+                              'Sukli',
+                              style: GoogleFonts.plusJakartaSans(
                                 color: textPrimary,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w700,
-                                fontFamily: 'DMSans',
+                                fontSize: 36,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -1.0,
                               ),
-                            ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
+                            ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
 
                             // ── Subtitle ────────────────────────────────────
                             Text(
-                              'Admin Portal',
-                              style: TextStyle(
-                                color: isDark
-                                    ? AppColors.accentDark
-                                    : AppColors.secondaryLight,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'DMSans',
-                                letterSpacing: 1.2,
-                              ),
-                            ).animate().fadeIn(duration: 400.ms, delay: 150.ms),
+                              'ADMIN PORTAL',
+                              style: GoogleFonts.inter(
+                                color: const Color(0xFF8B4049),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 4.0,
+                              ).copyWith(height: 1.5),
+                            ).animate().fadeIn(duration: 400.ms, delay: 300.ms),
 
-                            const SizedBox(height: AppSpacing.xl),
+                            const SizedBox(height: 48),
 
                             // ── Email field ─────────────────────────────────
                             AppTextField(
                               controller: _emailController,
                               focusNode: _emailFocus,
-                              label: 'Email',
-                              hint: 'admin@suklibiz.com',
+                              label: 'Admin Email',
+                              hint: 'example@sukli.pos',
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
-                              prefixIcon: Icon(Icons.email_outlined,
-                                  color: textSecondary, size: 20),
-                              onFieldSubmitted: (_) => FocusScope.of(context)
-                                  .requestFocus(_passwordFocus),
+                              prefixIcon: Icon(Icons.alternate_email_rounded, color: textPrimary.withValues(alpha: 0.4), size: 20),
+                              onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocus),
                               validator: (v) {
-                                if (v == null || v.trim().isEmpty) {
-                                  return 'Email is required';
-                                }
-                                if (!v.contains('@')) {
-                                  return 'Enter a valid email';
-                                }
+                                if (v == null || v.trim().isEmpty) return 'Email is required';
                                 return null;
                               },
-                            ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
+                            ).animate().fadeIn(duration: 400.ms, delay: 400.ms),
 
-                            const SizedBox(height: AppSpacing.md),
+                            const SizedBox(height: 16),
 
                             // ── Password field ──────────────────────────────
                             AppTextField(
@@ -211,36 +207,30 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                               obscureText: _obscurePassword,
                               textInputAction: TextInputAction.done,
                               onFieldSubmitted: (_) => _login(),
-                              prefixIcon: Icon(Icons.lock_outline_rounded,
-                                  color: textSecondary, size: 20),
+                              prefixIcon: Icon(Icons.lock_person_outlined, color: textPrimary.withValues(alpha: 0.4), size: 20),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  color: textSecondary,
+                                  _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                  color: textPrimary.withValues(alpha: 0.4),
                                   size: 20,
                                 ),
-                                onPressed: () => setState(
-                                    () => _obscurePassword = !_obscurePassword),
+                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                               ),
                               validator: (v) {
-                                if (v == null || v.isEmpty) {
-                                  return 'Password is required';
-                                }
+                                if (v == null || v.isEmpty) return 'Password is required';
                                 return null;
                               },
-                            ).animate().fadeIn(duration: 400.ms, delay: 250.ms),
+                            ).animate().fadeIn(duration: 400.ms, delay: 500.ms),
 
-                            const SizedBox(height: AppSpacing.xl),
+                            const SizedBox(height: 40),
 
                             // ── Login Button ────────────────────────────────
                             AppPrimaryButton(
-                              label: 'Sign In',
+                              label: 'Sign In to Portal',
                               onPressed: isLoading ? null : _login,
                               isLoading: isLoading,
-                              icon: isLoading ? null : Icons.login_rounded,
-                            ).animate().fadeIn(duration: 400.ms, delay: 300.ms),
+                              icon: isLoading ? null : Icons.shield_outlined,
+                            ).animate().fadeIn(duration: 400.ms, delay: 600.ms),
                           ],
                         ),
                       ),

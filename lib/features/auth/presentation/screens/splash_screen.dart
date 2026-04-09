@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 
-/// SplashScreen — cinematic entry screen with DM Serif Display branding.
+/// SplashScreen — The "Modern Brand Evolution" design.
+/// Features a rounded-rectangle logo container, Plus Jakarta Sans, and fintech gradient.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -21,8 +23,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   Future<void> _navigate() async {
-    // Wait for animations to complete, then navigate
-    await Future.delayed(const Duration(milliseconds: 2800));
+    await Future.delayed(const Duration(milliseconds: 3500));
     if (mounted) {
       context.go(RouteConstants.cashierSelect);
     }
@@ -31,80 +32,131 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.accentLight,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(0, -0.15),
+            radius: 1.0,
+            colors: [
+              Color(0xFF8B4049), // Lighter Maroon
+              Color(0xFF2A1215), // Deep Dark Maroon
+            ],
+          ),
+        ),
+        child: Stack(
           children: [
-            // Real Sukli POS logo
-            Image.asset(
-              'assets/images/sukli_logo_transparent.png',
-              width: 160,
-              height: 160,
-            )
-                .animate()
-                .fadeIn(duration: 600.ms, delay: 200.ms)
-                .scaleXY(begin: 0.7, end: 1.0, duration: 600.ms, delay: 200.ms,
-                    curve: Curves.easeOutBack),
-
-            const SizedBox(height: 24),
-
-            // App name
-            const Text(
-              'Sukli POS',
-              style: TextStyle(
-                color: AppColors.primaryLightVariant,
-                fontSize: 40,
-                fontFamily: 'DMSerifDisplay',
-                letterSpacing: 0.5,
-              ),
-            )
-                .animate()
-                .fadeIn(duration: 600.ms, delay: 500.ms)
-                .slideY(begin: 0.2, end: 0, duration: 600.ms, delay: 500.ms,
-                    curve: Curves.easeOut),
-
-            const SizedBox(height: 8),
-
-            // Tagline
-            const Text(
-              'Your offline-first POS solution',
-              style: TextStyle(
-                color: AppColors.primaryLight,
-                fontSize: 13,
-                fontFamily: 'DMSans',
-                letterSpacing: 0.3,
-              ),
-            )
-                .animate()
-                .fadeIn(duration: 600.ms, delay: 800.ms),
-
-            const SizedBox(height: 64),
-
-            // Loading dots
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(3, (i) {
-                return Container(
-                  width: 6,
-                  height: 6,
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight.withOpacity(0.6),
+            // Subtle geometric background element
+            Positioned(
+              top: -100,
+              right: -100,
+              child: Opacity(
+                opacity: 0.03,
+                child: Container(
+                  width: 300,
+                  height: 300,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
                     shape: BoxShape.circle,
                   ),
-                )
-                    .animate(
-                      delay: Duration(milliseconds: 1200 + (i * 150)),
-                      onPlay: (c) => c.repeat(reverse: true),
-                    )
-                    .fadeIn(duration: 400.ms)
-                    .scaleXY(
-                        begin: 0.5,
-                        end: 1.0,
-                        duration: 500.ms,
-                        curve: Curves.easeInOut);
-              }),
+                ),
+              ),
+            ),
+
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Logo Container: Rounded Box with Curve Edges
+                  Container(
+                    width: 140, // Container size
+                    height: 140,
+                    padding: const EdgeInsets.all(32), // Padding to make the internal logo smaller
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLightVariant, // Cream background for the box
+                      borderRadius: BorderRadius.circular(40), // Curved edges
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          blurRadius: 40,
+                          spreadRadius: 0,
+                          offset: const Offset(0, 15),
+                        ),
+                      ],
+                    ),
+                    child: Image.asset(
+                      'assets/images/sukli_logo.png',
+                      fit: BoxFit.contain,
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 1200.ms, curve: Curves.easeInQuad)
+                      .scaleXY(begin: 0.8, end: 1.0, duration: 1200.ms, curve: Curves.easeOutBack),
+
+                  const SizedBox(height: 54),
+
+                  // App Title
+                  Text(
+                    'Sukli',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: AppColors.primaryLightVariant,
+                      fontSize: 58,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -1.5,
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 800.ms, delay: 600.ms)
+                      .slideY(begin: 0.1, end: 0, duration: 800.ms, delay: 600.ms),
+
+                  const SizedBox(height: 4),
+
+                  // Subtext
+                  Text(
+                    'Smart Point of Sale',
+                    style: GoogleFonts.inter(
+                      color: AppColors.primaryLight.withValues(alpha: 0.6),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 800.ms, delay: 1200.ms),
+                ],
+              ),
+            ),
+
+            // Minimal Progress line
+            Positioned(
+              bottom: 100,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  width: 48,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 12,
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLightVariant.withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      )
+                          .animate(onPlay: (c) => c.repeat())
+                          .moveX(begin: -12, end: 48, duration: 1500.ms, curve: Curves.easeInOutSine),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),

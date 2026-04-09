@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -10,6 +11,7 @@ import '../providers/auth_provider.dart';
 import '../widgets/cashier_card.dart';
 
 /// CashierSelectionScreen — shows a 2-column grid of active cashiers.
+/// Redesigned with Plus Jakarta Sans and Inter for a high-end fintech aesthetic.
 class CashierSelectionScreen extends ConsumerStatefulWidget {
   const CashierSelectionScreen({super.key});
 
@@ -56,10 +58,8 @@ class _CashierSelectionScreenState
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final textPrimary =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSecondary =
-        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textSecondary = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
 
     return Scaffold(
       backgroundColor: bg,
@@ -74,46 +74,68 @@ class _CashierSelectionScreenState
               ),
               child: Row(
                 children: [
-                  // Real logo in top bar
-                  ClipRRect(
-                    borderRadius: AppRadius.smallBR,
+                  // Logo in a modern rounded box
+                  Container(
+                    width: 44,
+                    height: 44,
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.cardDark : AppColors.cardLight,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Image.asset(
-                      'assets/images/sukli_logo_transparent.png',
-                      width: 40,
-                      height: 40,
+                      'assets/images/sukli_logo.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
+                  const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Sukli POS',
-                    style: TextStyle(
+                    'Sukli',
+                    style: GoogleFonts.plusJakartaSans(
                       color: textPrimary,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'DMSans',
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
                     ),
                   ),
                 ],
               ),
             ).animate().fadeIn(duration: 400.ms),
 
+            const SizedBox(height: AppSpacing.md),
+
             // ── Title ──────────────────────────────────────────────────────
             Padding(
-              padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md, 0, AppSpacing.md, AppSpacing.lg),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Select Cashier',
-                  style: TextStyle(
-                    color: textPrimary,
-                    fontSize: 26,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'DMSans',
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Select Cashier',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: textPrimary,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -1.0,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Choose your profile to start selling',
+                    style: GoogleFonts.inter(
+                      color: textSecondary.withValues(alpha: 0.6),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-            ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
+            ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.05, end: 0),
+
+            const SizedBox(height: AppSpacing.xl),
 
             // ── Cashier Grid ───────────────────────────────────────────────
             Expanded(
@@ -121,9 +143,7 @@ class _CashierSelectionScreenState
                   ? Center(
                       child: CircularProgressIndicator.adaptive(
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          isDark
-                              ? AppColors.accentDark
-                              : AppColors.accentLight,
+                          isDark ? AppColors.accentDark : AppColors.accentLight,
                         ),
                       ),
                     )
@@ -131,9 +151,9 @@ class _CashierSelectionScreenState
                       ? Center(
                           child: Text(
                             'No active cashiers found.',
-                            style: TextStyle(
+                            style: GoogleFonts.inter(
                               color: textSecondary,
-                              fontFamily: 'DMSans',
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         )
@@ -141,11 +161,10 @@ class _CashierSelectionScreenState
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.md,
                           ),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            crossAxisSpacing: AppSpacing.sm,
-                            mainAxisSpacing: AppSpacing.sm,
+                            crossAxisSpacing: AppSpacing.md,
+                            mainAxisSpacing: AppSpacing.md,
                             childAspectRatio: 0.85,
                           ),
                           itemCount: _cashiers.length,
@@ -157,14 +176,15 @@ class _CashierSelectionScreenState
                             )
                                 .animate()
                                 .fadeIn(
-                                  duration: 400.ms,
-                                  delay: Duration(milliseconds: 150 * index),
+                                  duration: 600.ms,
+                                  delay: Duration(milliseconds: 100 * index),
                                 )
-                                .slideY(
-                                  begin: 0.1,
-                                  end: 0,
-                                  duration: 400.ms,
-                                  delay: Duration(milliseconds: 150 * index),
+                                .scaleXY(
+                                  begin: 0.95,
+                                  end: 1.0,
+                                  duration: 600.ms,
+                                  curve: Curves.easeOutBack,
+                                  delay: Duration(milliseconds: 100 * index),
                                 );
                           },
                         ),
@@ -173,14 +193,31 @@ class _CashierSelectionScreenState
             // ── Admin Login Button ─────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: TextButton(
-                onPressed: () => context.push(RouteConstants.adminLogin),
-                child: Text(
-                  'Admin Login',
-                  style: TextStyle(
-                    color: textSecondary,
-                    fontSize: 14,
-                    fontFamily: 'DMSans',
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: textSecondary.withValues(alpha: 0.1)),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: TextButton(
+                  onPressed: () => context.push(RouteConstants.adminLogin),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.admin_panel_settings_outlined, size: 18, color: textSecondary),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Admin Portal',
+                        style: GoogleFonts.plusJakartaSans(
+                          color: textSecondary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
