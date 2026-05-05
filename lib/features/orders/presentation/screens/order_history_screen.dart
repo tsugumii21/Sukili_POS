@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/isar_collections/order_collection.dart';
 import '../providers/order_history_provider.dart';
 import '../widgets/order_detail_sheet.dart';
@@ -40,6 +41,11 @@ class _OrderHistoryScreenState
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    // Always refresh from Isar when the screen mounts so any orders completed
+    // since the provider was first built are immediately visible.
+    Future.microtask(
+      () => ref.read(orderHistoryProvider.notifier).refresh(),
+    );
   }
 
   @override
@@ -59,13 +65,14 @@ class _OrderHistoryScreenState
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF2A1215) : const Color(0xFFFAF6F1);
-    final surface =
-        isDark ? const Color(0xFF3E2723) : const Color(0xFFF9F5F0);
-    final textPrimary = isDark ? Colors.white : const Color(0xFF1A1A1A);
+    final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final surface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final textPrimary =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final textSecondary =
-        isDark ? Colors.white70 : const Color(0xFF6B6B6B);
-    final inputBg = isDark ? const Color(0xFF5D2832) : const Color(0xFFF0E8DC);
+        isDark ? AppColors.textSecondaryDark : const Color(0xFF6B6B6B);
+    final inputBg =
+        isDark ? AppColors.surfaceDarkElevated : AppColors.cardLight;
     const maroon = Color(0xFF8B4049);
 
     final histState = ref.watch(orderHistoryProvider);
@@ -263,8 +270,7 @@ class _OrderHistoryScreenState
                                   .animate()
                                   .fadeIn(
                                     delay: Duration(
-                                        milliseconds: (index * 30)
-                                            .clamp(0, 300)),
+                                        milliseconds: index * 50),
                                     duration:
                                         const Duration(milliseconds: 250),
                                   )
@@ -428,7 +434,7 @@ class _ActiveFiltersRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textSecondary =
-        isDark ? Colors.white70 : const Color(0xFF6B6B6B);
+        isDark ? AppColors.textSecondaryDark : const Color(0xFF6B6B6B);
     const maroon = Color(0xFF8B4049);
 
     final chips = <String>[];
@@ -513,9 +519,9 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textSecondary =
-        isDark ? Colors.white60 : const Color(0xFF9E9E9E);
+        isDark ? AppColors.textSecondaryDark : const Color(0xFF9E9E9E);
     final iconColor =
-        isDark ? const Color(0xFF5D2832) : const Color(0xFFE0D0C0);
+        isDark ? AppColors.surfaceDarkElevated : const Color(0xFFE0D0C0);
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),

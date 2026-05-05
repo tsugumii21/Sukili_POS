@@ -6,25 +6,34 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/isar_collections/menu_item_collection.dart';
 
 /// ItemCard — Displays a single menu item in the grid.
-/// Shows image, name, price, and availability. Unavailable items are dimmed.
+/// Shows image/emoji placeholder, name, price, and availability.
+/// [categoryEmoji] is optional; when provided it replaces the icon placeholder
+/// with a 40px emoji centered on a gradient background.
 class ItemCard extends StatelessWidget {
   const ItemCard({
     super.key,
     required this.item,
     required this.onTap,
+    this.categoryEmoji,
   });
 
   final MenuItemCollection item;
   final VoidCallback onTap;
+  /// Optional emoji from the item's category (e.g. "☕").
+  final String? categoryEmoji;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.cardDark : AppColors.white;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textPrimary =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final priceColor =
+        isDark ? AppColors.accentDarkLight : const Color(0xFF8B4049);
+    final accentColor =
+        isDark ? AppColors.accentDark : const Color(0xFF8B4049);
     final isUnavailable = !item.isAvailable;
 
-    // Parse variants to show price range
     final variants = _parseVariants(item.variantsJson);
     final hasVariants = variants.isNotEmpty;
 
@@ -35,7 +44,7 @@ class ItemCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: cardBg,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),
@@ -51,31 +60,32 @@ class ItemCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ── Item Image / Placeholder ────────────────────────────
-                    Container(
-                      height: 80,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.05)
-                            : AppColors.backgroundLight,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: item.imageUrl != null && item.imageUrl!.isNotEmpty
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(14),
-                              child: Image.network(
+                    // ── Image / Emoji Placeholder ───────────────────────────
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        height: 80,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? AppColors.surfaceDarkElevated
+                              : AppColors.backgroundLight,
+                        ),
+                        child: item.imageUrl != null &&
+                                item.imageUrl!.isNotEmpty
+                            ? Image.network(
                                 item.imageUrl!,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => _buildPlaceholder(isDark),
-                              ),
-                            )
-                          : _buildPlaceholder(isDark),
+                                errorBuilder: (_, __, ___) =>
+                                    _buildPlaceholder(isDark, accentColor),
+                              )
+                            : _buildPlaceholder(isDark, accentColor),
+                      ),
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
 
-                    // ── Item Name ────────────────────────────────────────────
+                    // ── Item Name ───────────────────────────────────────────
                     Text(
                       item.name,
                       maxLines: 2,
@@ -88,19 +98,21 @@ class ItemCard extends StatelessWidget {
                       ),
                     ),
 
-                    const Spacer(),
+                    const SizedBox(height: 4),
 
-                    // ── Price ────────────────────────────────────────────────
+                    // ── Price (moved below name) ─────────────────────────────
                     Text(
                       hasVariants
                           ? 'from ${CurrencyFormatter.format(item.basePrice)}'
                           : CurrencyFormatter.format(item.basePrice),
                       style: GoogleFonts.plusJakartaSans(
-                        color: const Color(0xFF8B4049),
-                        fontSize: 15,
+                        color: priceColor,
+                        fontSize: 14,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
+
+                    const Spacer(),
                   ],
                 ),
               ),
@@ -111,7 +123,8 @@ class ItemCard extends StatelessWidget {
                   top: 12,
                   right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.errorLight.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(8),
@@ -127,22 +140,23 @@ class ItemCard extends StatelessWidget {
                   ),
                 ),
 
-              // ── Variant badge ───────────────────────────────────────────
+              // ── Variant badge (filled accent pill) ─────────────────────
               if (hasVariants && !isUnavailable)
                 Positioned(
                   top: 12,
                   right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B4049).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      color: accentColor.withAlpha(204), // ~80% opacity
+                      borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
                       '${variants.length} sizes',
                       style: GoogleFonts.inter(
-                        color: const Color(0xFF8B4049),
-                        fontSize: 10,
+                        color: Colors.white,
+                        fontSize: 11,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -155,7 +169,30 @@ class ItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder(bool isDark) {
+  /// Builds the placeholder area.
+  /// If [categoryEmoji] is set, renders a 40px emoji on a gradient bg.
+  /// Otherwise falls back to the restaurant icon.
+  Widget _buildPlaceholder(bool isDark, Color accentColor) {
+    if (categoryEmoji != null && categoryEmoji!.isNotEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              accentColor.withAlpha(77), // 30% opacity
+              Colors.transparent,
+            ],
+          ),
+        ),
+        child: Center(
+          child: Text(
+            categoryEmoji!,
+            style: const TextStyle(fontSize: 40),
+          ),
+        ),
+      );
+    }
     return Center(
       child: Icon(
         Icons.restaurant_menu_rounded,

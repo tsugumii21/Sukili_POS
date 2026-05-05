@@ -12,9 +12,11 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/isar_collections/menu_item_collection.dart';
 import '../../../orders/presentation/providers/order_provider.dart';
 import '../providers/menu_provider.dart';
+import '../providers/quick_picks_provider.dart';
 import '../widgets/category_pill.dart';
 import '../widgets/item_card.dart';
 import '../widgets/item_customization_modal.dart';
+import '../widgets/quick_pick_chip.dart';
 
 /// NewOrderScreen — The heart of the POS.
 /// Category filters → searchable item grid → item customization → cart FAB.
@@ -83,8 +85,8 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                   top: 4,
                   child: Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF8B4049),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.accentDark : const Color(0xFF8B4049),
                       shape: BoxShape.circle,
                     ),
                     child: Text(
@@ -109,7 +111,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             child: Container(
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : AppColors.white,
+                color: isDark ? AppColors.surfaceDarkElevated : AppColors.white,
                 borderRadius: BorderRadius.circular(99),
                 border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
               ),
@@ -144,7 +146,10 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
             ),
           ).animate().fadeIn(duration: 400.ms),
 
-          const SizedBox(height: AppSpacing.md),
+          // ── Quick Picks ─────────────────────────────────────────────────
+          _QuickPicksRow(
+            onItemTap: (item) => _showItemCustomization(context, item),
+          ),
 
           // ── Category Pills ──────────────────────────────────────────────
           SizedBox(
@@ -197,26 +202,46 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                           ],
                         ),
                       )
-                    : GridView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.78,
-                        ),
-                        itemCount: menuState.items.length,
-                        itemBuilder: (context, index) {
-                          final item = menuState.items[index];
-                          return ItemCard(
-                            item: item,
-                            onTap: () => _showItemCustomization(context, item),
-                          ).animate().fadeIn(
-                                duration: 400.ms,
-                                delay: (50 * index).ms,
-                              );
-                        },
-                      ),
+                    : Builder(builder: (context) {
+                        // Pre-build an O(1) emoji lookup map from category syncId.
+                        final emojiMap = {
+                          for (final cat in menuState.categories)
+                            cat.syncId: cat.iconEmoji,
+                        };
+                        return GridView.builder(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.78,
+                          ),
+                          itemCount: menuState.items.length,
+                          itemBuilder: (context, index) {
+                            final item = menuState.items[index];
+                            final emoji = emojiMap[item.categoryId];
+                            return ItemCard(
+                              item: item,
+                              categoryEmoji: emoji,
+                              onTap: () =>
+                                  _showItemCustomization(context, item),
+                            )
+                                .animate()
+                                .fadeIn(
+                                  duration: 400.ms,
+                                  delay: (50 * index).ms,
+                                )
+                                .slideY(
+                                  begin: 0.08,
+                                  end: 0,
+                                  duration: 300.ms,
+                                  delay: (50 * index).ms,
+                                );
+                          },
+                        );
+                      }),
           ),
         ],
       ),
@@ -429,6 +454,101 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
               ),
             );
           },
+        );
+      },
+    );
+  }
+}
+
+// ── Quick Picks Row ───────────────────────────────────────────────────────────
+
+/// Renders the "Quick Picks" horizontal strip below the search bar.
+/// Hidden entirely while loading or when there is no order history yet.
+class _QuickPicksRow extends ConsumerWidget {
+  const _QuickPicksRow({required this.onItemTap});
+
+  final void Function(MenuItemCollection item) onItemTap;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final quickAsync = ref.watch(quickPicksProvider);
+
+    return quickAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (items) {
+        if (items.isEmpty) return const SizedBox.shrink();
+
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textPrimary =
+            isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: AppSpacing.sm),
+
+            // ── Section header ─────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: Row(
+                children: [
+                  const Text('⚡', style: TextStyle(fontSize: 14)),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Quick Picks',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: textPrimary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.1,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'most ordered',
+                    style: GoogleFonts.inter(
+                      color: textPrimary.withValues(alpha: 0.38),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ).animate().fadeIn(duration: 350.ms),
+
+            const SizedBox(height: 8),
+
+            // ── Horizontal chip list ───────────────────────────────────
+            SizedBox(
+              height: 72,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                ),
+                itemCount: items.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                itemBuilder: (context, index) {
+                  return QuickPickChip(item: items[index])
+                      .animate()
+                      .fadeIn(
+                        duration: 350.ms,
+                        delay: (60 * index).ms,
+                      )
+                      .slideX(
+                        begin: 0.15,
+                        end: 0,
+                        duration: 300.ms,
+                        delay: (60 * index).ms,
+                        curve: Curves.easeOut,
+                      );
+                },
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.sm),
+          ],
         );
       },
     );

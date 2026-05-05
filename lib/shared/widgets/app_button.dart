@@ -33,7 +33,7 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColors.primaryDark : AppColors.accentLight;
+    final bg = isDark ? AppColors.accentDark : AppColors.accentLight;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),

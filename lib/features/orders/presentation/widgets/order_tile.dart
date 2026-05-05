@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/isar_collections/order_collection.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -18,22 +19,32 @@ class OrderTile extends StatelessWidget {
   final OrderCollection order;
   final VoidCallback onTap;
 
-  static final _dateFmt = DateFormat('MMM dd, yyyy');
-  static final _timeFmt = DateFormat('hh:mm a');
+  static final _dateFmt = DateFormat('MMM d, yyyy');
+
+  /// Shows relative time for orders under 24 hours, date otherwise.
+  static String _timeLabel(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 1) return 'just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes} min ago';
+    if (diff.inHours < 24) return '${diff.inHours} hr ago';
+    return _dateFmt.format(dt);
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg =
-        isDark ? const Color(0xFF5D2832) : const Color(0xFFF0E8DC);
+    final cardBg = isDark ? AppColors.cardDark : const Color(0xFFF0E8DC);
     final textPrimary =
-        isDark ? Colors.white : const Color(0xFF1A1A1A);
+        isDark ? AppColors.textPrimaryDark : const Color(0xFF1A1A1A);
     final textSecondary =
-        isDark ? Colors.white70 : const Color(0xFF6B6B6B);
-    const maroon = Color(0xFF8B4049);
+        isDark ? AppColors.textSecondaryDark : const Color(0xFF6B6B6B);
+    final totalColor =
+        isDark ? AppColors.accentDarkLight : const Color(0xFF8B4049);
 
     final statusColor = _statusColor(order.status);
     final payIcon = _paymentIcon(order.paymentMethod);
+    final payLabel = _paymentLabel(order.paymentMethod);
+    final timeLabel = _timeLabel(order.orderedAt);
 
     return GestureDetector(
       onTap: onTap,
@@ -41,10 +52,13 @@ class OrderTile extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
           color: cardBg,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
+          border: isDark
+              ? Border.all(color: AppColors.borderDark, width: 1)
+              : null,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(isDark ? 60 : 25),
+              color: Colors.black.withAlpha(isDark ? 40 : 25),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -55,7 +69,7 @@ class OrderTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Row 1: order number + status chip ──────────────────────
+              // ── Row 1: order number (primary) + relative time ───────────
               Row(
                 children: [
                   Expanded(
@@ -72,70 +86,37 @@ class OrderTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  _StatusChip(status: order.status, color: statusColor),
-                ],
-              ),
-              const SizedBox(height: 6),
-
-              // ── Row 2: date/time + cashier ──────────────────────────────
-              Row(
-                children: [
-                  Icon(Icons.access_time_rounded,
-                      size: 13, color: textSecondary),
-                  const SizedBox(width: 4),
                   Text(
-                    '${_dateFmt.format(order.orderedAt)}  •  ${_timeFmt.format(order.orderedAt)}',
+                    timeLabel,
                     style: GoogleFonts.dmSans(
-                      fontSize: 12,
+                      fontSize: 11,
                       color: textSecondary,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(Icons.person_outline_rounded,
-                      size: 13, color: textSecondary),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      order.cashierName,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 12,
-                        color: textSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
+
+              const SizedBox(height: 10),
+              Divider(
+                height: 1,
+                color: isDark
+                    ? AppColors.borderDark
+                    : Colors.black.withAlpha(12),
               ),
               const SizedBox(height: 10),
-              const Divider(height: 1),
-              const SizedBox(height: 10),
 
-              // ── Row 3: items count + payment icon + total ───────────────
+              // ── Row 2: payment method (left) + total + status (right) ───
               Row(
                 children: [
-                  Icon(Icons.receipt_long_rounded,
-                      size: 14, color: textSecondary),
+                  // Subtle payment icon + label — no background chip
+                  Icon(payIcon, size: 14, color: textSecondary),
                   const SizedBox(width: 4),
                   Text(
-                    '${order.orderItemsJson.length} item${order.orderItemsJson.length == 1 ? '' : 's'}',
+                    payLabel,
                     style: GoogleFonts.dmSans(
-                        fontSize: 12, color: textSecondary),
-                  ),
-                  const SizedBox(width: 10),
-                  Icon(payIcon,
-                      size: 14,
-                      color: _paymentIconColor(
-                          order.paymentMethod, isDark)),
-                  const SizedBox(width: 4),
-                  Text(
-                    _paymentLabel(order.paymentMethod),
-                    style: GoogleFonts.dmSans(
-                        fontSize: 12, color: textSecondary),
+                      fontSize: 12,
+                      color: textSecondary,
+                    ),
                   ),
                   const Spacer(),
                   Text(
@@ -143,9 +124,12 @@ class OrderTile extends StatelessWidget {
                     style: GoogleFonts.dmSans(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: maroon,
+                      color: totalColor,
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  // Status badge — aligned with price on the right
+                  _StatusChip(status: order.status, color: statusColor),
                 ],
               ),
             ],
@@ -173,22 +157,11 @@ class OrderTile extends StatelessWidget {
   IconData _paymentIcon(String method) {
     switch (method.toLowerCase()) {
       case 'cash':
-        return Icons.payments_rounded;
+        return Icons.payments_outlined;
       case 'gcash':
         return Icons.smartphone_rounded;
       default:
         return Icons.credit_card_rounded;
-    }
-  }
-
-  Color _paymentIconColor(String method, bool isDark) {
-    switch (method.toLowerCase()) {
-      case 'cash':
-        return const Color(0xFF2E7D32);
-      case 'gcash':
-        return const Color(0xFF1565C0);
-      default:
-        return const Color(0xFF6A1B9A);
     }
   }
 

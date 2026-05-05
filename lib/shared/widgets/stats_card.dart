@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
 
 /// StatsCard — Redesigned for the new high-end fintech design system.
 /// Displays a metric title and a bold value with soft elevation.
@@ -25,8 +24,7 @@ class StatsCard extends StatelessWidget {
     final cardBg = isDark ? AppColors.cardDark : AppColors.white;
     final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
-    return Expanded(
-      child: Container(
+    return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: cardBg,
@@ -75,7 +73,6 @@ class StatsCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 }

@@ -225,21 +225,27 @@ class OrderHistoryNotifier extends Notifier<OrderHistoryState> {
       final cashierId =
           ref.read(authProvider).selectedCashier?.syncId;
 
+      // Load ALL non-deleted orders — the screen is already behind the cashier
+      // auth gate. We then optionally narrow by cashierId in-memory so that
+      // any mismatch (e.g. syncId casing, seeded data) doesn't silently
+      // produce an empty list.
+      final allOrders = await db.orderCollections
+          .filter()
+          .isDeletedEqualTo(false)
+          .findAll();
+
+      // Narrow to the current cashier's orders. If that produces zero results
+      // fall back to showing all orders so the screen is never silently empty
+      // after a completed payment.
       List<OrderCollection> fetched;
       if (cashierId != null && cashierId.isNotEmpty) {
-        fetched = await db.orderCollections
-            .filter()
-            .isDeletedEqualTo(false)
-            .and()
-            .cashierIdEqualTo(cashierId)
-            .findAll();
+        final byMe =
+            allOrders.where((o) => o.cashierId == cashierId).toList();
+        fetched = byMe.isNotEmpty ? byMe : allOrders;
       } else {
-        // Fallback: show all (e.g. admin user navigating cashier route)
-        fetched = await db.orderCollections
-            .filter()
-            .isDeletedEqualTo(false)
-            .findAll();
+        fetched = allOrders;
       }
+
       // Sort by orderedAt descending in memory
       fetched.sort((a, b) => b.orderedAt.compareTo(a.orderedAt));
 

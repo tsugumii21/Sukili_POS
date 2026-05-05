@@ -33,21 +33,28 @@ class AppColors {
   static const Color warningLight = Color(0xFFD4A574);
   static const Color errorLight = Color(0xFFC2445B);
 
-  // --- DARK MODE ---
-  
-  static const Color primaryDark = Color(0xFF6B2C33);
-  static const Color primaryDarkVariant = Color(0xFF4A1F24);
-  static const Color secondaryDark = Color(0xFFC4B5A0);
-  static const Color accentDark = Color(0xFFE8D5C4);
-  static const Color backgroundDark = Color(0xFF2A1215);
-  static const Color backgroundDarkDeep = Color(0xFF1A0B0D);
-  static const Color surfaceDark = Color(0xFF3E2723);
-  static const Color cardDark = Color(0xFF5D2832);
-  static const Color textPrimaryDark = Color(0xFFFAF6F1);
-  static const Color textSecondaryDark = Color(0xFFE8D5C4);
-  static const Color successDark = Color(0xFF5A7A4F);
-  static const Color warningDark = Color(0xFFB8935E);
-  static const Color errorDark = Color(0xFFE85A6F);
+  // --- DARK MODE --- Dark Slate + Maroon Accent
+
+  static const Color backgroundDark       = Color(0xFF0F1117);
+  static const Color backgroundDarkDeep   = Color(0xFF090B0E);
+  static const Color surfaceDark          = Color(0xFF1C1F2A);
+  static const Color surfaceDarkElevated  = Color(0xFF252836);
+  static const Color cardDark             = Color(0xFF1C1F2A);
+  static const Color borderDark           = Color(0xFF2E3347);
+
+  static const Color primaryDark          = Color(0xFF1C1F2A);
+  static const Color primaryDarkVariant   = Color(0xFF252836);
+  static const Color accentDark           = Color(0xFFC4455A);
+  static const Color accentDarkLight      = Color(0xFFE8738A);
+  static const Color secondaryDark        = Color(0xFF8B92A8);
+
+  static const Color textPrimaryDark      = Color(0xFFF0F2F5);
+  static const Color textSecondaryDark    = Color(0xFF8B92A8);
+  static const Color textDisabledDark     = Color(0xFF4A5068);
+
+  static const Color successDark          = Color(0xFF4CAF82);
+  static const Color warningDark          = Color(0xFFF0A04B);
+  static const Color errorDark            = Color(0xFFE85A6F);
 
   // --- HELPERS ---
   

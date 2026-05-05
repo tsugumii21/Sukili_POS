@@ -114,17 +114,17 @@ class AppTheme {
       fontFamily: GoogleFonts.dmSans().fontFamily,
 
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.primaryDark,
+        primary: AppColors.accentDark,
         secondary: AppColors.secondaryDark,
         surface: AppColors.surfaceDark,
         error: AppColors.errorDark,
-        onPrimary: AppColors.textPrimaryDark,
+        onPrimary: Colors.white,
         onSecondary: AppColors.backgroundDark,
         onSurface: AppColors.textPrimaryDark,
       ),
 
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.primaryDark,
+        backgroundColor: AppColors.surfaceDark,
         foregroundColor: AppColors.textPrimaryDark,
         elevation: 0,
         centerTitle: false,
@@ -166,7 +166,7 @@ class AppTheme {
 
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceDark,
+        fillColor: AppColors.surfaceDarkElevated,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         hintStyle: GoogleFonts.dmSans(fontSize: 14, color: AppColors.textSecondaryDark),
         border: OutlineInputBorder(
@@ -180,13 +180,13 @@ class AppTheme {
       ),
 
       dividerTheme: const DividerThemeData(
-        color: AppColors.surfaceDark,
+        color: AppColors.borderDark,
         thickness: 1,
         space: 1,
       ),
 
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.cardDark,
+        backgroundColor: AppColors.surfaceDarkElevated,
         selectedColor: AppColors.accentDark,
         labelStyle: GoogleFonts.dmSans(fontSize: 12, color: AppColors.textPrimaryDark),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
