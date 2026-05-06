@@ -66,7 +66,7 @@ class QuickPickChip extends ConsumerWidget {
                     item.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.plusJakartaSans(
+                    style: GoogleFonts.dmSans(
                       color: textPrimary,
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -76,7 +76,7 @@ class QuickPickChip extends ConsumerWidget {
                   const SizedBox(height: 3),
                   Text(
                     CurrencyFormatter.format(item.basePrice),
-                    style: GoogleFonts.plusJakartaSans(
+                    style: GoogleFonts.dmSans(
                       color: maroon,
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
@@ -124,7 +124,7 @@ class QuickPickChip extends ConsumerWidget {
           SnackBar(
             content: Text(
               '${item.name} added',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+              style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
             ),
             duration: const Duration(seconds: 1),
             behavior: SnackBarBehavior.floating,

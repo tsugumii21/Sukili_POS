@@ -6,21 +6,16 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/isar_collections/menu_item_collection.dart';
 
 /// ItemCard — Displays a single menu item in the grid.
-/// Shows image/emoji placeholder, name, price, and availability.
-/// [categoryEmoji] is optional; when provided it replaces the icon placeholder
-/// with a 40px emoji centered on a gradient background.
+/// Shows image or a clean gradient placeholder, name, price, and availability.
 class ItemCard extends StatelessWidget {
   const ItemCard({
     super.key,
     required this.item,
     required this.onTap,
-    this.categoryEmoji,
   });
 
   final MenuItemCollection item;
   final VoidCallback onTap;
-  /// Optional emoji from the item's category (e.g. "☕").
-  final String? categoryEmoji;
 
   @override
   Widget build(BuildContext context) {
@@ -60,26 +55,21 @@ class ItemCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ── Image / Emoji Placeholder ───────────────────────────
+                    // ── Image / Gradient Placeholder ────────────────────────
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Container(
+                      child: SizedBox(
                         height: 80,
                         width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColors.surfaceDarkElevated
-                              : AppColors.backgroundLight,
-                        ),
                         child: item.imageUrl != null &&
                                 item.imageUrl!.isNotEmpty
                             ? Image.network(
                                 item.imageUrl!,
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) =>
-                                    _buildPlaceholder(isDark, accentColor),
+                                    _buildPlaceholder(isDark),
                               )
-                            : _buildPlaceholder(isDark, accentColor),
+                            : _buildPlaceholder(isDark),
                       ),
                     ),
 
@@ -90,7 +80,7 @@ class ItemCard extends StatelessWidget {
                       item.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: GoogleFonts.dmSans(
                         color: textPrimary,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -105,7 +95,7 @@ class ItemCard extends StatelessWidget {
                       hasVariants
                           ? 'from ${CurrencyFormatter.format(item.basePrice)}'
                           : CurrencyFormatter.format(item.basePrice),
-                      style: GoogleFonts.plusJakartaSans(
+                      style: GoogleFonts.dmSans(
                         color: priceColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
@@ -131,7 +121,7 @@ class ItemCard extends StatelessWidget {
                     ),
                     child: Text(
                       'Unavailable',
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.dmSans(
                         color: AppColors.white,
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -154,7 +144,7 @@ class ItemCard extends StatelessWidget {
                     ),
                     child: Text(
                       '${variants.length} sizes',
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.dmSans(
                         color: Colors.white,
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -169,37 +159,40 @@ class ItemCard extends StatelessWidget {
     );
   }
 
-  /// Builds the placeholder area.
-  /// If [categoryEmoji] is set, renders a 40px emoji on a gradient bg.
-  /// Otherwise falls back to the restaurant icon.
-  Widget _buildPlaceholder(bool isDark, Color accentColor) {
-    if (categoryEmoji != null && categoryEmoji!.isNotEmpty) {
-      return Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              accentColor.withAlpha(77), // 30% opacity
-              Colors.transparent,
-            ],
-          ),
+  /// Gradient placeholder shown when no image URL is available.
+  Widget _buildPlaceholder(bool isDark) {
+    final gradientStart =
+        isDark ? AppColors.cardDark : AppColors.cardLight;
+    final gradientEnd =
+        isDark ? AppColors.surfaceDark : AppColors.primaryLight;
+    final hintColor = (isDark
+            ? AppColors.textSecondaryDark
+            : AppColors.textSecondaryLight)
+        .withValues(alpha: 0.4);
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [gradientStart, gradientEnd],
         ),
-        child: Center(
-          child: Text(
-            categoryEmoji!,
-            style: const TextStyle(fontSize: 40),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.image_outlined, size: 28, color: hintColor),
+          const SizedBox(height: 4),
+          Text(
+            'No image',
+            style: GoogleFonts.dmSans(
+              color: hintColor,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-        ),
-      );
-    }
-    return Center(
-      child: Icon(
-        Icons.restaurant_menu_rounded,
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.15)
-            : Colors.black.withValues(alpha: 0.1),
-        size: 36,
+        ],
       ),
     );
   }

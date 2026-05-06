@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../providers/checkout_provider.dart';
 
 /// Large selectable card for Cash / GCash / Other payment methods.
@@ -60,12 +60,12 @@ class PaymentMethodCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: _iconColor(method).withValues(alpha: 0.12),
+                    color: _iconColor(isDark).withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     _icon(method),
-                    color: _iconColor(method),
+                    color: _iconColor(isDark),
                     size: 26,
                   ),
                 ),
@@ -92,9 +92,8 @@ class PaymentMethodCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               method.label,
-              style: GoogleFonts.dmSans(
+              style: AppTextStyles.captionMedium(context).copyWith(
                 color: isSelected ? maroon : textPrimary,
-                fontSize: 13,
                 fontWeight:
                     isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
@@ -116,14 +115,6 @@ class PaymentMethodCard extends StatelessWidget {
     }
   }
 
-  Color _iconColor(PaymentMethod method) {
-    switch (method) {
-      case PaymentMethod.cash:
-        return const Color(0xFF388E3C);
-      case PaymentMethod.gcash:
-        return const Color(0xFF1565C0);
-      case PaymentMethod.other:
-        return const Color(0xFF7B1FA2);
-    }
-  }
+  Color _iconColor(bool isDark) =>
+      isDark ? AppColors.accentDark : AppColors.accentLight;
 }

@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../orders/domain/entities/cart_item.dart';
 import '../../../orders/domain/entities/order_state.dart';
@@ -228,65 +229,113 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   void _showCancelDialog(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final maroon = isDark ? AppColors.primaryDark : AppColors.secondaryLight;
     final dialogBg =
         isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
     final textPrimary =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final textSecondary =
         isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final accentColor =
+        isDark ? AppColors.accentDark : AppColors.secondaryLight;
 
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => Dialog(
         backgroundColor: dialogBg,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
         ),
-        title: Text(
-          'Cancel Order?',
-          style: GoogleFonts.dmSans(
-            color: textPrimary,
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
-          ),
-        ),
-        content: Text(
-          'All items in your cart will be removed. This cannot be undone.',
-          style: GoogleFonts.dmSans(color: textSecondary, fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              'Keep Order',
-              style: GoogleFonts.dmSans(
-                color: maroon,
-                fontWeight: FontWeight.w600,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Warning icon badge
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.errorLight.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.delete_sweep_rounded,
+                  color: AppColors.errorLight,
+                  size: 32,
+                ),
               ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              ref.read(orderProvider.notifier).clearCart();
-              ref.read(checkoutProvider.notifier).reset();
-              context.pop();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.errorLight,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: AppRadius.mediumBR,
+              const SizedBox(height: 16),
+              Text(
+                'Cancel Order?',
+                style: GoogleFonts.dmSans(
+                  color: textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+                textAlign: TextAlign.center,
               ),
-              elevation: 0,
-            ),
-            child: Text(
-              'Cancel Order',
-              style: GoogleFonts.dmSans(fontWeight: FontWeight.w700),
-            ),
+              const SizedBox(height: 8),
+              Text(
+                'All items in your cart will be removed.\nThis cannot be undone.',
+                style: GoogleFonts.dmSans(
+                  color: textSecondary,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              // Cancel Order — destructive primary action
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    ref.read(orderProvider.notifier).clearCart();
+                    ref.read(checkoutProvider.notifier).reset();
+                    context.pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.errorLight,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: Text(
+                    'Yes, Cancel Order',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Keep Order — safe secondary action
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  style: TextButton.styleFrom(
+                    foregroundColor: accentColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: Text(
+                    'Keep Order',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -303,11 +352,9 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: GoogleFonts.dmSans(
+      style: AppTextStyles.caption(context).copyWith(
         color: textSecondary,
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 1.0,
+        letterSpacing: 1.2,
       ),
     );
   }
@@ -328,6 +375,10 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor =
+        isDark ? AppColors.accentDark : AppColors.accentLight;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -342,39 +393,30 @@ class _SummaryCard extends StatelessWidget {
             children: [
               Text(
                 '${order.items.length} line item${order.items.length == 1 ? '' : 's'}',
-                style: GoogleFonts.dmSans(
-                  color: textSecondary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: AppTextStyles.caption(context)
+                    .copyWith(color: textSecondary),
               ),
               Text(
                 '${order.itemCount} unit${order.itemCount == 1 ? '' : 's'}',
-                style: GoogleFonts.dmSans(
-                  color: textSecondary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: AppTextStyles.caption(context)
+                    .copyWith(color: textSecondary),
               ),
             ],
           ),
           const SizedBox(height: 12),
           Text(
             CurrencyFormatter.format(order.total),
-            style: GoogleFonts.dmSans(
-              color: maroon,
+            style: AppTextStyles.priceDisplay(context).copyWith(
+              color: accentColor,
               fontSize: 38,
-              fontWeight: FontWeight.w700,
               height: 1.0,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'Total to Pay',
-            style: GoogleFonts.dmSans(
-              color: textSecondary,
-              fontSize: 13,
-            ),
+            style: AppTextStyles.captionMedium(context)
+                .copyWith(color: textSecondary),
           ),
           const SizedBox(height: 12),
           Divider(height: 1, color: textSecondary.withValues(alpha: 0.15)),
@@ -416,18 +458,12 @@ class _SummaryRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.dmSans(
-            color: labelColor,
-            fontSize: 13,
-          ),
+          style: AppTextStyles.body(context).copyWith(color: labelColor),
         ),
         Text(
           value,
-          style: GoogleFonts.dmSans(
-            color: valueColor,
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-          ),
+          style:
+              AppTextStyles.bodyMedium(context).copyWith(color: valueColor),
         ),
       ],
     );
@@ -461,17 +497,14 @@ class _CartItemTile extends ConsumerWidget {
       child: Row(
         children: [
           // Item details
-          Expanded(
+              Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   cartItem.itemName,
-                  style: GoogleFonts.dmSans(
-                    color: textPrimary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTextStyles.bodySemiBold(context)
+                      .copyWith(color: textPrimary),
                 ),
                 if (cartItem.variantName != null)
                   Text(
@@ -505,10 +538,10 @@ class _CartItemTile extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   CurrencyFormatter.format(cartItem.subtotal),
-                  style: GoogleFonts.dmSans(
-                    color: maroon,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
+                  style: AppTextStyles.bodyMedium(context).copyWith(
+                    color: isDark
+                        ? AppColors.accentDark
+                        : AppColors.accentLight,
                   ),
                 ),
               ],

@@ -27,7 +27,7 @@ class AppRadius {
 class AppShadow {
   static final List<BoxShadow> level1 = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.06),
+      color: Colors.black.withValues(alpha: 0.06),
       blurRadius: 2,
       offset: const Offset(0, 1),
     ),
@@ -35,7 +35,7 @@ class AppShadow {
 
   static final List<BoxShadow> level2 = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.08),
+      color: Colors.black.withValues(alpha: 0.08),
       blurRadius: 4,
       offset: const Offset(0, 2),
     ),
@@ -43,7 +43,7 @@ class AppShadow {
 
   static final List<BoxShadow> level3 = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.10),
+      color: Colors.black.withValues(alpha: 0.10),
       blurRadius: 8,
       offset: const Offset(0, 4),
     ),
@@ -51,7 +51,7 @@ class AppShadow {
 
   static final List<BoxShadow> level4 = [
     BoxShadow(
-      color: Colors.black.withOpacity(0.14),
+      color: Colors.black.withValues(alpha: 0.14),
       blurRadius: 16,
       offset: const Offset(0, 8),
     ),

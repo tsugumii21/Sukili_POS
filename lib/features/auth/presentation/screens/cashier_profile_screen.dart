@@ -104,7 +104,7 @@ class _CashierProfileScreenState
         body: Center(
           child: Text(
             'No cashier logged in.',
-            style: GoogleFonts.inter(color: textSecondary),
+            style: GoogleFonts.dmSans(color: textSecondary),
           ),
         ),
       );
@@ -199,7 +199,7 @@ class _CashierProfileScreenState
                         cashier.pinHash == null
                             ? 'No PIN set. Set one below.'
                             : 'Enter your current PIN to set a new one.',
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.dmSans(
                           fontSize: 12,
                           color: textSecondary,
                           height: 1.5,
@@ -272,7 +272,7 @@ class _CashierProfileScreenState
                                     const SizedBox(width: 10),
                                     Text(
                                       'Changes Saved!',
-                                      style: GoogleFonts.plusJakartaSans(
+                                      style: GoogleFonts.dmSans(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16,
@@ -316,7 +316,7 @@ class _CashierProfileScreenState
                                         )
                                       : Text(
                                           'Save Changes',
-                                          style: GoogleFonts.plusJakartaSans(
+                                          style: GoogleFonts.dmSans(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w700,
                                             letterSpacing: 0.1,
@@ -364,7 +364,7 @@ class _CashierProfileScreenState
                           ),
                           title: Text(
                             isDarkMode ? 'Dark Mode' : 'Light Mode',
-                            style: GoogleFonts.plusJakartaSans(
+                            style: GoogleFonts.dmSans(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: textPrimary,
@@ -374,7 +374,7 @@ class _CashierProfileScreenState
                             isDarkMode
                                 ? 'Switch to light theme'
                                 : 'Switch to dark theme',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.dmSans(
                               fontSize: 11,
                               color: textSecondary,
                             ),
@@ -383,9 +383,9 @@ class _CashierProfileScreenState
                             value: isDarkMode,
                             onChanged: (_) =>
                                 ref.read(themeProvider.notifier).toggle(),
-                            activeColor: AppColors.accentLight,
+                            activeThumbColor: AppColors.accentLight,
                             activeTrackColor:
-                                AppColors.accentLight.withAlpha(80),
+                                AppColors.accentLight.withValues(alpha: 0.5),
                           ),
                         ),
                       ).animate().fadeIn(delay: 200.ms, duration: 320.ms),
@@ -403,7 +403,7 @@ class _CashierProfileScreenState
                           ),
                           label: Text(
                             'Logout',
-                            style: GoogleFonts.plusJakartaSans(
+                            style: GoogleFonts.dmSans(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               color: AppColors.errorLight,
@@ -456,7 +456,7 @@ class _CashierProfileScreenState
       ),
       title: Text(
         'My Profile',
-        style: GoogleFonts.plusJakartaSans(
+        style: GoogleFonts.dmSans(
           fontSize: 20,
           fontWeight: FontWeight.w800,
           color: textPrimary,
@@ -484,7 +484,7 @@ class _CashierProfileScreenState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Could not pick image: ${e.message}',
-            style: GoogleFonts.inter()),
+            style: GoogleFonts.dmSans()),
         backgroundColor: AppColors.secondaryLight,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -599,18 +599,18 @@ class _CashierProfileScreenState
             borderRadius: AppRadius.largeBR),
         title: Text(
           'Logout',
-          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700),
+          style: GoogleFonts.dmSans(fontWeight: FontWeight.w700),
         ),
         content: Text(
           'Are you sure you want to logout?',
-          style: GoogleFonts.inter(),
+          style: GoogleFonts.dmSans(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'Cancel',
-              style: GoogleFonts.inter(color: Colors.grey.shade600),
+              style: GoogleFonts.dmSans(color: Colors.grey.shade600),
             ),
           ),
           TextButton(
@@ -621,7 +621,7 @@ class _CashierProfileScreenState
             },
             child: Text(
               'Logout',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.dmSans(
                 color: AppColors.errorLight,
                 fontWeight: FontWeight.w600,
               ),
@@ -638,7 +638,7 @@ class _CashierProfileScreenState
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: GoogleFonts.inter()),
+        content: Text(message, style: GoogleFonts.dmSans()),
         backgroundColor: AppColors.secondaryLight,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -689,7 +689,7 @@ class _HeroHeader extends StatelessWidget {
         backgroundColor: Colors.white.withAlpha(30),
         child: Text(
           initial,
-          style: GoogleFonts.plusJakartaSans(
+          style: GoogleFonts.dmSans(
             fontSize: 36,
             fontWeight: FontWeight.w800,
             color: Colors.white,
@@ -809,7 +809,7 @@ class _SectionLabel extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label.toUpperCase(),
-          style: GoogleFonts.inter(
+          style: GoogleFonts.dmSans(
             fontSize: 10,
             fontWeight: FontWeight.w700,
             color: textSecondary,
@@ -884,7 +884,7 @@ class _EditableRow extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.dmSans(
                     fontSize: 11,
                     color: textSecondary,
                     fontWeight: FontWeight.w500,
@@ -967,7 +967,7 @@ class _ReadOnlyRow extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.dmSans(
                     fontSize: 11,
                     color: textSecondary,
                     fontWeight: FontWeight.w500,
@@ -1039,7 +1039,7 @@ class _RoleRow extends StatelessWidget {
             children: [
               Text(
                 'Role',
-                style: GoogleFonts.inter(
+                style: GoogleFonts.dmSans(
                   fontSize: 11,
                   color: textSecondary,
                   fontWeight: FontWeight.w500,
@@ -1055,7 +1055,7 @@ class _RoleRow extends StatelessWidget {
                 ),
                 child: Text(
                   _capitalize(role),
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.dmSans(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -1132,7 +1132,7 @@ class _PinInputRowState extends State<_PinInputRow> {
         children: [
           Text(
             widget.label,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.dmSans(
               fontSize: 11,
               color: textSecondary,
               fontWeight: FontWeight.w500,
@@ -1186,7 +1186,7 @@ class _PinInputRowState extends State<_PinInputRow> {
                                         )
                                       : Text(
                                           text[i],
-                                          style: GoogleFonts.plusJakartaSans(
+                                          style: GoogleFonts.dmSans(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w700,
                                             color: AppColors.accentLight,

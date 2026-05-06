@@ -52,7 +52,7 @@ class StatsCard extends StatelessWidget {
                 ],
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.dmSans(
                     color: textPrimary.withValues(alpha: 0.5),
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -64,7 +64,7 @@ class StatsCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               value,
-              style: GoogleFonts.plusJakartaSans(
+              style: GoogleFonts.dmSans(
                 color: valueColor ?? textPrimary,
                 fontSize: 24,
                 fontWeight: FontWeight.w800,

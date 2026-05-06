@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 
@@ -16,8 +17,6 @@ class PinPad extends StatelessWidget {
   final ValueChanged<String> onKeyTap;
   final VoidCallback onDelete;
   final bool hasError;
-
-  static const int _pinLength = 4;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +50,7 @@ class PinPad extends StatelessWidget {
               if (key == 'del') {
                 return _KeyButton(
                   isDark: isDark,
+                  onTap: onDelete,
                   child: Icon(
                     Icons.backspace_outlined,
                     color: isDark
@@ -58,20 +58,18 @@ class PinPad extends StatelessWidget {
                         : AppColors.textPrimaryLight,
                     size: 22,
                   ),
-                  onTap: onDelete,
                 );
               }
               return _KeyButton(
                 isDark: isDark,
                 child: Text(
                   key,
-                  style: TextStyle(
+                  style: GoogleFonts.dmSans(
                     color: isDark
                         ? AppColors.textPrimaryDark
                         : AppColors.textPrimaryLight,
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
-                    fontFamily: 'DMSans',
                   ),
                 ),
                 onTap: () => onKeyTap(key),
@@ -112,7 +110,7 @@ class _PinDots extends StatelessWidget {
             shape: BoxShape.circle,
             color: filled ? activeColor : inactiveColor,
             border: Border.all(
-              color: filled ? activeColor : activeColor.withOpacity(0.4),
+              color: filled ? activeColor : activeColor.withValues(alpha: 0.4),
               width: 1.5,
             ),
           ),
@@ -143,11 +141,9 @@ class _KeyButtonState extends State<_KeyButton> {
 
   @override
   Widget build(BuildContext context) {
-    final cardBg =
-        widget.isDark ? AppColors.cardDark : AppColors.cardLight;
-    final pressedBg = widget.isDark
-        ? AppColors.surfaceDark
-        : AppColors.primaryLight;
+    final cardBg = widget.isDark ? AppColors.cardDark : AppColors.cardLight;
+    final pressedBg =
+        widget.isDark ? AppColors.surfaceDark : AppColors.primaryLight;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),

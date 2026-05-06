@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -131,11 +132,10 @@ class _CashierPinScreenState extends ConsumerState<CashierPinScreen>
                     child: Center(
                       child: Text(
                         cashier.name[0].toUpperCase(),
-                        style: const TextStyle(
+                        style: GoogleFonts.dmSans(
                           color: AppColors.white,
                           fontSize: 32,
                           fontWeight: FontWeight.w700,
-                          fontFamily: 'DMSans',
                         ),
                       ),
                     ),
@@ -143,20 +143,18 @@ class _CashierPinScreenState extends ConsumerState<CashierPinScreen>
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     cashier.name,
-                    style: TextStyle(
+                    style: GoogleFonts.dmSans(
                       color: textPrimary,
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      fontFamily: 'DMSans',
                     ),
                   ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
                   const SizedBox(height: 4),
                   Text(
                     'Enter your PIN',
-                    style: TextStyle(
+                    style: GoogleFonts.dmSans(
                       color: textSecondary,
                       fontSize: 14,
-                      fontFamily: 'DMSans',
                     ),
                   ).animate().fadeIn(duration: 400.ms, delay: 150.ms),
                 ],
@@ -192,12 +190,11 @@ class _CashierPinScreenState extends ConsumerState<CashierPinScreen>
                 if (_hasError)
                   Text(
                     'Incorrect PIN. Try again.',
-                    style: TextStyle(
+                    style: GoogleFonts.dmSans(
                       color: isDark
                           ? AppColors.errorDark
                           : AppColors.errorLight,
                       fontSize: 13,
-                      fontFamily: 'DMSans',
                     ),
                   ).animate().fadeIn(duration: 200.ms),
               ],

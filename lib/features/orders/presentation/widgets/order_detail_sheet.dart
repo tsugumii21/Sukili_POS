@@ -23,7 +23,15 @@ class OrderDetailSheet extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => OrderDetailSheet(order: order),
+      builder: (ctx) {
+        // Cap at 80 % of screen height so a simple 1-item order doesn't fill
+        // the whole screen, while long orders still scroll comfortably.
+        final maxH = MediaQuery.of(ctx).size.height * 0.80;
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: maxH),
+          child: OrderDetailSheet(order: order),
+        );
+      },
     );
   }
 
@@ -45,229 +53,226 @@ class OrderDetailSheet extends ConsumerWidget {
         .map((raw) => jsonDecode(raw) as Map<String, dynamic>)
         .toList();
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.85,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
-      builder: (_, scrollCtrl) {
-        return Container(
-          decoration: BoxDecoration(
-            color: bg,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(20)),
+    // Content-adaptive sheet: shrinks to fit the order, scrolls when tall.
+    // Height is capped by the ConstrainedBox in OrderDetailSheet.show().
+    return Container(
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min, // shrink-wrap to content
+        children: [
+          // ── Drag handle ───────────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 4),
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: textSecondary.withAlpha(80),
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
           ),
-          child: Column(
-            children: [
-              // ── Drag handle ─────────────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 4),
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: textSecondary.withAlpha(80),
-                    borderRadius: BorderRadius.circular(999),
+
+          // ── Header bar ────────────────────────────────────────────────
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        order.orderNumber,
+                        style: GoogleFonts.dmSans(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        _dateFmt.format(order.orderedAt),
+                        style: GoogleFonts.dmSans(
+                            fontSize: 12, color: textSecondary),
+                      ),
+                    ],
                   ),
                 ),
-              ),
+                _StatusChipDetail(status: order.status),
+              ],
+            ),
+          ),
+          Divider(
+              height: 1,
+              color: textSecondary.withAlpha(50),
+              indent: 16,
+              endIndent: 16),
 
-              // ── Header bar ───────────────────────────────────────────────
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            order.orderNumber,
-                            style: GoogleFonts.dmSans(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            _dateFmt.format(order.orderedAt),
-                            style: GoogleFonts.dmSans(
-                                fontSize: 12, color: textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                    _StatusChipDetail(status: order.status),
-                  ],
-                ),
-              ),
-              Divider(
-                  height: 1,
-                  color: textSecondary.withAlpha(50),
-                  indent: 16,
-                  endIndent: 16),
+          // ── Scrollable body (Flexible so it doesn't push past cap) ───
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Cashier info
+                  _InfoRow(
+                    icon: Icons.person_outline_rounded,
+                    label: 'Cashier',
+                    value: order.cashierName,
+                    textSecondary: textSecondary,
+                    textPrimary: textPrimary,
+                  ),
+                  const SizedBox(height: 16),
 
-              // ── Scrollable body ──────────────────────────────────────────
-              Expanded(
-                child: ListView(
-                  controller: scrollCtrl,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
-                  children: [
-                    // Cashier info
-                    _InfoRow(
-                      icon: Icons.person_outline_rounded,
-                      label: 'Cashier',
-                      value: order.cashierName,
-                      textSecondary: textSecondary,
-                      textPrimary: textPrimary,
+                  // Items section
+                  Text(
+                    'Items',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: textSecondary,
+                      letterSpacing: 0.5,
                     ),
-                    const SizedBox(height: 16),
-
-                    // Items section
-                    Text(
-                      'Items',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: textSecondary,
-                        letterSpacing: 0.5,
-                      ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: cardBg,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: cardBg,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          for (int i = 0; i < items.length; i++) ...[
-                            _ItemRow(
-                                item: items[i],
-                                textPrimary: textPrimary,
-                                textSecondary: textSecondary),
-                            if (i < items.length - 1)
-                              Divider(
-                                  height: 1,
-                                  color: textSecondary.withAlpha(40),
-                                  indent: 16,
-                                  endIndent: 16),
-                          ],
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Totals section
-                    Text(
-                      'Summary',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: textSecondary,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: cardBg,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          _SummaryRow(
-                              label: 'Subtotal',
-                              value: CurrencyFormatter.format(order.subtotal),
+                    child: Column(
+                      children: [
+                        for (int i = 0; i < items.length; i++) ...[
+                          _ItemRow(
+                              item: items[i],
                               textPrimary: textPrimary,
                               textSecondary: textSecondary),
-                          if (order.discountAmount > 0) ...[
-                            const SizedBox(height: 6),
-                            _SummaryRow(
-                              label: 'Discount${order.discountReason != null ? ' (${order.discountReason})' : ''}',
-                              value:
-                                  '- ${CurrencyFormatter.format(order.discountAmount)}',
-                              textPrimary: const Color(0xFF2E7D32),
-                              textSecondary: textSecondary,
-                              valueColor: const Color(0xFF2E7D32),
-                            ),
-                          ],
-                          const SizedBox(height: 6),
-                          Divider(
-                              height: 1,
-                              color: textSecondary.withAlpha(40)),
-                          const SizedBox(height: 6),
-                          _SummaryRow(
-                            label: 'Total',
-                            value: CurrencyFormatter.format(order.totalAmount),
-                            textPrimary: maroon,
-                            textSecondary: textSecondary,
-                            isBold: true,
-                            valueColor: maroon,
-                          ),
-                          const SizedBox(height: 10),
-                          Divider(
-                              height: 1,
-                              color: textSecondary.withAlpha(40)),
-                          const SizedBox(height: 10),
-                          _SummaryRow(
-                            label: 'Payment',
-                            value: _paymentLabel(order.paymentMethod),
+                          if (i < items.length - 1)
+                            Divider(
+                                height: 1,
+                                color: textSecondary.withAlpha(40),
+                                indent: 16,
+                                endIndent: 16),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Summary section
+                  Text(
+                    'Summary',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: textSecondary,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: cardBg,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        _SummaryRow(
+                            label: 'Subtotal',
+                            value: CurrencyFormatter.format(order.subtotal),
                             textPrimary: textPrimary,
-                            textSecondary: textSecondary,
-                          ),
+                            textSecondary: textSecondary),
+                        if (order.discountAmount > 0) ...[
                           const SizedBox(height: 6),
                           _SummaryRow(
-                            label: 'Tendered',
-                            value: CurrencyFormatter.format(
-                                order.amountTendered),
-                            textPrimary: textPrimary,
-                            textSecondary: textSecondary,
-                          ),
-                          const SizedBox(height: 6),
-                          _SummaryRow(
-                            label: 'Change',
+                            label:
+                                'Discount${order.discountReason != null ? ' (${order.discountReason})' : ''}',
                             value:
-                                CurrencyFormatter.format(order.changeAmount),
-                            textPrimary: textPrimary,
+                                '- ${CurrencyFormatter.format(order.discountAmount)}',
+                            textPrimary: const Color(0xFF2E7D32),
                             textSecondary: textSecondary,
+                            valueColor: const Color(0xFF2E7D32),
                           ),
                         ],
-                      ),
+                        const SizedBox(height: 6),
+                        Divider(
+                            height: 1,
+                            color: textSecondary.withAlpha(40)),
+                        const SizedBox(height: 6),
+                        _SummaryRow(
+                          label: 'Total',
+                          value:
+                              CurrencyFormatter.format(order.totalAmount),
+                          textPrimary: maroon,
+                          textSecondary: textSecondary,
+                          isBold: true,
+                          valueColor: maroon,
+                        ),
+                        const SizedBox(height: 10),
+                        Divider(
+                            height: 1,
+                            color: textSecondary.withAlpha(40)),
+                        const SizedBox(height: 10),
+                        _SummaryRow(
+                          label: 'Payment',
+                          value: _paymentLabel(order.paymentMethod),
+                          textPrimary: textPrimary,
+                          textSecondary: textSecondary,
+                        ),
+                        const SizedBox(height: 6),
+                        _SummaryRow(
+                          label: 'Tendered',
+                          value: CurrencyFormatter.format(
+                              order.amountTendered),
+                          textPrimary: textPrimary,
+                          textSecondary: textSecondary,
+                        ),
+                        const SizedBox(height: 6),
+                        _SummaryRow(
+                          label: 'Change',
+                          value: CurrencyFormatter.format(
+                              order.changeAmount),
+                          textPrimary: textPrimary,
+                          textSecondary: textSecondary,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 24),
+                  ),
+                  const SizedBox(height: 20),
 
-                    // Reprint button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: OutlinedButton.icon(
-                        onPressed: () => _onReprint(context, ref),
-                        icon: const Icon(Icons.print_rounded, size: 18),
-                        label: Text(
-                          'Reprint Receipt',
-                          style: GoogleFonts.dmSans(
-                              fontWeight: FontWeight.w600),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: maroon,
-                          side: const BorderSide(color: maroon, width: 1.5),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                        ),
+                  // Reprint button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _onReprint(context, ref),
+                      icon: const Icon(Icons.print_rounded, size: 18),
+                      label: Text(
+                        'Reprint Receipt',
+                        style: GoogleFonts.dmSans(
+                            fontWeight: FontWeight.w600),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: maroon,
+                        side: const BorderSide(color: maroon, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
@@ -364,7 +369,13 @@ class _ItemRow extends StatelessWidget {
         (item['unitPrice'] as num?)?.toDouble() ?? 0.0;
     final subtotal =
         (item['subtotal'] as num?)?.toDouble() ?? 0.0;
-    final modifiers = item['modifiers']?.toString() ?? '';
+    final rawMods = item['modifiers'];
+    final modifiers = rawMods is List && rawMods.isNotEmpty
+        ? rawMods
+            .map((m) => m?.toString().trim() ?? '')
+            .where((s) => s.isNotEmpty)
+            .join(', ')
+        : '';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),

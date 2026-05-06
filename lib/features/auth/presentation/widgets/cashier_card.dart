@@ -88,7 +88,7 @@ class _CashierCardState extends State<CashierCard> {
                   child: Center(
                     child: Text(
                       _initial,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: GoogleFonts.dmSans(
                         color: Colors.white,
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
@@ -104,7 +104,7 @@ class _CashierCardState extends State<CashierCard> {
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: GoogleFonts.dmSans(
                     color: textPrimary,
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -116,7 +116,7 @@ class _CashierCardState extends State<CashierCard> {
                 // Caption: Inter
                 Text(
                   'Tap to login'.toUpperCase(),
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.dmSans(
                     color: textSecondary.withValues(alpha: 0.6),
                     fontSize: 10,
                     fontWeight: FontWeight.w600,

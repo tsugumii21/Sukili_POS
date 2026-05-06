@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import 'app_button.dart';
@@ -37,11 +38,10 @@ class ErrorStateWidget extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: GoogleFonts.dmSans(
                 color: primaryText,
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'DMSans',
               ),
             ),
             if (message != null) ...[
@@ -49,10 +49,9 @@ class ErrorStateWidget extends StatelessWidget {
               Text(
                 message!,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: GoogleFonts.dmSans(
                   color: secondaryText,
                   fontSize: 14,
-                  fontFamily: 'DMSans',
                 ),
               ),
             ],

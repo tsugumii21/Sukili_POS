@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 
@@ -39,12 +40,11 @@ class LoadingOverlay extends StatelessWidget {
                       const SizedBox(height: AppSpacing.md),
                       Text(
                         message!,
-                        style: TextStyle(
+                        style: GoogleFonts.dmSans(
                           color: isDark
                               ? AppColors.textPrimaryDark
                               : AppColors.textPrimaryLight,
                           fontSize: 14,
-                          fontFamily: 'DMSans',
                         ),
                       ),
                     ],

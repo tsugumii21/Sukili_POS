@@ -39,7 +39,7 @@ class AppCard extends StatelessWidget {
             ? InkWell(
                 onTap: onTap,
                 splashColor: overlay,
-                highlightColor: overlay.withOpacity(0.5),
+                highlightColor: overlay.withValues(alpha: 0.5),
                 child: Padding(
                   padding: padding ?? const EdgeInsets.all(AppSpacing.md),
                   child: child,

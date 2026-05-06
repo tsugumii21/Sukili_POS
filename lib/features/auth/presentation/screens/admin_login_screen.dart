@@ -71,7 +71,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
             Expanded(
               child: Text(
                 'Invalid login credentials. Please try again.',
-                style: GoogleFonts.inter(
+                style: GoogleFonts.dmSans(
                   color: AppColors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -159,7 +159,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                             // ── App name ────────────────────────────────────
                             Text(
                               'Sukli',
-                              style: GoogleFonts.plusJakartaSans(
+                              style: GoogleFonts.dmSans(
                                 color: textPrimary,
                                 fontSize: 36,
                                 fontWeight: FontWeight.w800,
@@ -170,7 +170,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                             // ── Subtitle ────────────────────────────────────
                             Text(
                               'ADMIN PORTAL',
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.dmSans(
                                 color: const Color(0xFF8B4049),
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,

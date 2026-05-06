@@ -7,8 +7,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers/sync_provider.dart';
+import '../../../../shared/providers/theme_provider.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/stats_card.dart';
 import '../../../../shared/widgets/sync_status_badge.dart';
@@ -34,6 +36,11 @@ class CashierDashboardScreen extends ConsumerWidget {
     final cardBg = isDark ? AppColors.cardDark : AppColors.white;
 
     final cashierName = authState.selectedCashier?.name ?? 'Cashier';
+    final initials =
+        cashierName.isNotEmpty ? cashierName[0].toUpperCase() : '?';
+    final hour = DateTime.now().hour;
+    final greeting =
+        hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
 
     return Scaffold(
       backgroundColor: bg,
@@ -42,6 +49,7 @@ class CashierDashboardScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
+        titleSpacing: 0,
         leading: Builder(
           builder: (context) => IconButton(
             icon: Icon(Icons.menu_rounded, color: textPrimary, size: 28),
@@ -50,50 +58,57 @@ class CashierDashboardScreen extends ConsumerWidget {
         ),
         title: Row(
           children: [
+            // Avatar circle
             CircleAvatar(
-              radius: 18,
-              backgroundColor: const Color(0xFF8B4049).withValues(alpha: 0.1),
+              radius: 16,
+              backgroundColor: isDark
+                  ? AppColors.accentDark.withValues(alpha: 0.2)
+                  : AppColors.accentLight.withValues(alpha: 0.15),
               child: Text(
-                cashierName.isNotEmpty ? cashierName[0].toUpperCase() : '?',
-                style: GoogleFonts.plusJakartaSans(
-                  color: const Color(0xFF8B4049),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
+                initials,
+                style: TextStyle(
+                  color: isDark
+                      ? AppColors.accentDarkLight
+                      : AppColors.accentLight,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Good morning,',
-                  style: GoogleFonts.inter(
-                    color: textPrimary.withValues(alpha: 0.5),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
+            const SizedBox(width: AppSpacing.sm),
+            // Greeting — Expanded prevents title from pushing into actions
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Good $greeting,',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: AppTextStyles.caption(context).copyWith(
+                      color: textPrimary.withValues(alpha: 0.55),
+                    ),
                   ),
-                ),
-                Text(
-                  cashierName,
-                  style: GoogleFonts.plusJakartaSans(
-                    color: textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+                  Text(
+                    cashierName,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: AppTextStyles.bodySemiBold(context)
+                        .copyWith(color: textPrimary),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
+        // SyncStatusBadge in actions — reserved fixed space outside the title
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: SyncStatusBadge(
-              isOnline: isOnline,
-              isSyncing: isSyncing,
-            ),
+          SyncStatusBadge(
+            isOnline: isOnline,
+            isSyncing: isSyncing,
           ),
+          const SizedBox(width: AppSpacing.md),
         ],
       ),
       body: dashboardAsync.when(
@@ -159,7 +174,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           '${data.lowStockItems.length} items are low on stock!',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.dmSans(
                             color: const Color(0xFFB8935E),
                             fontWeight: FontWeight.w700,
                             fontSize: 14,
@@ -170,7 +185,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                         onPressed: () => context.push(RouteConstants.adminInventory),
                         child: Text(
                           'View',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.dmSans(
                             color: const Color(0xFFB8935E),
                             fontWeight: FontWeight.w800,
                             decoration: TextDecoration.underline,
@@ -185,7 +200,7 @@ class CashierDashboardScreen extends ConsumerWidget {
               if (data.favorites.isNotEmpty) ...[
                 Text(
                   'Quick Picks',
-                  style: GoogleFonts.plusJakartaSans(
+                  style: GoogleFonts.dmSans(
                     color: textPrimary,
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
@@ -221,7 +236,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                             child: Center(
                               child: Text(
                                 item.name,
-                                style: GoogleFonts.inter(
+                                style: GoogleFonts.dmSans(
                                   color: textPrimary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -261,7 +276,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                 children: [
                   Text(
                     'Recent Orders',
-                    style: GoogleFonts.plusJakartaSans(
+                    style: GoogleFonts.dmSans(
                       color: textPrimary,
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
@@ -272,7 +287,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                     onPressed: () => context.push(RouteConstants.orderHistory),
                     child: Text(
                       'See All',
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.dmSans(
                         color: const Color(0xFF8B4049),
                         fontWeight: FontWeight.w700,
                       ),
@@ -287,7 +302,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(32.0),
                     child: Text(
                       'No orders yet today.',
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.dmSans(
                           color: textPrimary.withValues(alpha: 0.4)),
                     ),
                   ),
@@ -354,7 +369,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                                           Text(
                                             shortNum,
                                             style:
-                                                GoogleFonts.plusJakartaSans(
+                                                GoogleFonts.dmSans(
                                               color: textPrimary,
                                               fontSize: 16,
                                               fontWeight: FontWeight.w700,
@@ -362,7 +377,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                                           ),
                                           Text(
                                             '${order.orderedAt.hour}:${order.orderedAt.minute.toString().padLeft(2, '0')}',
-                                            style: GoogleFonts.inter(
+                                            style: GoogleFonts.dmSans(
                                               color: textPrimary
                                                   .withValues(alpha: 0.5),
                                               fontSize: 12,
@@ -374,7 +389,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                                     Text(
                                       CurrencyFormatter.format(
                                           order.totalAmount),
-                                      style: GoogleFonts.plusJakartaSans(
+                                      style: GoogleFonts.dmSans(
                                         color: textPrimary,
                                         fontSize: 18,
                                         fontWeight: FontWeight.w800,
@@ -465,7 +480,7 @@ class _DashboardDrawer extends ConsumerWidget {
                   child: Center(
                     child: Text(
                       initial,
-                      style: GoogleFonts.plusJakartaSans(
+                      style: GoogleFonts.dmSans(
                         color: Colors.white,
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
@@ -484,7 +499,7 @@ class _DashboardDrawer extends ConsumerWidget {
                 // Name
                 Text(
                   cashierName,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: GoogleFonts.dmSans(
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
@@ -504,7 +519,7 @@ class _DashboardDrawer extends ConsumerWidget {
                   ),
                   child: Text(
                     'Cashier',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.dmSans(
                       color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -523,7 +538,7 @@ class _DashboardDrawer extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
             child: Text(
               'MENU',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.dmSans(
                 color: textPrimary.withValues(alpha: 0.35),
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
@@ -565,21 +580,9 @@ class _DashboardDrawer extends ConsumerWidget {
             hoverBg: itemHoverBg,
             textColor: textPrimary,
           ),
-          _NavItem(
-            icon: Icons.manage_accounts_rounded,
-            label: 'My Profile',
-            delay: 300,
-            onTap: () {
-              Navigator.pop(context);
-              context.push(RouteConstants.cashierProfile);
-            },
-            hoverBg: itemHoverBg,
-            textColor: textPrimary,
-          ),
-
           const Spacer(),
 
-          // ── Footer divider + logout ────────────────────────────────────
+          // ── Footer divider ─────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Divider(
@@ -589,6 +592,12 @@ class _DashboardDrawer extends ConsumerWidget {
           ),
 
           const SizedBox(height: 8),
+
+          // ── Theme toggle ───────────────────────────────────────────────
+          _ThemeToggleTile(
+            textColor: textPrimary,
+            hoverBg: itemHoverBg,
+          ),
 
           _NavItem(
             icon: Icons.power_settings_new_rounded,
@@ -656,7 +665,7 @@ class _NavItem extends StatelessWidget {
                 const SizedBox(width: 16),
                 Text(
                   label,
-                  style: GoogleFonts.plusJakartaSans(
+                  style: GoogleFonts.dmSans(
                     color: textColor,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -677,5 +686,73 @@ class _NavItem extends StatelessWidget {
           delay: delay.ms,
           curve: Curves.easeOut,
         );
+  }
+}
+
+/// Theme toggle row — sits above Logout in the drawer footer.
+/// Tapping anywhere on the row (or the switch) toggles light/dark mode.
+class _ThemeToggleTile extends ConsumerWidget {
+  const _ThemeToggleTile({
+    required this.textColor,
+    required this.hoverBg,
+  });
+
+  final Color textColor;
+  final Color hoverBg;
+
+  static const _maroon = Color(0xFF8B4049);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+    final isDark = themeMode == ThemeMode.dark;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap: () => ref.read(themeProvider.notifier).toggle(),
+          borderRadius: BorderRadius.circular(14),
+          splashColor: textColor.withValues(alpha: 0.08),
+          highlightColor: hoverBg,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                Icon(
+                  isDark
+                      ? Icons.dark_mode_rounded
+                      : Icons.light_mode_rounded,
+                  size: 21,
+                  color: isDark ? AppColors.accentDarkLight : _maroon,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    isDark ? 'Dark Mode' : 'Light Mode',
+                    style: GoogleFonts.dmSans(
+                      color: textColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Switch.adaptive(
+                  value: isDark,
+                  onChanged: (_) =>
+                      ref.read(themeProvider.notifier).toggle(),
+                  activeThumbColor: AppColors.accentDark,
+                  activeTrackColor: AppColors.accentDark.withValues(alpha: 0.5),
+                  inactiveThumbColor: _maroon,
+                  inactiveTrackColor: _maroon.withValues(alpha: 0.2),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

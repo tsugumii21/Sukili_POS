@@ -99,7 +99,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   // App Title
                   Text(
                     'Sukli',
-                    style: GoogleFonts.plusJakartaSans(
+                    style: GoogleFonts.dmSans(
                       color: AppColors.primaryLightVariant,
                       fontSize: 58,
                       fontWeight: FontWeight.w800,
@@ -115,7 +115,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   // Subtext
                   Text(
                     'Smart Point of Sale',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.dmSans(
                       color: AppColors.primaryLight.withValues(alpha: 0.6),
                       fontSize: 15,
                       fontWeight: FontWeight.w500,

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AppPrimaryButton — filled pill button with Plus Jakarta Sans and press animation
@@ -79,7 +77,7 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
                         ],
                         Text(
                           widget.label,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: GoogleFonts.dmSans(
                             color: AppColors.white,
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
@@ -163,7 +161,7 @@ class _AppSecondaryButtonState extends State<AppSecondaryButton> {
                         ],
                         Text(
                           widget.label,
-                          style: GoogleFonts.plusJakartaSans(
+                          style: GoogleFonts.dmSans(
                             color: color,
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
@@ -208,7 +206,7 @@ class AppTextButton extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.plusJakartaSans(
+        style: GoogleFonts.dmSans(
           color: color,
           fontSize: 15,
           fontWeight: FontWeight.w600,

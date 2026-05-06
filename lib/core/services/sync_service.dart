@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'isar_service.dart';
-import 'supabase_service.dart';
 import '../constants/app_constants.dart';
 import '../../shared/isar_collections/sync_queue_collection.dart';
-import 'package:isar_community/isar.dart';
 
 /// SyncResult represents the outcome of a synchronization operation.
 class SyncResult {
@@ -30,7 +28,6 @@ class SyncService {
   static final SyncService instance = SyncService._();
 
   final IsarService _isar = IsarService.instance;
-  final SupabaseService _supabase = SupabaseService.instance;
 
   bool _isSyncing = false;
   bool get isSyncing => _isSyncing;
@@ -49,17 +46,21 @@ class SyncService {
   /// Manually triggers a full synchronization.
   Future<SyncResult> syncAll() async {
     if (_isSyncing) {
-      return SyncResult(processed: 0, succeeded: 0, failed: 0, error: 'Sync already in progress');
+      return SyncResult(
+          processed: 0,
+          succeeded: 0,
+          failed: 0,
+          error: 'Sync already in progress');
     }
 
     _isSyncing = true;
     try {
       // 1. Push local changes
       final pushResult = await syncPendingQueue();
-      
+
       // 2. Pull remote changes (Categories, Products, etc.)
       // To be implemented in Part 10/11
-      
+
       return pushResult;
     } finally {
       _isSyncing = false;
@@ -69,8 +70,11 @@ class SyncService {
   /// Processes the pending local changes and pushes them to Supabase.
   Future<SyncResult> syncPendingQueue() async {
     // TODO: Fix Isar findAll() type resolution issue. Bypassing for UI testing.
+    // When uncommenting the block below, re-add:
+    //   import 'supabase_service.dart';
+    //   final SupabaseService _supabase = SupabaseService.instance;
     return SyncResult(processed: 0, succeeded: 0, failed: 0);
-    
+
     /*
     int succeeded = 0;
     int failed = 0;
@@ -131,7 +135,8 @@ class SyncService {
     required Map<String, dynamic> payload,
   }) async {
     final item = SyncQueueCollection()
-      ..operationId = '${tableName}_${recordSyncId}_${DateTime.now().millisecondsSinceEpoch}'
+      ..operationId =
+          '${tableName}_${recordSyncId}_${DateTime.now().millisecondsSinceEpoch}'
       ..tableName = tableName
       ..recordSyncId = recordSyncId
       ..operation = operation

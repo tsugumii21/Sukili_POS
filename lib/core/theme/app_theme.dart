@@ -4,6 +4,9 @@ import 'app_colors.dart';
 import 'app_spacing.dart';
 
 /// AppTheme generates the Material 3 ThemeData for both light and dark modes.
+/// DM Sans is applied globally via GoogleFonts.dmSansTextTheme so that every
+/// Material widget (AppBar, Button, ListTile, etc.) inherits the correct font
+/// without needing explicit style overrides.
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
@@ -11,8 +14,9 @@ class AppTheme {
       brightness: Brightness.light,
       primaryColor: AppColors.accentLight,
       scaffoldBackgroundColor: AppColors.backgroundLight,
-      fontFamily: GoogleFonts.dmSans().fontFamily,
-      
+      textTheme:
+          GoogleFonts.dmSansTextTheme(ThemeData.light().textTheme),
+
       colorScheme: const ColorScheme.light(
         primary: AppColors.accentLight,
         secondary: AppColors.secondaryLight,
@@ -47,7 +51,10 @@ class AppTheme {
           foregroundColor: Colors.white,
           minimumSize: const Size.fromHeight(52),
           shape: RoundedRectangleBorder(borderRadius: AppRadius.pillBR),
-          textStyle: GoogleFonts.dmSans(fontSize: 16, fontWeight: FontWeight.w600),
+          textStyle: GoogleFonts.dmSans(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
 
@@ -67,15 +74,20 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceLight,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        hintStyle: GoogleFonts.dmSans(fontSize: 14, color: AppColors.textSecondaryLight),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        hintStyle: GoogleFonts.dmSans(
+          fontSize: 14,
+          color: AppColors.textSecondaryLight,
+        ),
         border: OutlineInputBorder(
           borderRadius: AppRadius.mediumBR,
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.mediumBR,
-          borderSide: const BorderSide(color: AppColors.accentLight, width: 1.5),
+          borderSide:
+              const BorderSide(color: AppColors.accentLight, width: 1.5),
         ),
       ),
 
@@ -95,7 +107,10 @@ class AppTheme {
 
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.textPrimaryLight,
-        contentTextStyle: GoogleFonts.dmSans(fontSize: 14, color: AppColors.textPrimaryDark),
+        contentTextStyle: GoogleFonts.dmSans(
+          fontSize: 14,
+          color: AppColors.textPrimaryDark,
+        ),
       ),
 
       dialogTheme: DialogThemeData(
@@ -111,7 +126,8 @@ class AppTheme {
       brightness: Brightness.dark,
       primaryColor: AppColors.primaryDark,
       scaffoldBackgroundColor: AppColors.backgroundDark,
-      fontFamily: GoogleFonts.dmSans().fontFamily,
+      textTheme:
+          GoogleFonts.dmSansTextTheme(ThemeData.dark().textTheme),
 
       colorScheme: const ColorScheme.dark(
         primary: AppColors.accentDark,
@@ -147,7 +163,10 @@ class AppTheme {
           foregroundColor: AppColors.primaryDark,
           minimumSize: const Size.fromHeight(52),
           shape: RoundedRectangleBorder(borderRadius: AppRadius.pillBR),
-          textStyle: GoogleFonts.dmSans(fontSize: 16, fontWeight: FontWeight.w600),
+          textStyle: GoogleFonts.dmSans(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
 
@@ -167,15 +186,20 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceDarkElevated,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        hintStyle: GoogleFonts.dmSans(fontSize: 14, color: AppColors.textSecondaryDark),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        hintStyle: GoogleFonts.dmSans(
+          fontSize: 14,
+          color: AppColors.textSecondaryDark,
+        ),
         border: OutlineInputBorder(
           borderRadius: AppRadius.mediumBR,
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.mediumBR,
-          borderSide: const BorderSide(color: AppColors.accentDark, width: 1.5),
+          borderSide:
+              const BorderSide(color: AppColors.accentDark, width: 1.5),
         ),
       ),
 
@@ -188,14 +212,20 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceDarkElevated,
         selectedColor: AppColors.accentDark,
-        labelStyle: GoogleFonts.dmSans(fontSize: 12, color: AppColors.textPrimaryDark),
+        labelStyle: GoogleFonts.dmSans(
+          fontSize: 12,
+          color: AppColors.textPrimaryDark,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         shape: const StadiumBorder(side: BorderSide.none),
       ),
 
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.textPrimaryDark,
-        contentTextStyle: GoogleFonts.dmSans(fontSize: 14, color: AppColors.textPrimaryLight),
+        contentTextStyle: GoogleFonts.dmSans(
+          fontSize: 14,
+          color: AppColors.textPrimaryLight,
+        ),
       ),
 
       dialogTheme: DialogThemeData(

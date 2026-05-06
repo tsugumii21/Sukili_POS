@@ -61,8 +61,8 @@ class AppColors {
   static const Color transparent = Colors.transparent;
   static const Color white = Colors.white;
 
-  static Color overlayLight = const Color(0xFF3E2723).withOpacity(0.08);
-  static Color overlayDark = const Color(0xFFFAF6F1).withOpacity(0.08);
-  static Color scrimLight = const Color(0xFF3E2723).withOpacity(0.4);
-  static Color scrimDark = const Color(0xFF1A0B0D).withOpacity(0.6);
+  static Color overlayLight = const Color(0xFF3E2723).withValues(alpha: 0.08);
+  static Color overlayDark = const Color(0xFFFAF6F1).withValues(alpha: 0.08);
+  static Color scrimLight = const Color(0xFF3E2723).withValues(alpha: 0.4);
+  static Color scrimDark = const Color(0xFF1A0B0D).withValues(alpha: 0.6);
 }

@@ -91,7 +91,7 @@ class _CashierSelectionScreenState
                   const SizedBox(width: AppSpacing.md),
                   Text(
                     'Sukli',
-                    style: GoogleFonts.plusJakartaSans(
+                    style: GoogleFonts.dmSans(
                       color: textPrimary,
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -114,7 +114,7 @@ class _CashierSelectionScreenState
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Select Cashier',
-                      style: GoogleFonts.plusJakartaSans(
+                      style: GoogleFonts.dmSans(
                         color: textPrimary,
                         fontSize: 32,
                         fontWeight: FontWeight.w800,
@@ -125,7 +125,7 @@ class _CashierSelectionScreenState
                   const SizedBox(height: 4),
                   Text(
                     'Choose your profile to start selling',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.dmSans(
                       color: textSecondary.withValues(alpha: 0.6),
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -151,7 +151,7 @@ class _CashierSelectionScreenState
                       ? Center(
                           child: Text(
                             'No active cashiers found.',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.dmSans(
                               color: textSecondary,
                               fontWeight: FontWeight.w500,
                             ),
@@ -211,7 +211,7 @@ class _CashierSelectionScreenState
                       const SizedBox(width: 8),
                       Text(
                         'Admin Portal',
-                        style: GoogleFonts.plusJakartaSans(
+                        style: GoogleFonts.dmSans(
                           color: textSecondary,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,

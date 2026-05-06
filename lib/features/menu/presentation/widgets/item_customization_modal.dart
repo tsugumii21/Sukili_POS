@@ -239,7 +239,7 @@ class _ItemCustomizationModalState
             Expanded(
               child: Text(
                 '${widget.item.name}${variantName != null ? " ($variantName)" : ""} $label!',
-                style: GoogleFonts.inter(
+                style: GoogleFonts.dmSans(
                   color: AppColors.white,
                   fontWeight: FontWeight.w600,
                 ),
@@ -340,7 +340,7 @@ class _ItemCustomizationModalState
                           // ── Item Name ─────────────────────────────────
                           Text(
                             widget.item.name,
-                            style: GoogleFonts.plusJakartaSans(
+                            style: GoogleFonts.dmSans(
                               color: textPrimary,
                               fontSize: 24,
                               fontWeight: FontWeight.w800,
@@ -353,7 +353,7 @@ class _ItemCustomizationModalState
                             const SizedBox(height: 6),
                             Text(
                               widget.item.description!,
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.dmSans(
                                 color:
                                     textPrimary.withValues(alpha: 0.5),
                                 fontSize: 14,
@@ -368,7 +368,7 @@ class _ItemCustomizationModalState
                           if (_variants.isNotEmpty) ...[
                             Text(
                               'SIZE',
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.dmSans(
                                 color:
                                     textPrimary.withValues(alpha: 0.4),
                                 fontSize: 11,
@@ -431,7 +431,7 @@ class _ItemCustomizationModalState
                                         children: [
                                           Text(
                                             v.name,
-                                            style: GoogleFonts.inter(
+                                            style: GoogleFonts.dmSans(
                                               color: isSelected
                                                   ? AppColors.white
                                                   : textPrimary,
@@ -444,7 +444,7 @@ class _ItemCustomizationModalState
                                           Text(
                                             CurrencyFormatter.format(
                                                 price),
-                                            style: GoogleFonts.inter(
+                                            style: GoogleFonts.dmSans(
                                               color: isSelected
                                                   ? AppColors.white
                                                       .withValues(
@@ -481,7 +481,7 @@ class _ItemCustomizationModalState
                           // ── Quantity ───────────────────────────────────
                           Text(
                             'QUANTITY',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.dmSans(
                               color:
                                   textPrimary.withValues(alpha: 0.4),
                               fontSize: 11,
@@ -519,7 +519,7 @@ class _ItemCustomizationModalState
                                   child: Text(
                                     '$_quantity',
                                     style:
-                                        GoogleFonts.plusJakartaSans(
+                                        GoogleFonts.dmSans(
                                       color: textPrimary,
                                       fontSize: 24,
                                       fontWeight: FontWeight.w800,
@@ -543,7 +543,7 @@ class _ItemCustomizationModalState
                           // ── Notes ─────────────────────────────────────
                           Text(
                             'SPECIAL INSTRUCTIONS',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.dmSans(
                               color:
                                   textPrimary.withValues(alpha: 0.4),
                               fontSize: 11,
@@ -555,13 +555,13 @@ class _ItemCustomizationModalState
                           TextField(
                             controller: _notesController,
                             maxLines: 2,
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.dmSans(
                               color: textPrimary,
                               fontSize: 15,
                             ),
                             decoration: InputDecoration(
                               hintText: 'e.g. No onions, extra sauce',
-                              hintStyle: GoogleFonts.inter(
+                              hintStyle: GoogleFonts.dmSans(
                                 color: textPrimary.withValues(
                                     alpha: 0.3),
                                 fontSize: 14,
@@ -610,7 +610,7 @@ class _ItemCustomizationModalState
                         children: [
                           Text(
                             'Total',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.dmSans(
                               color:
                                   textPrimary.withValues(alpha: 0.5),
                               fontSize: 12,
@@ -619,7 +619,7 @@ class _ItemCustomizationModalState
                           ),
                           Text(
                             CurrencyFormatter.format(_runningTotal),
-                            style: GoogleFonts.plusJakartaSans(
+                            style: GoogleFonts.dmSans(
                               color: const Color(0xFF8B4049),
                               fontSize: 22,
                               fontWeight: FontWeight.w800,
@@ -661,7 +661,7 @@ class _ItemCustomizationModalState
                                       ? 'Update Cart'
                                       : 'Add to Cart',
                                   style:
-                                      GoogleFonts.plusJakartaSans(
+                                      GoogleFonts.dmSans(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -695,7 +695,7 @@ class _ItemCustomizationModalState
       children: [
         Text(
           groupName.toUpperCase(),
-          style: GoogleFonts.inter(
+          style: GoogleFonts.dmSans(
             color: textPrimary.withValues(alpha: 0.4),
             fontSize: 11,
             fontWeight: FontWeight.w800,
@@ -734,7 +734,7 @@ class _ItemCustomizationModalState
               },
               title: Text(
                 mod.name,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.dmSans(
                   color: textPrimary,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -742,7 +742,7 @@ class _ItemCustomizationModalState
               ),
               secondary: Text(
                 '+${CurrencyFormatter.format(mod.priceDelta)}',
-                style: GoogleFonts.plusJakartaSans(
+                style: GoogleFonts.dmSans(
                   color: const Color(0xFF8B4049),
                   fontSize: 14,
                   fontWeight: FontWeight.w700,

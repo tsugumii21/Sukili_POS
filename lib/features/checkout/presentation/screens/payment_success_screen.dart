@@ -11,6 +11,7 @@ import '../../../../core/constants/route_constants.dart';
 import '../../../../core/services/printer_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../providers/checkout_provider.dart';
 
@@ -96,11 +97,8 @@ class PaymentSuccessScreen extends ConsumerWidget {
                   // ── Title ────────────────────────────────────────────────
                   Text(
                     'Payment Successful!',
-                    style: GoogleFonts.dmSerifDisplay(
-                      color: Colors.white,
-                      fontSize: 32,
-                      height: 1.2,
-                    ),
+                    style: AppTextStyles.h1(context)
+                        .copyWith(color: Colors.white),
                     textAlign: TextAlign.center,
                   )
                       .animate()
@@ -118,10 +116,8 @@ class PaymentSuccessScreen extends ConsumerWidget {
                   // Order number + timestamp
                   Text(
                     '${order.orderNumber}  •  ${DateFormat('hh:mm a').format(order.orderedAt)}',
-                    style: GoogleFonts.dmSans(
+                    style: AppTextStyles.caption(context).copyWith(
                       color: Colors.white.withValues(alpha: 0.75),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
                     ),
                   )
                       .animate()
@@ -257,83 +253,80 @@ class PaymentSuccessScreen extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-              // New Order — primary white button
+              // Print Receipt — primary: white filled button
               SizedBox(
                 width: double.infinity,
                 height: 56,
+                child: OutlinedButton.icon(
+                  onPressed: () => _onPrintReceipt(context, ref, order),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: _maroon,
+                    side: BorderSide.none,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppRadius.largeBR,
+                    ),
+                  ),
+                  icon: const Icon(Icons.print_rounded, size: 20),
+                  label: Text(
+                    'Print Receipt',
+                    style: AppTextStyles.bodySemiBold(context)
+                        .copyWith(color: _maroon),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.sm),
+
+              // New Order — secondary: white outlined button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
                 child: ElevatedButton.icon(
                   onPressed: () {
                     ref.read(checkoutProvider.notifier).reset();
-                    // go() resets to cashierHome (base of stack), then
-                    // push() adds newOrder on top so the back button works.
                     context.go(RouteConstants.cashierHome);
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       final router = GoRouter.of(context);
                       router.push(RouteConstants.newOrder);
                     });
                   },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: _maroon,
-                shape: RoundedRectangleBorder(
-                  borderRadius: AppRadius.largeBR,
-                ),
-                elevation: 0,
-              ),
-              icon: const Icon(Icons.add_shopping_cart_rounded, size: 20),
-              label: Text(
-                'New Order',
-                style: GoogleFonts.dmSans(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.sm),
-
-          // Print Receipt — white outlined button
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: OutlinedButton.icon(
-              onPressed: () => _onPrintReceipt(context, ref, order),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
-                side: const BorderSide(color: Colors.white54, width: 1.5),
-                shape: RoundedRectangleBorder(
-                  borderRadius: AppRadius.largeBR,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
+                    side: const BorderSide(
+                        color: Colors.white54, width: 1.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppRadius.largeBR,
+                    ),
+                  ),
+                  icon: const Icon(Icons.add_shopping_cart_rounded,
+                      size: 20),
+                  label: Text(
+                    'New Order',
+                    style: AppTextStyles.bodyMedium(context)
+                        .copyWith(color: Colors.white),
+                  ),
                 ),
               ),
-              icon: const Icon(Icons.print_rounded, size: 20),
-              label: Text(
-                'Print Receipt',
-                style: GoogleFonts.dmSans(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+
+              const SizedBox(height: 4),
+
+              // Back to Home — text button
+              TextButton(
+                onPressed: () {
+                  ref.read(checkoutProvider.notifier).reset();
+                  context.go(RouteConstants.cashierHome);
+                },
+                child: Text(
+                  'Back to Home',
+                  style: AppTextStyles.caption(context).copyWith(
+                    color: Colors.white.withValues(alpha: 0.75),
+                  ),
                 ),
               ),
-            ),
-          ),
-
-          const SizedBox(height: 4),
-
-          // Back to Home — text button
-          TextButton(
-            onPressed: () {
-              ref.read(checkoutProvider.notifier).reset();
-              context.go(RouteConstants.cashierHome);
-            },
-            child: Text(
-              'Back to Home',
-              style: GoogleFonts.dmSans(
-                color: Colors.white70,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -433,11 +426,8 @@ class _OrderSummaryCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     order.orderNumber as String,
-                    style: GoogleFonts.dmSans(
-                      color: const Color(0xFF3E2723),
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: AppTextStyles.bodySemiBold(context)
+                        .copyWith(color: AppColors.textPrimaryLight),
                   ),
                 ),
                 Container(
@@ -446,16 +436,13 @@ class _OrderSummaryCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.successLight.withValues(alpha: 0.15),
+                    color: AppColors.successLight.withValues(alpha: 0.20),
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
                     'Completed',
-                    style: GoogleFonts.dmSans(
-                      color: AppColors.successLight,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: AppTextStyles.captionMedium(context)
+                        .copyWith(color: AppColors.successLight),
                   ),
                 ),
               ],
@@ -475,19 +462,15 @@ class _OrderSummaryCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       order.cashierName as String,
-                      style: GoogleFonts.dmSans(
-                        color: const Color(0xFF5D4037),
-                        fontSize: 13,
-                      ),
+                      style: AppTextStyles.caption(context)
+                          .copyWith(color: AppColors.textSecondaryLight),
                     ),
                     const Spacer(),
                     Text(
                       DateFormat('MMM dd  hh:mm a')
                           .format(order.orderedAt as DateTime),
-                      style: GoogleFonts.dmSans(
-                        color: const Color(0xFF5D4037),
-                        fontSize: 12,
-                      ),
+                      style: AppTextStyles.caption(context)
+                          .copyWith(color: AppColors.textSecondaryLight),
                     ),
                   ],
                 ),
@@ -519,37 +502,31 @@ class _OrderSummaryCard extends StatelessWidget {
                             children: [
                               Text(
                                 '$name${variant != null ? ' ($variant)' : ''}',
-                                style: GoogleFonts.dmSans(
-                                  color: const Color(0xFF3E2723),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: AppTextStyles.bodySemiBold(context)
+                                    .copyWith(
+                                        color: AppColors.textPrimaryLight),
                               ),
                               if (mods.isNotEmpty)
                                 Text(
                                   mods.join(' · '),
-                                  style: GoogleFonts.dmSans(
-                                    color: const Color(0xFF5D4037),
-                                    fontSize: 11,
-                                  ),
+                                  style: AppTextStyles.caption(context)
+                                      .copyWith(
+                                          color:
+                                              AppColors.textSecondaryLight),
                                 ),
                               Text(
                                 'x$qty',
-                                style: GoogleFonts.dmSans(
-                                  color: const Color(0xFF5D4037),
-                                  fontSize: 12,
-                                ),
+                                style: AppTextStyles.caption(context)
+                                    .copyWith(
+                                        color: AppColors.textSecondaryLight),
                               ),
                             ],
                           ),
                         ),
                         Text(
                           CurrencyFormatter.format(subtotal),
-                          style: GoogleFonts.dmSans(
-                            color: const Color(0xFF8B4049),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: AppTextStyles.bodyMedium(context)
+                              .copyWith(color: AppColors.accentLight),
                         ),
                       ],
                     ),
@@ -576,7 +553,7 @@ class _OrderSummaryCard extends StatelessWidget {
                   value:
                       CurrencyFormatter.format(order.totalAmount as double),
                   bold: true,
-                  valueColor: const Color(0xFF8B4049),
+                  valueColor: AppColors.accentLight,
                 ),
 
                 const SizedBox(height: AppSpacing.xs),
@@ -644,18 +621,16 @@ class _CardRow extends StatelessWidget {
         children: [
           Text(
             label,
-            style: GoogleFonts.dmSans(
-              color: const Color(0xFF5D4037),
-              fontSize: 13,
-            ),
+            style: AppTextStyles.body(context)
+                .copyWith(color: AppColors.textSecondaryLight),
           ),
           Text(
             value,
-            style: GoogleFonts.dmSans(
-              color: valueColor ?? const Color(0xFF3E2723),
-              fontSize: 13,
-              fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
-            ),
+            style: bold
+                ? AppTextStyles.bodySemiBold(context).copyWith(
+                    color: valueColor ?? AppColors.textPrimaryLight)
+                : AppTextStyles.bodyMedium(context).copyWith(
+                    color: valueColor ?? AppColors.textPrimaryLight),
           ),
         ],
       ),

@@ -31,9 +31,133 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
   final _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // If items are already in the cart from a previous session, ask the user
+    // whether they want to continue or start fresh.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final order = ref.read(orderProvider);
+      if (order.isNotEmpty) _showContinueDialog(context, order);
+    });
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _showContinueDialog(BuildContext context, dynamic order) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dialogBg =
+        isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
+    final textPrimary =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textSecondary =
+        isDark ? AppColors.textSecondaryDark : const Color(0xFF6B6B6B);
+    final accentColor =
+        isDark ? AppColors.accentDark : const Color(0xFF8B4049);
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        backgroundColor: dialogBg,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon badge
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.shopping_bag_rounded,
+                  color: accentColor,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Continue Previous Order?',
+                style: GoogleFonts.dmSans(
+                  color: textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'You have ${order.itemCount} item${order.itemCount == 1 ? '' : 's'} '
+                '(${CurrencyFormatter.format(order.total)}) left in your cart.',
+                style: GoogleFonts.dmSans(
+                  color: textSecondary,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              // Continue button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accentColor,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: Text(
+                    'Yes, Continue',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Start fresh button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: TextButton(
+                  onPressed: () {
+                    ref.read(orderProvider.notifier).clearCart();
+                    Navigator.pop(ctx);
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: textSecondary,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: Text(
+                    'No, Start Fresh',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -61,7 +185,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
         ),
         title: Text(
           'New Order',
-          style: GoogleFonts.plusJakartaSans(
+          style: GoogleFonts.dmSans(
             color: textPrimary,
             fontSize: 22,
             fontWeight: FontWeight.w800,
@@ -91,7 +215,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                     ),
                     child: Text(
                       orderState.itemCount.toString(),
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.dmSans(
                         color: AppColors.white,
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
@@ -118,10 +242,10 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
               child: TextField(
                 controller: _searchController,
                 onChanged: (v) => ref.read(menuProvider.notifier).updateSearch(v),
-                style: GoogleFonts.inter(color: textPrimary, fontSize: 15),
+                style: GoogleFonts.dmSans(color: textPrimary, fontSize: 15),
                 decoration: InputDecoration(
                   hintText: 'Search items...',
-                  hintStyle: GoogleFonts.inter(
+                  hintStyle: GoogleFonts.dmSans(
                     color: textPrimary.withValues(alpha: 0.35),
                     fontSize: 15,
                   ),
@@ -160,7 +284,6 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
               children: [
                 CategoryPill(
                   label: 'All',
-                  emoji: '🍽️',
                   isSelected: menuState.selectedCategoryId == null,
                   onTap: () => ref.read(menuProvider.notifier).selectCategory(null),
                 ),
@@ -169,7 +292,6 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                       padding: const EdgeInsets.only(right: 10),
                       child: CategoryPill(
                         label: cat.name,
-                        emoji: cat.iconEmoji,
                         isSelected: menuState.selectedCategoryId == cat.syncId,
                         onTap: () => ref.read(menuProvider.notifier).selectCategory(cat.syncId),
                       ),
@@ -193,7 +315,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                             const SizedBox(height: 12),
                             Text(
                               'No items found',
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.dmSans(
                                 color: textPrimary.withValues(alpha: 0.4),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -202,46 +324,37 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                           ],
                         ),
                       )
-                    : Builder(builder: (context) {
-                        // Pre-build an O(1) emoji lookup map from category syncId.
-                        final emojiMap = {
-                          for (final cat in menuState.categories)
-                            cat.syncId: cat.iconEmoji,
-                        };
-                        return GridView.builder(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 0.78,
-                          ),
-                          itemCount: menuState.items.length,
-                          itemBuilder: (context, index) {
-                            final item = menuState.items[index];
-                            final emoji = emojiMap[item.categoryId];
-                            return ItemCard(
-                              item: item,
-                              categoryEmoji: emoji,
-                              onTap: () =>
-                                  _showItemCustomization(context, item),
-                            )
-                                .animate()
-                                .fadeIn(
-                                  duration: 400.ms,
-                                  delay: (50 * index).ms,
-                                )
-                                .slideY(
-                                  begin: 0.08,
-                                  end: 0,
-                                  duration: 300.ms,
-                                  delay: (50 * index).ms,
-                                );
-                          },
-                        );
-                      }),
+                    : GridView.builder(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.78,
+                        ),
+                        itemCount: menuState.items.length,
+                        itemBuilder: (context, index) {
+                          final item = menuState.items[index];
+                          return ItemCard(
+                            item: item,
+                            onTap: () =>
+                                _showItemCustomization(context, item),
+                          )
+                              .animate()
+                              .fadeIn(
+                                duration: 400.ms,
+                                delay: (50 * index).ms,
+                              )
+                              .slideY(
+                                begin: 0.08,
+                                end: 0,
+                                duration: 300.ms,
+                                delay: (50 * index).ms,
+                              );
+                        },
+                      ),
           ),
         ],
       ),
@@ -260,7 +373,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                 icon: const Icon(Icons.shopping_cart_checkout_rounded, color: AppColors.white),
                 label: Text(
                   'Checkout  •  ${CurrencyFormatter.format(orderState.total)}',
-                  style: GoogleFonts.plusJakartaSans(
+                  style: GoogleFonts.dmSans(
                     color: AppColors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -324,7 +437,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                     children: [
                       Text(
                         'Your Order',
-                        style: GoogleFonts.plusJakartaSans(
+                        style: GoogleFonts.dmSans(
                           color: textPrimary,
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
@@ -337,7 +450,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                         },
                         child: Text(
                           'Clear All',
-                          style: GoogleFonts.inter(
+                          style: GoogleFonts.dmSans(
                             color: AppColors.errorLight,
                             fontWeight: FontWeight.w700,
                           ),
@@ -367,7 +480,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                                   children: [
                                     Text(
                                       cartItem.itemName,
-                                      style: GoogleFonts.plusJakartaSans(
+                                      style: GoogleFonts.dmSans(
                                         color: textPrimary,
                                         fontSize: 15,
                                         fontWeight: FontWeight.w700,
@@ -376,14 +489,14 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                                     if (cartItem.variantName != null)
                                       Text(
                                         cartItem.variantName!,
-                                        style: GoogleFonts.inter(
+                                        style: GoogleFonts.dmSans(
                                           color: textPrimary.withValues(alpha: 0.5),
                                           fontSize: 12,
                                         ),
                                       ),
                                     Text(
                                       CurrencyFormatter.format(cartItem.subtotal),
-                                      style: GoogleFonts.plusJakartaSans(
+                                      style: GoogleFonts.dmSans(
                                         color: const Color(0xFF8B4049),
                                         fontWeight: FontWeight.w800,
                                       ),
@@ -403,7 +516,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                                     padding: const EdgeInsets.symmetric(horizontal: 14),
                                     child: Text(
                                       cartItem.quantity.toString(),
-                                      style: GoogleFonts.plusJakartaSans(
+                                      style: GoogleFonts.dmSans(
                                         color: textPrimary,
                                         fontSize: 18,
                                         fontWeight: FontWeight.w800,
@@ -443,7 +556,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                       ),
                       child: Text(
                         'Checkout  •  ${CurrencyFormatter.format(order.total)}',
-                        style: GoogleFonts.plusJakartaSans(
+                        style: GoogleFonts.dmSans(
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
                         ),
@@ -497,7 +610,7 @@ class _QuickPicksRow extends ConsumerWidget {
                   const SizedBox(width: 6),
                   Text(
                     'Quick Picks',
-                    style: GoogleFonts.plusJakartaSans(
+                    style: GoogleFonts.dmSans(
                       color: textPrimary,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -507,7 +620,7 @@ class _QuickPicksRow extends ConsumerWidget {
                   const SizedBox(width: 6),
                   Text(
                     'most ordered',
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.dmSans(
                       color: textPrimary.withValues(alpha: 0.38),
                       fontSize: 11,
                       fontWeight: FontWeight.w500,

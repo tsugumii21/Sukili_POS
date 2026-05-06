@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/isar_collections/order_collection.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -39,7 +39,7 @@ class OrderTile extends StatelessWidget {
     final textSecondary =
         isDark ? AppColors.textSecondaryDark : const Color(0xFF6B6B6B);
     final totalColor =
-        isDark ? AppColors.accentDarkLight : const Color(0xFF8B4049);
+        isDark ? AppColors.accentDark : AppColors.accentLight;
 
     final statusColor = _statusColor(order.status);
     final payIcon = _paymentIcon(order.paymentMethod);
@@ -75,9 +75,7 @@ class OrderTile extends StatelessWidget {
                   Expanded(
                     child: Text(
                       order.orderNumber,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
+                      style: AppTextStyles.bodySemiBold(context).copyWith(
                         color: textPrimary,
                         letterSpacing: 0.2,
                       ),
@@ -88,10 +86,8 @@ class OrderTile extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     timeLabel,
-                    style: GoogleFonts.dmSans(
-                      fontSize: 11,
-                      color: textSecondary,
-                    ),
+                    style: AppTextStyles.caption(context)
+                        .copyWith(color: textSecondary),
                   ),
                 ],
               ),
@@ -113,19 +109,14 @@ class OrderTile extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     payLabel,
-                    style: GoogleFonts.dmSans(
-                      fontSize: 12,
-                      color: textSecondary,
-                    ),
+                    style: AppTextStyles.caption(context)
+                        .copyWith(color: textSecondary),
                   ),
                   const Spacer(),
                   Text(
                     '₱${order.totalAmount.toStringAsFixed(2)}',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: totalColor,
-                    ),
+                    style: AppTextStyles.bodyMedium(context)
+                        .copyWith(color: totalColor),
                   ),
                   const SizedBox(width: 8),
                   // Status badge — aligned with price on the right
@@ -192,15 +183,12 @@ class _StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withAlpha(30),
+        color: color.withAlpha(51), // 20 % opacity
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withAlpha(120), width: 1),
       ),
       child: Text(
         _label(status),
-        style: GoogleFonts.dmSans(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
+        style: AppTextStyles.captionMedium(context).copyWith(
           color: color,
           letterSpacing: 0.3,
         ),

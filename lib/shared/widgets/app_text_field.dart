@@ -64,7 +64,7 @@ class AppTextField extends StatelessWidget {
         maxLines: obscureText ? 1 : maxLines,
         focusNode: focusNode,
         autofocus: autofocus,
-        style: GoogleFonts.inter(
+        style: GoogleFonts.dmSans(
           color: labelColor,
           fontSize: 15,
           fontWeight: FontWeight.w500,
@@ -80,16 +80,16 @@ class AppTextField extends StatelessWidget {
             horizontal: AppSpacing.lg,
             vertical: 18,
           ),
-          hintStyle: GoogleFonts.inter(
+          hintStyle: GoogleFonts.dmSans(
             color: hintColor.withValues(alpha: 0.5),
             fontSize: 15,
           ),
-          labelStyle: GoogleFonts.inter(
+          labelStyle: GoogleFonts.dmSans(
             color: labelColor.withValues(alpha: 0.7),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
-          floatingLabelStyle: GoogleFonts.plusJakartaSans(
+          floatingLabelStyle: GoogleFonts.dmSans(
             color: focusedBorderColor,
             fontSize: 14,
             fontWeight: FontWeight.w700,
