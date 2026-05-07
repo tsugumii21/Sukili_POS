@@ -48,68 +48,83 @@ class CashierDashboardScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: false,
-        titleSpacing: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu_rounded, color: textPrimary, size: 28),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        title: Row(
-          children: [
-            // Avatar circle
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: isDark
-                  ? AppColors.accentDark.withValues(alpha: 0.2)
-                  : AppColors.accentLight.withValues(alpha: 0.15),
-              child: Text(
-                initials,
-                style: TextStyle(
-                  color: isDark
-                      ? AppColors.accentDarkLight
-                      : AppColors.accentLight,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            // Greeting — Expanded prevents title from pushing into actions
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+        toolbarHeight: 60,
+        // All content lives in flexibleSpace so NavigationToolbar's
+        // intrinsic-width measurement cycle never touches title/actions.
+        // A single Row + Expanded makes overflow physically impossible.
+        automaticallyImplyLeading: false,
+        flexibleSpace: Builder(
+          builder: (context) => SafeArea(
+            bottom: false,
+            child: SizedBox(
+              height: 60,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    'Good $greeting,',
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: AppTextStyles.caption(context).copyWith(
-                      color: textPrimary.withValues(alpha: 0.55),
+                  // Drawer button
+                  SizedBox(
+                    width: 48,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon:
+                          Icon(Icons.menu_rounded, color: textPrimary, size: 28),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
                     ),
                   ),
-                  Text(
-                    cashierName,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: AppTextStyles.bodySemiBold(context)
-                        .copyWith(color: textPrimary),
+                  // Avatar circle
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundColor: isDark
+                        ? AppColors.accentDark.withValues(alpha: 0.2)
+                        : AppColors.accentLight.withValues(alpha: 0.15),
+                    child: Text(
+                      initials,
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.accentDarkLight
+                            : AppColors.accentLight,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
+                  const SizedBox(width: AppSpacing.sm),
+                  // Expanded absorbs all remaining width — overflow impossible
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Good $greeting,',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: AppTextStyles.caption(context).copyWith(
+                            color: textPrimary.withValues(alpha: 0.55),
+                          ),
+                        ),
+                        Text(
+                          cashierName,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: AppTextStyles.bodySemiBold(context)
+                              .copyWith(color: textPrimary),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Badge sits at its natural width; Expanded guarantees no bleed
+                  SyncStatusBadge(
+                    isOnline: isOnline,
+                    isSyncing: isSyncing,
+                  ),
+                  const SizedBox(width: 12),
                 ],
               ),
             ),
-          ],
-        ),
-        // SyncStatusBadge in actions — reserved fixed space outside the title
-        actions: [
-          SyncStatusBadge(
-            isOnline: isOnline,
-            isSyncing: isSyncing,
           ),
-          const SizedBox(width: AppSpacing.md),
-        ],
+        ),
       ),
       body: dashboardAsync.when(
         loading: () => const Center(child: CircularProgressIndicator.adaptive()),

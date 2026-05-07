@@ -31,7 +31,7 @@ class SyncStatusBadge extends StatelessWidget {
     // ConstrainedBox caps the badge width so it never pushes the AppBar title
     // into overflow — "Syncing…" is the widest label at ~80px.
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 90),
+      constraints: const BoxConstraints(maxWidth: 90, minWidth: 0),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(

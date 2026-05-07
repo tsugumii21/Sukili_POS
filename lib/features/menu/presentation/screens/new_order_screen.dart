@@ -12,11 +12,9 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/isar_collections/menu_item_collection.dart';
 import '../../../orders/presentation/providers/order_provider.dart';
 import '../providers/menu_provider.dart';
-import '../providers/quick_picks_provider.dart';
 import '../widgets/category_pill.dart';
 import '../widgets/item_card.dart';
 import '../widgets/item_customization_modal.dart';
-import '../widgets/quick_pick_chip.dart';
 
 /// NewOrderScreen — The heart of the POS.
 /// Category filters → searchable item grid → item customization → cart FAB.
@@ -269,11 +267,6 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
               ),
             ),
           ).animate().fadeIn(duration: 400.ms),
-
-          // ── Quick Picks ─────────────────────────────────────────────────
-          _QuickPicksRow(
-            onItemTap: (item) => _showItemCustomization(context, item),
-          ),
 
           // ── Category Pills ──────────────────────────────────────────────
           SizedBox(
@@ -573,100 +566,6 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
   }
 }
 
-// ── Quick Picks Row ───────────────────────────────────────────────────────────
-
-/// Renders the "Quick Picks" horizontal strip below the search bar.
-/// Hidden entirely while loading or when there is no order history yet.
-class _QuickPicksRow extends ConsumerWidget {
-  const _QuickPicksRow({required this.onItemTap});
-
-  final void Function(MenuItemCollection item) onItemTap;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final quickAsync = ref.watch(quickPicksProvider);
-
-    return quickAsync.when(
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-      data: (items) {
-        if (items.isEmpty) return const SizedBox.shrink();
-
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        final textPrimary =
-            isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: AppSpacing.sm),
-
-            // ── Section header ─────────────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              child: Row(
-                children: [
-                  const Text('⚡', style: TextStyle(fontSize: 14)),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Quick Picks',
-                    style: GoogleFonts.dmSans(
-                      color: textPrimary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.1,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'most ordered',
-                    style: GoogleFonts.dmSans(
-                      color: textPrimary.withValues(alpha: 0.38),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ).animate().fadeIn(duration: 350.ms),
-
-            const SizedBox(height: 8),
-
-            // ── Horizontal chip list ───────────────────────────────────
-            SizedBox(
-              height: 72,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                ),
-                itemCount: items.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
-                itemBuilder: (context, index) {
-                  return QuickPickChip(item: items[index])
-                      .animate()
-                      .fadeIn(
-                        duration: 350.ms,
-                        delay: (60 * index).ms,
-                      )
-                      .slideX(
-                        begin: 0.15,
-                        end: 0,
-                        duration: 300.ms,
-                        delay: (60 * index).ms,
-                        curve: Curves.easeOut,
-                      );
-                },
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.sm),
-          ],
-        );
-      },
-    );
-  }
-}
 
 /// Small +/- button used in the cart quantity controls.
 class _QtyButton extends StatelessWidget {
