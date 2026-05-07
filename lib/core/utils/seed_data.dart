@@ -20,16 +20,6 @@ class SeedData {
         final users = [
           UserCollection()
             ..syncId = _uuid.v4()
-            ..name = "Store Admin"
-            ..email = "admin@suklipos.com"
-            ..role = "admin"
-            ..status = "active"
-            ..createdAt = now
-            ..updatedAt = now
-            ..isSynced = false
-            ..isDeleted = false,
-          UserCollection()
-            ..syncId = _uuid.v4()
             ..name = "Juan Dela Cruz"
             ..email = "juan@example.com"
             ..pinHash = PinHelper.hashPin("1234")
