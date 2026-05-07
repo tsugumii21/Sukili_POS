@@ -503,6 +503,10 @@ class _Step1Category extends ConsumerWidget {
                 if (newId != null) onTopChanged(newId);
               }
             },
+            onDeleted: (deletedId) {
+              // If the deleted category was selected, clear it
+              if (selectedTopId == deletedId) onTopChanged(null);
+            },
           ),
 
           // ── Sub-category ───────────────────────────────────────────
@@ -531,6 +535,9 @@ class _Step1Category extends ConsumerWidget {
                       context, ref, name, selectedTopId);
                   if (newId != null) onSubChanged(newId);
                 }
+              },
+              onDeleted: (deletedId) {
+                if (selectedSubId == deletedId) onSubChanged(null);
               },
             ),
           ],
@@ -614,7 +621,7 @@ class _Step1Category extends ConsumerWidget {
   }
 }
 
-class _CategoryGrid extends StatelessWidget {
+class _CategoryGrid extends ConsumerWidget {
   const _CategoryGrid({
     required this.cats,
     required this.selectedId,
@@ -626,6 +633,7 @@ class _CategoryGrid extends StatelessWidget {
     this.emptyText,
     this.allowNone = false,
     this.noneLabel,
+    this.onDeleted,
   });
 
   final List<CategoryWithCount> cats;
@@ -638,9 +646,53 @@ class _CategoryGrid extends StatelessWidget {
   final String? emptyText;
   final bool allowNone;
   final String? noneLabel;
+  /// Called with the deleted category's syncId so parent can clear selection.
+  final ValueChanged<String>? onDeleted;
+
+  Future<void> _deleteCategory(
+      BuildContext context, WidgetRef ref, CategoryWithCount cat) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor:
+            isDark ? AppColors.surfaceDark : AppColors.white,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Delete "${cat.category.name}"?',
+            style: AppTextStyles.bodySemiBold(context)),
+        content: Text(
+          cat.itemCount > 0
+              ? 'This category has ${cat.itemCount} item(s). '
+                  'Deleting it will leave those items uncategorised.'
+              : 'This category will be permanently removed.',
+          style: GoogleFonts.dmSans(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Cancel',
+                style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text('Delete',
+                style: GoogleFonts.dmSans(
+                    color: AppColors.errorLight,
+                    fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await ref
+          .read(categoryProvider.notifier)
+          .softDelete(cat.category);
+      onDeleted?.call(cat.category.syncId);
+    }
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final items = [
       if (allowNone)
         _CatChip(
@@ -660,6 +712,9 @@ class _CategoryGrid extends StatelessWidget {
             cardBg: cardBg,
             textPrimary: textPrimary,
             onTap: () => onSelect(c.category.syncId),
+            onDelete: onDeleted != null
+                ? () => _deleteCategory(context, ref, c)
+                : null,
           )),
       _CatChip(
         label: '+ New',
@@ -691,6 +746,7 @@ class _CatChip extends StatelessWidget {
     required this.textPrimary,
     required this.onTap,
     this.isCreate = false,
+    this.onDelete,
   });
 
   final String label;
@@ -701,6 +757,8 @@ class _CatChip extends StatelessWidget {
   final Color textPrimary;
   final VoidCallback onTap;
   final bool isCreate;
+  /// When non-null, a small delete icon is shown on the chip.
+  final VoidCallback? onDelete;
 
   static const _maroon = Color(0xFF8B4049);
 
@@ -722,15 +780,19 @@ class _CatChip extends StatelessWidget {
       bg = cardBg;
       textColor = textPrimary;
       border = Border.all(
-          color: Colors.black.withValues(alpha: 0.06), width: 1);
+          color: Colors.black.withValues(alpha: 0.12), width: 1);
     }
 
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: EdgeInsets.only(
+          left: 14,
+          right: onDelete != null ? 4 : 14,
+          top: 10,
+          bottom: 10,
+        ),
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(12),
@@ -763,6 +825,23 @@ class _CatChip extends StatelessWidget {
                     : FontWeight.w500,
               ),
             ),
+            if (onDelete != null) ...[
+              const SizedBox(width: 4),
+              GestureDetector(
+                onTap: onDelete,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 14,
+                    color: isSelected
+                        ? Colors.white.withValues(alpha: 0.8)
+                        : AppColors.errorLight,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -1003,8 +1082,14 @@ class _Step3PricingState extends State<_Step3Pricing> {
             hint: '0.00',
             keyboardType:
                 const TextInputType.numberWithOptions(decimal: true),
-            prefixIcon: Icon(Icons.attach_money_rounded,
-                color: textPrimary.withValues(alpha: 0.4), size: 20),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text('₱',
+                  style: GoogleFonts.dmSans(
+                      color: textPrimary.withValues(alpha: 0.5),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700)),
+            ),
             textInputAction: TextInputAction.done,
           ),
 
@@ -1172,7 +1257,9 @@ class _VariantGroupEditorState extends State<_VariantGroupEditor> {
         color: cardBg,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-            color: Colors.black.withValues(alpha: 0.06)),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.15)
+                : Colors.black.withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1308,11 +1395,20 @@ class _VariantOptionRowState extends State<_VariantOptionRow> {
     final textPrimary =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.15)
+        : Colors.black.withValues(alpha: 0.15);
+    final fieldBg = isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: fieldBg,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: borderColor, width: 1.2),
+      ),
       child: Row(
         children: [
-          const SizedBox(width: 4),
           Expanded(
             flex: 3,
             child: TextField(
@@ -1327,12 +1423,13 @@ class _VariantOptionRowState extends State<_VariantOptionRow> {
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               ),
             ),
           ),
+          Container(width: 1, height: 36, color: borderColor),
           SizedBox(
-            width: 90,
+            width: 100,
             child: TextField(
               controller: _priceCtrl,
               onChanged: (_) => _notify(),
@@ -1344,7 +1441,7 @@ class _VariantOptionRowState extends State<_VariantOptionRow> {
               style: GoogleFonts.dmSans(color: textPrimary, fontSize: 13),
               textAlign: TextAlign.right,
               decoration: InputDecoration(
-                hintText: '₱ 0',
+                hintText: '0',
                 hintStyle: GoogleFonts.dmSans(
                     color: textPrimary.withValues(alpha: 0.35),
                     fontSize: 12),
@@ -1352,12 +1449,14 @@ class _VariantOptionRowState extends State<_VariantOptionRow> {
                 isDense: true,
                 prefixText: '+₱ ',
                 prefixStyle: GoogleFonts.dmSans(
-                    color: textPrimary, fontSize: 13),
+                    color: textPrimary.withValues(alpha: 0.6),
+                    fontSize: 13),
                 contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               ),
             ),
           ),
+          Container(width: 1, height: 36, color: borderColor),
           IconButton(
             icon: Icon(Icons.close_rounded,
                 size: 16, color: AppColors.errorLight),
@@ -1418,18 +1517,25 @@ class _ModifierRowState extends State<_ModifierRow> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColors.cardDark : AppColors.cardLight;
     final textPrimary =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.15)
+        : Colors.black.withValues(alpha: 0.15);
+    final fieldBg =
+        isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
+
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm, vertical: 4),
       decoration: BoxDecoration(
-          color: cardBg, borderRadius: BorderRadius.circular(12)),
+        color: fieldBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: 1.2),
+      ),
       child: Column(
         children: [
+          // Group name row with delete button
           Row(
             children: [
               Expanded(
@@ -1447,8 +1553,8 @@ class _ModifierRowState extends State<_ModifierRow> {
                         fontSize: 12),
                     border: InputBorder.none,
                     isDense: true,
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 8),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 8),
                   ),
                 ),
               ),
@@ -1461,6 +1567,8 @@ class _ModifierRowState extends State<_ModifierRow> {
               ),
             ],
           ),
+          Divider(height: 1, color: borderColor),
+          // Add-on name + price row
           Row(
             children: [
               Expanded(
@@ -1477,13 +1585,14 @@ class _ModifierRowState extends State<_ModifierRow> {
                         fontSize: 12),
                     border: InputBorder.none,
                     isDense: true,
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 8),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
                   ),
                 ),
               ),
+              Container(width: 1, height: 36, color: borderColor),
               SizedBox(
-                width: 100,
+                width: 110,
                 child: TextField(
                   controller: _priceCtrl,
                   onChanged: (_) => _notify(),
@@ -1497,7 +1606,7 @@ class _ModifierRowState extends State<_ModifierRow> {
                       color: textPrimary, fontSize: 13),
                   textAlign: TextAlign.right,
                   decoration: InputDecoration(
-                    hintText: '₱ 0',
+                    hintText: '0',
                     hintStyle: GoogleFonts.dmSans(
                         color: textPrimary.withValues(alpha: 0.35),
                         fontSize: 12),
@@ -1505,9 +1614,10 @@ class _ModifierRowState extends State<_ModifierRow> {
                     isDense: true,
                     prefixText: '+₱ ',
                     prefixStyle: GoogleFonts.dmSans(
-                        color: textPrimary, fontSize: 13),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 4),
+                        color: textPrimary.withValues(alpha: 0.6),
+                        fontSize: 13),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 10),
                   ),
                 ),
               ),
