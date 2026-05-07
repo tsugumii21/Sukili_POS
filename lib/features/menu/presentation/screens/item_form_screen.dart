@@ -61,6 +61,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
   bool _isFavorite = false;
 
   bool _isSaving = false;
+  bool _isClosing = false;
   bool get _isEdit => widget.item != null;
 
   @override
@@ -136,6 +137,18 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
   }
 
   // ── Navigation ────────────────────────────────────────────────────────────
+
+  /// Safely pops the form, guarded against navigator-lock race conditions.
+  void _closeForm([dynamic result]) {
+    if (_isClosing || !mounted) return;
+    _isClosing = true;
+    FocusScope.of(context).unfocus();
+    // Schedule for next frame so any in-progress Riverpod rebuilds complete
+    // before we touch the navigator (prevents the !_debugLocked assertion).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) Navigator.pop(context, result);
+    });
+  }
 
   void _next() {
     if (_step == 0) {
@@ -223,7 +236,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
               modifiers: List.from(_modifiers),
             );
       }
-      if (mounted) Navigator.pop(context, true);
+      _closeForm(true);
     } catch (e) {
       if (mounted) _showError('Error saving item: $e');
     } finally {
@@ -259,7 +272,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.close_rounded, color: textPrimary),
-          onPressed: () => Navigator.pop(context),
+          onPressed: _closeForm,
         ),
         title: Text(
           _isEdit ? 'Edit Item' : 'New Item',
@@ -918,7 +931,8 @@ class _Step2BasicInfo extends StatelessWidget {
     final hasImage = localImageFile != null || (imageUrl?.isNotEmpty == true);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.md),
       child: Form(
         key: formKey,
         child: Column(
@@ -926,18 +940,22 @@ class _Step2BasicInfo extends StatelessWidget {
           children: [
             // ── Image picker ────────────────────────────────────────────
             _SectionLabel(
-                label: 'Item Photo', sub: 'Pick from gallery', context: context),
+                label: 'Item Photo', sub: 'Tap to pick from gallery (max 15 MB)', context: context),
             const SizedBox(height: AppSpacing.sm),
             GestureDetector(
               onTap: () => _pickImage(context),
-              child: Container(
-                height: 160,
+              child: AspectRatio(
+                aspectRatio: 1.0,
+                child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: cardBg,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Colors.black.withValues(alpha: 0.07),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.12)
+                        : Colors.black.withValues(alpha: 0.10),
+                    width: 1.2,
                   ),
                 ),
                 clipBehavior: Clip.antiAlias,
@@ -992,6 +1010,7 @@ class _Step2BasicInfo extends StatelessWidget {
                         ],
                       )
                     : _imagePlaceholder(isDark, hintColor),
+                ),
               ),
             ),
 
@@ -1034,12 +1053,19 @@ class _Step2BasicInfo extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.add_photo_alternate_outlined,
-              size: 40, color: hintColor),
-          const SizedBox(height: 8),
+              size: 48, color: hintColor),
+          const SizedBox(height: 12),
           Text(
-            'Tap to add photo from gallery',
-            style:
-                GoogleFonts.dmSans(color: hintColor, fontSize: 13),
+            'Tap to add photo',
+            style: GoogleFonts.dmSans(
+                color: hintColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'from your gallery',
+            style: GoogleFonts.dmSans(color: hintColor, fontSize: 12),
           ),
         ],
       );
@@ -1071,11 +1097,17 @@ class _Step3PricingState extends State<_Step3Pricing> {
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      // Extra top padding so the AppTextField floating label never clips
+      // when the field is focused at the top of the scroll area.
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.md, AppSpacing.lg, AppSpacing.md, AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Base price ─────────────────────────────────────────────
+          _SectionLabel(
+              label: 'Base Price', sub: 'Starting price before options', context: context),
+          const SizedBox(height: AppSpacing.sm),
           AppTextField(
             controller: widget.priceCtrl,
             label: 'Base Price (₱)',
