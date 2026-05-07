@@ -30,7 +30,14 @@ class MenuItemCollection {
   double? lowStockThreshold;
   late int sortOrder;
 
+  /// Legacy flat variant format: [{name, priceDelta}].
+  /// Kept for backward-compat; new items use variantGroupsJson.
   List<String> variantsJson = [];
+
+  /// New multi-group variant format: [{groupName, options:[{name,priceDelta}]}].
+  /// Each entry is a JSON-encoded VariantGroupDraft.
+  List<String> variantGroupsJson = [];
+
   List<String> modifiersJson = [];
 
   late DateTime createdAt;

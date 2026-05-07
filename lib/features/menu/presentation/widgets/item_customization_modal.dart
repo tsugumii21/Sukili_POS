@@ -10,12 +10,20 @@ import '../../../../shared/isar_collections/menu_item_collection.dart';
 import '../../../orders/domain/entities/cart_item.dart';
 import '../../../orders/presentation/providers/order_provider.dart';
 
-/// Parsed variant from the item's variantsJson.
+/// Parsed variant from the item's variantsJson (legacy flat format).
 class _Variant {
   final String name;
   final double priceDelta;
 
   const _Variant({required this.name, required this.priceDelta});
+}
+
+/// Parsed variant group from the item's variantGroupsJson (new format).
+class _VariantGroup {
+  final String groupName;
+  final List<_Variant> options;
+
+  const _VariantGroup({required this.groupName, required this.options});
 }
 
 /// Parsed modifier from the item's modifiersJson.
@@ -76,16 +84,24 @@ class ItemCustomizationModal extends ConsumerStatefulWidget {
 
 class _ItemCustomizationModalState
     extends ConsumerState<ItemCustomizationModal> {
+  // Legacy flat variants (used when variantGroupsJson is empty)
   late List<_Variant> _variants;
+  // New multi-group variants
+  late List<_VariantGroup> _variantGroups;
+  /// One selected index per group (for new format).
+  late List<int> _selectedGroupIndices;
+
   late List<_Modifier> _allModifiers;
   late Map<String, List<_Modifier>> _modifierGroups;
 
+  // Legacy: single selected index
   int _selectedVariantIndex = 0;
   final Set<int> _selectedModifierIndices = {};
   int _quantity = 1;
   final _notesController = TextEditingController();
 
   bool get _isUpdateMode => widget.existingCartItem != null;
+  bool get _useGroups => _variantGroups.isNotEmpty;
 
   @override
   void initState() {
@@ -101,7 +117,36 @@ class _ItemCustomizationModalState
   }
 
   void _parseItemData() {
-    // Parse variants
+    // ── New multi-group format ────────────────────────────────────────
+    _variantGroups = widget.item.variantGroupsJson
+        .map((json) {
+          try {
+            final map = jsonDecode(json) as Map<String, dynamic>;
+            final options = (map['options'] as List<dynamic>?)
+                    ?.map((o) {
+                      final om = o as Map<String, dynamic>;
+                      return _Variant(
+                        name: om['name'] as String? ?? '',
+                        priceDelta:
+                            (om['priceDelta'] as num?)?.toDouble() ?? 0,
+                      );
+                    })
+                    .toList() ??
+                [];
+            return _VariantGroup(
+              groupName: map['groupName'] as String? ?? '',
+              options: options,
+            );
+          } catch (_) {
+            return null;
+          }
+        })
+        .whereType<_VariantGroup>()
+        .toList();
+    // Default: first option selected for each group
+    _selectedGroupIndices = List.filled(_variantGroups.length, 0);
+
+    // ── Legacy flat variants (fallback) ──────────────────────────────
     _variants = widget.item.variantsJson
         .map((json) {
           try {
@@ -117,7 +162,7 @@ class _ItemCustomizationModalState
         .whereType<_Variant>()
         .toList();
 
-    // Parse modifiers
+    // ── Modifiers ────────────────────────────────────────────────────
     _allModifiers = widget.item.modifiersJson
         .map((json) {
           try {
@@ -134,7 +179,6 @@ class _ItemCustomizationModalState
         .whereType<_Modifier>()
         .toList();
 
-    // Group modifiers by groupName
     _modifierGroups = {};
     for (final mod in _allModifiers) {
       _modifierGroups.putIfAbsent(mod.groupName, () => []).add(mod);
@@ -148,10 +192,23 @@ class _ItemCustomizationModalState
     _quantity = existing.quantity;
     _notesController.text = existing.notes ?? '';
 
-    // Restore variant selection
-    if (existing.variantName != null && _variants.isNotEmpty) {
-      final idx = _variants.indexWhere((v) => v.name == existing.variantName);
-      if (idx != -1) _selectedVariantIndex = idx;
+    if (_useGroups) {
+      // Restore group selections by matching variant name across all groups
+      if (existing.variantName != null) {
+        for (int gi = 0; gi < _variantGroups.length; gi++) {
+          final idx = _variantGroups[gi]
+              .options
+              .indexWhere((o) => o.name == existing.variantName);
+          if (idx != -1) _selectedGroupIndices[gi] = idx;
+        }
+      }
+    } else {
+      // Legacy restore
+      if (existing.variantName != null && _variants.isNotEmpty) {
+        final idx =
+            _variants.indexWhere((v) => v.name == existing.variantName);
+        if (idx != -1) _selectedVariantIndex = idx;
+      }
     }
 
     // Restore modifier selections
@@ -162,27 +219,23 @@ class _ItemCustomizationModalState
     }
   }
 
-  /// Calculates the running total: (base + variant delta + modifier deltas) × quantity.
-  double get _runningTotal {
-    double unitPrice = widget.item.basePrice;
-
-    // Add variant delta
-    if (_variants.isNotEmpty) {
-      unitPrice += _variants[_selectedVariantIndex].priceDelta;
-    }
-
-    // Add modifier deltas
-    for (final idx in _selectedModifierIndices) {
-      unitPrice += _allModifiers[idx].priceDelta;
-    }
-
-    return unitPrice * _quantity;
-  }
+  /// Calculates the running total: (base + variant deltas + modifier deltas) × quantity.
+  double get _runningTotal => _unitPrice * _quantity;
 
   /// The unit price (before quantity multiplication).
   double get _unitPrice {
     double price = widget.item.basePrice;
-    if (_variants.isNotEmpty) {
+    if (_useGroups) {
+      for (int gi = 0; gi < _variantGroups.length; gi++) {
+        final g = _variantGroups[gi];
+        final selIdx = gi < _selectedGroupIndices.length
+            ? _selectedGroupIndices[gi]
+            : 0;
+        if (selIdx < g.options.length) {
+          price += g.options[selIdx].priceDelta;
+        }
+      }
+    } else if (_variants.isNotEmpty) {
       price += _variants[_selectedVariantIndex].priceDelta;
     }
     for (final idx in _selectedModifierIndices) {
@@ -191,9 +244,30 @@ class _ItemCustomizationModalState
     return price;
   }
 
+  /// Returns a human-readable variant description for cart display.
+  /// e.g. "Large / Iced" for multi-group, "Large" for legacy.
+  String? get _selectedVariantLabel {
+    if (_useGroups) {
+      final parts = <String>[];
+      for (int gi = 0; gi < _variantGroups.length; gi++) {
+        final g = _variantGroups[gi];
+        final selIdx = gi < _selectedGroupIndices.length
+            ? _selectedGroupIndices[gi]
+            : 0;
+        if (selIdx < g.options.length) {
+          parts.add(g.options[selIdx].name);
+        }
+      }
+      return parts.isEmpty ? null : parts.join(' / ');
+    } else {
+      return _variants.isNotEmpty
+          ? _variants[_selectedVariantIndex].name
+          : null;
+    }
+  }
+
   void _addOrUpdateCart() {
-    final variantName =
-        _variants.isNotEmpty ? _variants[_selectedVariantIndex].name : null;
+    final variantName = _selectedVariantLabel;
 
     final selectedModNames = _selectedModifierIndices
         .map((i) => _allModifiers[i].name)
@@ -364,8 +438,136 @@ class _ItemCustomizationModalState
 
                           const SizedBox(height: 20),
 
-                          // ── Variant Selection ─────────────────────────
-                          if (_variants.isNotEmpty) ...[
+                          // ── Variant Selection (new multi-group) ───────
+                          if (_useGroups) ...[
+                            ..._variantGroups
+                                .asMap()
+                                .entries
+                                .map((entry) {
+                              final gi = entry.key;
+                              final group = entry.value;
+                              return Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    group.groupName.toUpperCase(),
+                                    style: GoogleFonts.dmSans(
+                                      color: textPrimary
+                                          .withValues(alpha: 0.4),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 1.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: List.generate(
+                                        group.options.length, (oi) {
+                                      final opt = group.options[oi];
+                                      final isSelected =
+                                          _selectedGroupIndices[gi] == oi;
+                                      final price =
+                                          widget.item.basePrice +
+                                              opt.priceDelta;
+                                      return Expanded(
+                                        child: GestureDetector(
+                                          onTap: () => setState(() =>
+                                              _selectedGroupIndices[gi] =
+                                                  oi),
+                                          child: AnimatedContainer(
+                                            duration: const Duration(
+                                                milliseconds: 200),
+                                            margin: EdgeInsets.only(
+                                                right: oi <
+                                                        group.options
+                                                                .length -
+                                                            1
+                                                    ? 10
+                                                    : 0),
+                                            padding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 14),
+                                            decoration: BoxDecoration(
+                                              color: isSelected
+                                                  ? const Color(
+                                                      0xFF8B4049)
+                                                  : chipBg,
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      14),
+                                              border: isSelected
+                                                  ? null
+                                                  : Border.all(
+                                                      color: Colors.black
+                                                          .withValues(
+                                                              alpha:
+                                                                  0.06)),
+                                              boxShadow: isSelected
+                                                  ? [
+                                                      BoxShadow(
+                                                        color: const Color(
+                                                                0xFF8B4049)
+                                                            .withValues(
+                                                                alpha:
+                                                                    0.25),
+                                                        blurRadius: 8,
+                                                        offset:
+                                                            const Offset(
+                                                                0, 3),
+                                                      )
+                                                    ]
+                                                  : null,
+                                            ),
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  opt.name,
+                                                  style:
+                                                      GoogleFonts.dmSans(
+                                                    color: isSelected
+                                                        ? AppColors.white
+                                                        : textPrimary,
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                        FontWeight.w700,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  opt.priceDelta == 0
+                                                      ? CurrencyFormatter
+                                                          .format(price)
+                                                      : '+${CurrencyFormatter.format(opt.priceDelta)}',
+                                                  style:
+                                                      GoogleFonts.dmSans(
+                                                    color: isSelected
+                                                        ? AppColors.white
+                                                            .withValues(
+                                                                alpha: 0.7)
+                                                        : textPrimary
+                                                            .withValues(
+                                                                alpha: 0.5),
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                  const SizedBox(height: 20),
+                                ],
+                              );
+                            }),
+                          ]
+
+                          // ── Legacy single variant row ─────────────────
+                          else if (_variants.isNotEmpty) ...[
                             Text(
                               'SIZE',
                               style: GoogleFonts.dmSans(

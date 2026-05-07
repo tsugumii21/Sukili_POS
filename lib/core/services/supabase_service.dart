@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 import '../constants/app_constants.dart';
 import '../errors/app_exception.dart';
@@ -72,6 +73,31 @@ class SupabaseService {
           .eq(SupabaseConstants.syncId, syncId);
     } catch (e) {
       throw DatabaseException('Failed to soft delete in Supabase: $e');
+    }
+  }
+
+  // --- STORAGE METHODS ---
+
+  /// Uploads [bytes] to the `menu-items` bucket at [path] and returns
+  /// the public URL, or null on failure.
+  ///
+  /// Prerequisites: Create a public bucket named `menu-items` in Supabase
+  /// Storage and enable public read access.
+  Future<String?> uploadMenuImage(List<int> bytes, String fileName) async {
+    try {
+      final ext = fileName.contains('.')
+          ? fileName.split('.').last.toLowerCase()
+          : 'jpg';
+      final storagePath =
+          '${DateTime.now().millisecondsSinceEpoch}_$fileName';
+      await client.storage.from('menu-items').uploadBinary(
+            storagePath,
+            bytes is Uint8List ? bytes : Uint8List.fromList(bytes),
+            fileOptions: sb.FileOptions(contentType: 'image/$ext'),
+          );
+      return client.storage.from('menu-items').getPublicUrl(storagePath);
+    } catch (e) {
+      return null;
     }
   }
 }

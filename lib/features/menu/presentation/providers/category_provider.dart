@@ -90,6 +90,35 @@ class CategoryNotifier
     required String name,
     String? iconEmoji,
     String? description,
+    String? parentId,
+  }) async {
+    await _doCreate(
+        name: name,
+        iconEmoji: iconEmoji,
+        description: description,
+        parentId: parentId);
+  }
+
+  /// Creates a category and returns its new syncId.
+  /// Used for inline "Create New" from item form.
+  Future<String> createCategoryAndReturnId({
+    required String name,
+    String? iconEmoji,
+    String? description,
+    String? parentId,
+  }) async {
+    return await _doCreate(
+        name: name,
+        iconEmoji: iconEmoji,
+        description: description,
+        parentId: parentId);
+  }
+
+  Future<String> _doCreate({
+    required String name,
+    String? iconEmoji,
+    String? description,
+    String? parentId,
   }) async {
     final now = DateTime.now();
     final syncId = _uuid.v4();
@@ -104,6 +133,7 @@ class CategoryNotifier
 
     final category = CategoryCollection()
       ..syncId = syncId
+      ..parentId = parentId
       ..name = name.trim()
       ..iconEmoji = iconEmoji?.trim().isNotEmpty == true ? iconEmoji!.trim() : null
       ..description = description?.trim().isNotEmpty == true ? description!.trim() : null
@@ -123,6 +153,7 @@ class CategoryNotifier
       operation: 'insert',
       payload: _toPayload(category),
     );
+    return syncId;
   }
 
   // ── Update ──────────────────────────────────────────────────────────────────
@@ -245,6 +276,7 @@ class CategoryNotifier
 
   Map<String, dynamic> _toPayload(CategoryCollection c) => {
         'sync_id': c.syncId,
+        'parent_id': c.parentId,
         'name': c.name,
         'description': c.description,
         'icon_emoji': c.iconEmoji,

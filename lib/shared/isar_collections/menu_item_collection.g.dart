@@ -103,8 +103,13 @@ const MenuItemCollectionSchema = CollectionSchema(
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
-    r'variantsJson': PropertySchema(
+    r'variantGroupsJson': PropertySchema(
       id: 17,
+      name: r'variantGroupsJson',
+      type: IsarType.stringList,
+    ),
+    r'variantsJson': PropertySchema(
+      id: 18,
       name: r'variantsJson',
       type: IsarType.stringList,
     )
@@ -217,6 +222,13 @@ int _menuItemCollectionEstimateSize(
   }
   bytesCount += 3 + object.name.length * 3;
   bytesCount += 3 + object.syncId.length * 3;
+  bytesCount += 3 + object.variantGroupsJson.length * 3;
+  {
+    for (var i = 0; i < object.variantGroupsJson.length; i++) {
+      final value = object.variantGroupsJson[i];
+      bytesCount += value.length * 3;
+    }
+  }
   bytesCount += 3 + object.variantsJson.length * 3;
   {
     for (var i = 0; i < object.variantsJson.length; i++) {
@@ -250,7 +262,8 @@ void _menuItemCollectionSerialize(
   writer.writeString(offsets[14], object.syncId);
   writer.writeBool(offsets[15], object.trackInventory);
   writer.writeDateTime(offsets[16], object.updatedAt);
-  writer.writeStringList(offsets[17], object.variantsJson);
+  writer.writeStringList(offsets[17], object.variantGroupsJson);
+  writer.writeStringList(offsets[18], object.variantsJson);
 }
 
 MenuItemCollection _menuItemCollectionDeserialize(
@@ -278,7 +291,8 @@ MenuItemCollection _menuItemCollectionDeserialize(
   object.syncId = reader.readString(offsets[14]);
   object.trackInventory = reader.readBool(offsets[15]);
   object.updatedAt = reader.readDateTime(offsets[16]);
-  object.variantsJson = reader.readStringList(offsets[17]) ?? [];
+  object.variantGroupsJson = reader.readStringList(offsets[17]) ?? [];
+  object.variantsJson = reader.readStringList(offsets[18]) ?? [];
   return object;
 }
 
@@ -324,6 +338,8 @@ P _menuItemCollectionDeserializeProp<P>(
     case 16:
       return (reader.readDateTime(offset)) as P;
     case 17:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 18:
       return (reader.readStringList(offset) ?? []) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -2183,6 +2199,233 @@ extension MenuItemCollectionQueryFilter
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'variantGroupsJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'variantGroupsJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'variantGroupsJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'variantGroupsJson',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'variantGroupsJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'variantGroupsJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonElementContains(String value,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'variantGroupsJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonElementMatches(String pattern,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'variantGroupsJson',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'variantGroupsJson',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'variantGroupsJson',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'variantGroupsJson',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'variantGroupsJson',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'variantGroupsJson',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'variantGroupsJson',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'variantGroupsJson',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      variantGroupsJsonLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'variantGroupsJson',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
       variantsJsonElementEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -3004,6 +3247,13 @@ extension MenuItemCollectionQueryWhereDistinct
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QDistinct>
+      distinctByVariantGroupsJson() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'variantGroupsJson');
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QDistinct>
       distinctByVariantsJson() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'variantsJson');
@@ -3130,6 +3380,13 @@ extension MenuItemCollectionQueryProperty
       updatedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'updatedAt');
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, List<String>, QQueryOperations>
+      variantGroupsJsonProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'variantGroupsJson');
     });
   }
 

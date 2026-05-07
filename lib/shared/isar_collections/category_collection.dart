@@ -9,6 +9,10 @@ class CategoryCollection {
   @Index(unique: true, replace: true)
   late String syncId;
 
+  /// syncId of the parent category; null = top-level category.
+  @Index()
+  String? parentId;
+
   late String name;
   String? description;
   String? iconEmoji;

@@ -8,7 +8,55 @@ import '../../../../core/services/sync_service.dart';
 import '../../../../shared/isar_collections/category_collection.dart';
 import '../../../../shared/isar_collections/menu_item_collection.dart';
 
-/// In-memory draft for a variant row during editing.
+/// In-memory draft for a single option within a variant group.
+/// e.g. {name: "Small", priceDelta: 0} or {name: "Hot", priceDelta: 0}
+class VariantOptionDraft {
+  String name;
+  double priceDelta;
+
+  VariantOptionDraft({required this.name, required this.priceDelta});
+
+  Map<String, dynamic> toJson() => {'name': name, 'priceDelta': priceDelta};
+
+  factory VariantOptionDraft.fromJson(Map<String, dynamic> map) =>
+      VariantOptionDraft(
+        name: map['name'] as String? ?? '',
+        priceDelta: (map['priceDelta'] as num?)?.toDouble() ?? 0,
+      );
+
+  VariantOptionDraft copyWith({String? name, double? priceDelta}) =>
+      VariantOptionDraft(
+          name: name ?? this.name,
+          priceDelta: priceDelta ?? this.priceDelta);
+}
+
+/// In-memory draft for a named variant group (e.g. "Size", "Temperature").
+/// Each group has a set of mutually-exclusive options; selecting one from each
+/// group adds its priceDelta to the base price.
+class VariantGroupDraft {
+  String groupName;
+  List<VariantOptionDraft> options;
+
+  VariantGroupDraft({required this.groupName, required this.options});
+
+  Map<String, dynamic> toJson() => {
+        'groupName': groupName,
+        'options': options.map((o) => o.toJson()).toList(),
+      };
+
+  factory VariantGroupDraft.fromJson(Map<String, dynamic> map) =>
+      VariantGroupDraft(
+        groupName: map['groupName'] as String? ?? '',
+        options: (map['options'] as List<dynamic>?)
+                ?.map((o) =>
+                    VariantOptionDraft.fromJson(o as Map<String, dynamic>))
+                .toList() ??
+            [],
+      );
+}
+
+/// Legacy single-option variant (used in old items / backward-compat only).
+/// New items use [VariantGroupDraft] via variantGroupsJson.
 class VariantDraft {
   String name;
   double priceDelta;
@@ -21,9 +69,6 @@ class VariantDraft {
         name: map['name'] as String? ?? '',
         priceDelta: (map['priceDelta'] as num?)?.toDouble() ?? 0,
       );
-
-  VariantDraft copyWith({String? name, double? priceDelta}) =>
-      VariantDraft(name: name ?? this.name, priceDelta: priceDelta ?? this.priceDelta);
 }
 
 /// In-memory draft for a modifier row during editing.
@@ -219,10 +264,7 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
     String? imageUrl,
     bool isAvailable = true,
     bool isFavorite = false,
-    bool trackInventory = false,
-    double? stockQuantity,
-    double? lowStockThreshold,
-    List<VariantDraft> variants = const [],
+    List<VariantGroupDraft> variantGroups = const [],
     List<ModifierDraft> modifiers = const [],
   }) async {
     final now = DateTime.now();
@@ -245,11 +287,11 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
           imageUrl?.trim().isNotEmpty == true ? imageUrl!.trim() : null
       ..isAvailable = isAvailable
       ..isFavorite = isFavorite
-      ..trackInventory = trackInventory
-      ..stockQuantity = trackInventory ? (stockQuantity ?? 0) : null
-      ..lowStockThreshold = trackInventory ? (lowStockThreshold ?? 5) : null
+      ..trackInventory = false
       ..sortOrder = nextOrder
-      ..variantsJson = variants.map((v) => jsonEncode(v.toJson())).toList()
+      ..variantsJson = []
+      ..variantGroupsJson =
+          variantGroups.map((g) => jsonEncode(g.toJson())).toList()
       ..modifiersJson =
           modifiers.map((m) => jsonEncode(m.toJson())).toList()
       ..createdAt = now
@@ -279,10 +321,7 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
     String? imageUrl,
     required bool isAvailable,
     required bool isFavorite,
-    required bool trackInventory,
-    double? stockQuantity,
-    double? lowStockThreshold,
-    required List<VariantDraft> variants,
+    required List<VariantGroupDraft> variantGroups,
     required List<ModifierDraft> modifiers,
   }) async {
     item
@@ -295,10 +334,9 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
           imageUrl?.trim().isNotEmpty == true ? imageUrl!.trim() : null
       ..isAvailable = isAvailable
       ..isFavorite = isFavorite
-      ..trackInventory = trackInventory
-      ..stockQuantity = trackInventory ? (stockQuantity ?? 0) : null
-      ..lowStockThreshold = trackInventory ? (lowStockThreshold ?? 5) : null
-      ..variantsJson = variants.map((v) => jsonEncode(v.toJson())).toList()
+      ..variantsJson = []
+      ..variantGroupsJson =
+          variantGroups.map((g) => jsonEncode(g.toJson())).toList()
       ..modifiersJson = modifiers.map((m) => jsonEncode(m.toJson())).toList()
       ..updatedAt = DateTime.now()
       ..isSynced = false;
@@ -348,6 +386,7 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
         'low_stock_threshold': i.lowStockThreshold,
         'sort_order': i.sortOrder,
         'variants_json': i.variantsJson,
+        'variant_groups_json': i.variantGroupsJson,
         'modifiers_json': i.modifiersJson,
         'is_deleted': i.isDeleted,
         'created_at': i.createdAt.toIso8601String(),

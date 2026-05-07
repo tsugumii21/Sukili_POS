@@ -10,6 +10,53 @@ import '../../shared/isar_collections/menu_item_collection.dart';
 class SeedData {
   static const _uuid = Uuid();
 
+  /// Migrates items that still use the old flat `variantsJson` format
+  /// (list of {name, priceDelta}) into the new `variantGroupsJson` format
+  /// (list of {groupName, options:[{name, priceDelta}]}).
+  ///
+  /// Idempotent — only processes items where variantGroupsJson is empty.
+  static Future<void> migrateVariantsToGroups(Isar isar) async {
+    final items = await isar.menuItemCollections
+        .filter()
+        .isDeletedEqualTo(false)
+        .findAll();
+
+    final toUpdate = <MenuItemCollection>[];
+
+    for (final item in items) {
+      if (item.variantsJson.isEmpty) continue;
+      if (item.variantGroupsJson.isNotEmpty) continue;
+
+      // Convert flat variants to a single "Size" group
+      final options = item.variantsJson.map((s) {
+        try {
+          final m = jsonDecode(s) as Map<String, dynamic>;
+          return <String, dynamic>{
+            'name': m['name'] ?? '',
+            'priceDelta': (m['priceDelta'] as num?)?.toDouble() ?? 0,
+          };
+        } catch (_) {
+          return null;
+        }
+      }).whereType<Map<String, dynamic>>().toList();
+
+      if (options.isEmpty) continue;
+
+      item.variantGroupsJson = [
+        jsonEncode({'groupName': 'Size', 'options': options}),
+      ];
+      item.variantsJson = [];
+      item.updatedAt = DateTime.now();
+      toUpdate.add(item);
+    }
+
+    if (toUpdate.isNotEmpty) {
+      await isar.writeTxn(() async {
+        await isar.menuItemCollections.putAll(toUpdate);
+      });
+    }
+  }
+
   /// Removes legacy demo accounts that should no longer exist in the app.
   /// Run this once at startup before [seedInitialData].
   static Future<void> cleanupLegacyData(Isar isar) async {

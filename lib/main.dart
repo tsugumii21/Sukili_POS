@@ -39,5 +39,8 @@ void main() async {
   // Remove legacy demo accounts
   await SeedData.cleanupLegacyData(IsarService.instance.isar);
 
+  // Migrate old flat variantsJson → new variantGroupsJson format (idempotent)
+  await SeedData.migrateVariantsToGroups(IsarService.instance.isar);
+
   runApp(const ProviderScope(child: SukliPosApp()));
 }

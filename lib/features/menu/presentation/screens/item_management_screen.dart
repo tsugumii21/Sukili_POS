@@ -49,10 +49,7 @@ class _ItemManagementScreenState
     await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (_) => ItemFormScreen(
-          item: item,
-          categories: stateData.categories,
-        ),
+        builder: (_) => ItemFormScreen(item: item),
       ),
     );
   }
