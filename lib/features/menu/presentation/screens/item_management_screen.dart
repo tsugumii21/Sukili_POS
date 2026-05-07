@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -59,7 +60,7 @@ class _ItemManagementScreenState
     final messenger = ScaffoldMessenger.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text('Delete Item?',
             style: AppTextStyles.bodySemiBold(context)),
@@ -69,12 +70,12 @@ class _ItemManagementScreenState
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(dialogCtx, false),
             child: Text('Cancel',
                 style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogCtx, true),
             child: Text('Delete',
                 style: GoogleFonts.dmSans(
                     color: AppColors.errorLight,
@@ -117,7 +118,7 @@ class _ItemManagementScreenState
       elevation: 0,
       leading: IconButton(
         icon: Icon(Icons.arrow_back_rounded, color: textPrimary),
-        onPressed: () => Navigator.pop(context),
+        onPressed: () => context.pop(),
       ),
       title: _showSearch
           ? TextField(

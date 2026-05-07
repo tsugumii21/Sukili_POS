@@ -316,7 +316,7 @@ class AdminDashboardScreen extends ConsumerWidget {
   Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: Text(
           'Logout',
           style: GoogleFonts.dmSans(fontWeight: FontWeight.w700),
@@ -327,11 +327,11 @@ class AdminDashboardScreen extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(dialogCtx, false),
             child: Text('Cancel', style: GoogleFonts.dmSans()),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogCtx, true),
             child: Text(
               'Logout',
               style: GoogleFonts.dmSans(

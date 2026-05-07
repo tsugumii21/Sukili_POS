@@ -565,7 +565,7 @@ class _Step1Category extends ConsumerWidget {
     final ctrl = TextEditingController();
     return showDialog<String>(
       context: context,
-      builder: (_) {
+      builder: (dialogCtx) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return AlertDialog(
           backgroundColor:
@@ -595,14 +595,14 @@ class _Step1Category extends ConsumerWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogCtx),
               child: Text('Cancel',
                   style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
             ),
             TextButton(
               onPressed: () {
                 if (ctrl.text.trim().isNotEmpty) {
-                  Navigator.pop(context, ctrl.text.trim());
+                  Navigator.pop(dialogCtx, ctrl.text.trim());
                 }
               },
               child: Text('Create',
@@ -666,7 +666,7 @@ class _CategoryGrid extends ConsumerWidget {
       BuildContext context, WidgetRef ref, CategoryWithCount cat) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         backgroundColor:
             isDark ? AppColors.surfaceDark : AppColors.white,
         shape:
@@ -682,12 +682,12 @@ class _CategoryGrid extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(dialogCtx, false),
             child: Text('Cancel',
                 style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogCtx, true),
             child: Text('Delete',
                 style: GoogleFonts.dmSans(
                     color: AppColors.errorLight,

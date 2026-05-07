@@ -171,7 +171,7 @@ class _UserFormScreenState extends ConsumerState<UserFormScreen> {
   Future<void> _confirmDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: Text(
           'Delete User',
           style: GoogleFonts.dmSans(fontWeight: FontWeight.w700),
@@ -182,11 +182,11 @@ class _UserFormScreenState extends ConsumerState<UserFormScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(dialogCtx, false),
             child: Text('Cancel', style: GoogleFonts.dmSans()),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogCtx, true),
             child: Text(
               'Delete',
               style: GoogleFonts.dmSans(

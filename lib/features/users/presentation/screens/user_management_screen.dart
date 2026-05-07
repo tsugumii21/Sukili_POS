@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -123,7 +124,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
           : IconButton(
               icon: Icon(Icons.arrow_back_ios_new_rounded,
                   color: textPrimary, size: 20),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.pop(),
             ),
       title: _showSearch
           ? TextField(
