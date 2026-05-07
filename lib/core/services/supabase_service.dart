@@ -83,7 +83,12 @@ class SupabaseService {
   ///
   /// Prerequisites: Create a public bucket named `menu-items` in Supabase
   /// Storage and enable public read access.
+  ///
+  /// Rejects files larger than 15 MB.
+  static const int maxImageBytes = 15 * 1024 * 1024; // 15 MB
+
   Future<String?> uploadMenuImage(List<int> bytes, String fileName) async {
+    if (bytes.length > maxImageBytes) return null;
     try {
       final ext = fileName.contains('.')
           ? fileName.split('.').last.toLowerCase()

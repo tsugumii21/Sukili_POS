@@ -791,24 +791,41 @@ class _Step2BasicInfo extends StatelessWidget {
   final ValueChanged<File?> onImagePicked;
   final VoidCallback onImageRemoved;
 
+  static const int _maxImageBytes = 15 * 1024 * 1024; // 15 MB
+
   Future<void> _pickImage(BuildContext context) async {
     final picker = ImagePicker();
+    final messenger = ScaffoldMessenger.of(context);
     try {
       final XFile? picked = await picker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 85,
         maxWidth: 1200,
       );
-      if (picked != null) {
-        onImagePicked(File(picked.path));
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Could not open gallery: $e'),
+      if (picked == null) return;
+
+      final bytes = await picked.length();
+      if (bytes > _maxImageBytes) {
+        messenger.showSnackBar(SnackBar(
+          content: Text(
+            'Image is too large (${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB). '
+            'Maximum allowed size is 15 MB.',
+            style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
+          ),
           backgroundColor: AppColors.errorLight,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ));
+        return;
       }
+
+      onImagePicked(File(picked.path));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(
+        content: Text('Could not open gallery: $e'),
+        backgroundColor: AppColors.errorLight,
+      ));
     }
   }
 
