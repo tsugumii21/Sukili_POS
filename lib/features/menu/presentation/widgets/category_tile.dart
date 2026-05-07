@@ -85,7 +85,7 @@ class CategoryTile extends StatelessWidget {
                 child: hasEmoji
                     ? Text(
                         category.iconEmoji!,
-                        style: const TextStyle(fontSize: 20),
+                        style: GoogleFonts.dmSans(fontSize: 20),
                       )
                     : Text(
                         initial,

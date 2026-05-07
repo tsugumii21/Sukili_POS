@@ -304,7 +304,7 @@ class _CategoryTabsRow extends StatelessWidget {
           ...categories.map((cat) {
             final count = countForCategory(cat.syncId);
             return _Tab(
-              label: '${cat.iconEmoji ?? ''} ${cat.name}'.trim(),
+              label: cat.name,
               count: count,
               isSelected: selectedId == cat.syncId,
               onTap: () => onSelect(cat.syncId),

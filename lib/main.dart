@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'core/services/isar_service.dart';
 import 'core/services/supabase_service.dart';
 import 'core/services/sync_service.dart';
+import 'core/utils/seed_data.dart';
 import 'app.dart';
 
 void main() async {
@@ -34,6 +35,9 @@ void main() async {
   await IsarService.instance.init();
   await SupabaseService.instance.init();
   SyncService.instance.startPeriodicSync();
+
+  // Remove legacy demo accounts
+  await SeedData.cleanupLegacyData(IsarService.instance.isar);
 
   runApp(const ProviderScope(child: SukliPosApp()));
 }

@@ -107,7 +107,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                         : AppColors.accentLight.withValues(alpha: 0.15),
                     child: Text(
                       initial,
-                      style: TextStyle(
+                      style: GoogleFonts.dmSans(
                         color: isDark
                             ? AppColors.accentDarkLight
                             : AppColors.accentLight,

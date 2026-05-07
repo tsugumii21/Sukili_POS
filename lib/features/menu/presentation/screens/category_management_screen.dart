@@ -343,7 +343,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                             child: Center(
                               child: hasEmoji
                                   ? Text(emojiVal.text.trim(),
-                                      style: const TextStyle(fontSize: 24))
+                                      style: GoogleFonts.dmSans(fontSize: 24))
                                   : Text(
                                       initial,
                                       style: GoogleFonts.dmSans(

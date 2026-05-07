@@ -10,6 +10,23 @@ import '../../shared/isar_collections/menu_item_collection.dart';
 class SeedData {
   static const _uuid = Uuid();
 
+  /// Removes legacy demo accounts that should no longer exist in the app.
+  /// Run this once at startup before [seedInitialData].
+  static Future<void> cleanupLegacyData(Isar isar) async {
+    final legacy = await isar.userCollections
+        .filter()
+        .emailEqualTo('admin@suklipos.com')
+        .findAll();
+    if (legacy.isEmpty) return;
+    await isar.writeTxn(() async {
+      for (final u in legacy) {
+        u.isDeleted = true;
+        u.updatedAt = DateTime.now();
+      }
+      await isar.userCollections.putAll(legacy);
+    });
+  }
+
   static Future<void> seedInitialData(Isar isar) async {
     final now = DateTime.now();
 

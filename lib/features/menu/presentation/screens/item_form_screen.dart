@@ -505,15 +505,7 @@ class _Step1Basic extends StatelessWidget {
                   items: categories
                       .map((c) => DropdownMenuItem(
                             value: c.syncId,
-                            child: Row(
-                              children: [
-                                if (c.iconEmoji != null)
-                                  Text('${c.iconEmoji} ',
-                                      style:
-                                          const TextStyle(fontSize: 16)),
-                                Text(c.name),
-                              ],
-                            ),
+                            child: Text(c.name),
                           ))
                       .toList(),
                   onChanged: onCategoryChanged,
