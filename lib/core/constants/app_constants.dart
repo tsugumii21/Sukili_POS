@@ -19,9 +19,6 @@ class AppConstants {
   static const int syncIntervalSeconds = 30;
   static const int maxSyncRetries = 3;
   
-  // Inventory
-  static const double defaultLowStockThreshold = 5.0;
-  
   // Currency
   static const String currencySymbol = '₱';
   static const String currencyCode = 'PHP';

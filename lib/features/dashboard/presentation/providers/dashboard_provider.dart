@@ -9,20 +9,17 @@ class DashboardData {
   final double todaySales;
   final int todayOrders;
   final List<MenuItemCollection> favorites;
-  final List<MenuItemCollection> lowStockItems;
   final List<OrderCollection> recentOrders;
 
   DashboardData({
     required this.todaySales,
     required this.todayOrders,
     required this.favorites,
-    required this.lowStockItems,
     required this.recentOrders,
   });
 }
 
 /// DashboardNotifier manages the state of the Cashier Dashboard.
-/// Migrated to Notifier for consistency with the modern Riverpod API used in this project.
 class DashboardNotifier extends Notifier<AsyncValue<DashboardData>> {
   @override
   AsyncValue<DashboardData> build() {
@@ -33,10 +30,7 @@ class DashboardNotifier extends Notifier<AsyncValue<DashboardData>> {
   IsarService get _isar => IsarService.instance;
 
   void _init() {
-    // Initial refresh
     Future.microtask(() => refreshData());
-    
-    // Watch for changes in orders and items
     _isar.isar.orderCollections.watchLazy().listen((_) => refreshData());
     _isar.isar.menuItemCollections.watchLazy().listen((_) => refreshData());
   }
@@ -68,21 +62,7 @@ class DashboardNotifier extends Notifier<AsyncValue<DashboardData>> {
           .sortBySortOrder()
           .findAll();
 
-      // 3. Low Stock alert
-      final items = await _isar.isar.menuItemCollections
-          .filter()
-          .trackInventoryEqualTo(true)
-          .and()
-          .isDeletedEqualTo(false)
-          .findAll();
-      
-      final lowStock = items.where((item) {
-        final current = item.stockQuantity ?? 0;
-        final threshold = item.lowStockThreshold ?? 5.0;
-        return current <= threshold;
-      }).toList();
-
-      // 4. Recent
+      // 3. Recent orders
       final recent = await _isar.isar.orderCollections
           .where()
           .sortByOrderedAtDesc()
@@ -93,7 +73,6 @@ class DashboardNotifier extends Notifier<AsyncValue<DashboardData>> {
         todaySales: salesTotal,
         todayOrders: todayOrders.length,
         favorites: favorites,
-        lowStockItems: lowStock,
         recentOrders: recent,
       ));
     } catch (e, st) {

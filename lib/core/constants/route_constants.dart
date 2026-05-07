@@ -21,7 +21,6 @@ class RouteConstants {
   static const String adminUsers     = '/admin/users';
   static const String adminMenuCats  = '/admin/menu/categories';
   static const String adminMenuItems = '/admin/menu/items';
-  static const String adminInventory = '/admin/inventory';
   static const String adminVoids     = '/admin/void-refund';
   static const String adminReports   = '/admin/reports';
   static const String adminEndOfDay  = '/admin/end-of-day';

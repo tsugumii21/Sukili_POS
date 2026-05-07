@@ -155,7 +155,6 @@ class SeedData {
             ..basePrice = 65
             ..isAvailable = true
             ..isFavorite = true
-            ..trackInventory = false
             ..sortOrder = 1
             ..variantsJson = [
               jsonEncode({"name": "Small", "priceDelta": 0}),
@@ -173,8 +172,6 @@ class SeedData {
             ..basePrice = 120
             ..isAvailable = true
             ..isFavorite = true
-            ..trackInventory = true
-            ..stockQuantity = 50
             ..sortOrder = 1
             ..createdAt = now
             ..updatedAt = now
@@ -187,8 +184,6 @@ class SeedData {
             ..basePrice = 55
             ..isAvailable = true
             ..isFavorite = false
-            ..trackInventory = true
-            ..stockQuantity = 20
             ..sortOrder = 1
             ..createdAt = now
             ..updatedAt = now
@@ -202,8 +197,6 @@ class SeedData {
             ..basePrice = 85
             ..isAvailable = true
             ..isFavorite = true
-            ..trackInventory = true
-            ..stockQuantity = 30
             ..sortOrder = 2
             ..variantsJson = [
               jsonEncode({"name": "Regular", "priceDelta": 0}),

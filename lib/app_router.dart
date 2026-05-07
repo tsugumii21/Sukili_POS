@@ -22,7 +22,6 @@ import 'features/dashboard/presentation/screens/admin_dashboard_screen.dart';
 import 'features/users/presentation/screens/user_management_screen.dart';
 import 'features/menu/presentation/screens/category_management_screen.dart';
 import 'features/menu/presentation/screens/item_management_screen.dart';
-import 'features/inventory/presentation/screens/inventory_screen.dart';
 import 'features/void_refund/presentation/screens/void_refund_screen.dart';
 import 'features/reports/presentation/screens/reports_screen.dart';
 import 'features/reports/presentation/screens/end_of_day_screen.dart';
@@ -101,10 +100,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: RouteConstants.adminMenuItems,
             builder: (c, s) => const ItemManagementScreen(),
-          ),
-          GoRoute(
-            path: RouteConstants.adminInventory,
-            builder: (c, s) => const InventoryScreen(),
           ),
           GoRoute(
             path: RouteConstants.adminVoids,

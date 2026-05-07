@@ -287,7 +287,6 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
           imageUrl?.trim().isNotEmpty == true ? imageUrl!.trim() : null
       ..isAvailable = isAvailable
       ..isFavorite = isFavorite
-      ..trackInventory = false
       ..sortOrder = nextOrder
       ..variantsJson = []
       ..variantGroupsJson =
@@ -381,9 +380,6 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
         'image_url': i.imageUrl,
         'is_available': i.isAvailable,
         'is_favorite': i.isFavorite,
-        'track_inventory': i.trackInventory,
-        'stock_quantity': i.stockQuantity,
-        'low_stock_threshold': i.lowStockThreshold,
         'sort_order': i.sortOrder,
         'variants_json': i.variantsJson,
         'variant_groups_json': i.variantGroupsJson,

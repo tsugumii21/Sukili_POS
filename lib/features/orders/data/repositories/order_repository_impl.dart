@@ -4,22 +4,19 @@ import 'package:isar_community/isar.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../shared/isar_collections/inventory_log_collection.dart';
-import '../../../../shared/isar_collections/menu_item_collection.dart';
 import '../../../../shared/isar_collections/order_collection.dart';
 import '../../../../shared/isar_collections/sync_queue_collection.dart';
 import '../../domain/entities/order_state.dart';
 
-/// Handles persisting completed orders, sync queue entries, and inventory
-/// adjustments in a single atomic Isar transaction.
+/// Handles persisting completed orders and sync queue entries
+/// in a single atomic Isar transaction.
 class OrderRepositoryImpl {
   const OrderRepositoryImpl(this._isar);
   final Isar _isar;
 
   static const _uuid = Uuid();
 
-  /// Saves a completed order to Isar, enqueues it for Supabase sync,
-  /// and auto-deducts stock for all inventory-tracked cart items.
+  /// Saves a completed order to Isar and enqueues it for Supabase sync.
   Future<OrderCollection> saveOrder({
     required OrderState orderState,
     required String cashierId,
@@ -87,71 +84,6 @@ class OrderRepositoryImpl {
           now: now,
         ),
       );
-
-      // 3. Deduct inventory for each tracked item
-      for (final cartItem in orderState.items) {
-        final menuItem = await _isar.menuItemCollections
-            .where()
-            .syncIdEqualTo(cartItem.itemSyncId)
-            .findFirst();
-
-        if (menuItem == null || !menuItem.trackInventory) continue;
-
-        final prev = menuItem.stockQuantity ?? 0.0;
-        final adjustment = -(cartItem.quantity.toDouble());
-        final newQty = (prev + adjustment).clamp(0.0, double.infinity);
-
-        menuItem
-          ..stockQuantity = newQty
-          ..updatedAt = now
-          ..isSynced = false;
-        await _isar.menuItemCollections.put(menuItem);
-
-        final logSyncId = _uuid.v4();
-        final log = InventoryLogCollection()
-          ..syncId = logSyncId
-          ..menuItemId = cartItem.itemSyncId
-          ..menuItemName = cartItem.itemName
-          ..previousQuantity = prev
-          ..adjustmentQuantity = adjustment
-          ..newQuantity = newQty
-          ..reason = 'sale'
-          ..notes = 'Order $orderNumber'
-          ..performedById = cashierId
-          ..performedByName = cashierName
-          ..performedAt = now
-          ..createdAt = now
-          ..updatedAt = now
-          ..isSynced = false
-          ..isDeleted = false;
-        await _isar.inventoryLogCollections.put(log);
-
-        await _isar.syncQueueCollections.put(
-          _buildSyncEntry(
-            tableName: 'inventory_logs',
-            recordSyncId: logSyncId,
-            operation: 'insert',
-            payload: jsonEncode({
-              'sync_id': logSyncId,
-              'menu_item_id': cartItem.itemSyncId,
-              'menu_item_name': cartItem.itemName,
-              'previous_quantity': prev,
-              'adjustment_quantity': adjustment,
-              'new_quantity': newQty,
-              'reason': 'sale',
-              'notes': 'Order $orderNumber',
-              'performed_by_id': cashierId,
-              'performed_by_name': cashierName,
-              'performed_at': now.toIso8601String(),
-              'created_at': now.toIso8601String(),
-              'updated_at': now.toIso8601String(),
-              'is_synced': false,
-              'is_deleted': false,
-            }),
-            now: now,
-          ),
-        );
-      }
     });
 
     return order;

@@ -5,8 +5,6 @@ class SupabaseConstants {
   static const String categoriesTable = 'categories';
   static const String menuItemsTable = 'menu_items';
   static const String ordersTable = 'orders';
-  static const String inventoryLogsTable = 'inventory_logs';
-
   // Common columns
   static const String syncId = 'sync_id';
   static const String updatedAt = 'updated_at';
@@ -32,8 +30,6 @@ class SupabaseConstants {
   static const String menuItemName = 'name';
   static const String menuItemBasePrice = 'base_price';
   static const String menuItemIsAvailable = 'is_available';
-  static const String menuItemTrackInventory = 'track_inventory';
-  static const String menuItemStockQuantity = 'stock_quantity';
   static const String menuItemVariantsJson = 'variants_json';
   static const String menuItemModifiersJson = 'modifiers_json';
 

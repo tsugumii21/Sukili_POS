@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar_community/isar.dart';
 import '../../../../core/services/isar_service.dart';
-import '../../../../shared/isar_collections/menu_item_collection.dart';
 import '../../../../shared/isar_collections/order_collection.dart';
 import '../../../../shared/isar_collections/sync_queue_collection.dart';
 
@@ -9,14 +8,12 @@ import '../../../../shared/isar_collections/sync_queue_collection.dart';
 class AdminDashboardData {
   final double totalSalesToday;
   final int ordersToday;
-  final int lowStockCount;
   final int pendingSyncCount;
   final List<OrderCollection> recentOrders;
 
   AdminDashboardData({
     required this.totalSalesToday,
     required this.ordersToday,
-    required this.lowStockCount,
     required this.pendingSyncCount,
     required this.recentOrders,
   });
@@ -36,7 +33,6 @@ class AdminDashboardNotifier
   void _init() {
     Future.microtask(() => refreshData());
     _isar.isar.orderCollections.watchLazy().listen((_) => refreshData());
-    _isar.isar.menuItemCollections.watchLazy().listen((_) => refreshData());
     _isar.isar.syncQueueCollections.watchLazy().listen((_) => refreshData());
   }
 
@@ -57,27 +53,13 @@ class AdminDashboardNotifier
       final salesTotal =
           todayOrders.fold<double>(0, (sum, o) => sum + o.totalAmount);
 
-      // 2. Low-stock items
-      final trackedItems = await _isar.isar.menuItemCollections
-          .filter()
-          .trackInventoryEqualTo(true)
-          .and()
-          .isDeletedEqualTo(false)
-          .findAll();
-
-      final lowStockCount = trackedItems.where((item) {
-        final current = item.stockQuantity ?? 0;
-        final threshold = item.lowStockThreshold ?? 5.0;
-        return current <= threshold;
-      }).length;
-
-      // 3. Pending sync queue items
+      // 2. Pending sync queue items
       final pendingItems = await _isar.isar.syncQueueCollections
           .filter()
           .statusEqualTo('pending')
           .findAll();
 
-      // 4. Recent 10 orders (any status)
+      // 3. Recent 10 orders (any status)
       final recentOrders = await _isar.isar.orderCollections
           .where()
           .sortByOrderedAtDesc()
@@ -87,7 +69,6 @@ class AdminDashboardNotifier
       state = AsyncValue.data(AdminDashboardData(
         totalSalesToday: salesTotal,
         ordersToday: todayOrders.length,
-        lowStockCount: lowStockCount,
         pendingSyncCount: pendingItems.length,
         recentOrders: recentOrders,
       ));

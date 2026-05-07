@@ -172,45 +172,6 @@ class CashierDashboardScreen extends ConsumerWidget {
 
               const SizedBox(height: AppSpacing.xl),
 
-              // ── Low Stock Banner ─────────────────────────────────────────
-              if (data.lowStockItems.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD4A574).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFD4A574).withValues(alpha: 0.2)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.warning_amber_rounded, color: Color(0xFFD4A574)),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          '${data.lowStockItems.length} items are low on stock!',
-                          style: GoogleFonts.dmSans(
-                            color: const Color(0xFFB8935E),
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () => context.push(RouteConstants.adminInventory),
-                        child: Text(
-                          'View',
-                          style: GoogleFonts.dmSans(
-                            color: const Color(0xFFB8935E),
-                            fontWeight: FontWeight.w800,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate().shake(delay: 800.ms),
-
               // ── Favorites / Quick Picks Section ──────────────────────────
               if (data.favorites.isNotEmpty) ...[
                 Text(

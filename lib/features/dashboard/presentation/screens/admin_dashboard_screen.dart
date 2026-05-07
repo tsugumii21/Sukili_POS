@@ -178,15 +178,6 @@ class AdminDashboardScreen extends ConsumerWidget {
                         delay: 80,
                       ),
                       _AdminStatCard(
-                        icon: Icons.inventory_2_outlined,
-                        value: data.lowStockCount.toString(),
-                        label: "Items Low Stock",
-                        accentColor: data.lowStockCount > 0
-                            ? AppColors.warningLight
-                            : AppColors.successLight,
-                        delay: 160,
-                      ),
-                      _AdminStatCard(
                         icon: Icons.sync_rounded,
                         value: data.pendingSyncCount.toString(),
                         label: "Pending Sync",
@@ -223,13 +214,6 @@ class AdminDashboardScreen extends ConsumerWidget {
                         delay: 60,
                         onTap: () =>
                             context.push(RouteConstants.adminMenuItems),
-                      ),
-                      _QuickActionCard(
-                        icon: Icons.inventory_2_rounded,
-                        label: 'Inventory',
-                        delay: 120,
-                        onTap: () =>
-                            context.push(RouteConstants.adminInventory),
                       ),
                       _QuickActionCard(
                         icon: Icons.remove_circle_outline_rounded,
@@ -929,17 +913,6 @@ class _AdminNavDrawer extends ConsumerWidget {
             onTap: () {
               Navigator.pop(context);
               context.push(RouteConstants.adminMenuItems);
-            },
-            hoverBg: itemHoverBg,
-            textColor: textPrimary,
-          ),
-          _AdminNavItem(
-            icon: Icons.inventory_2_rounded,
-            label: 'Inventory',
-            delay: 260,
-            onTap: () {
-              Navigator.pop(context);
-              context.push(RouteConstants.adminInventory);
             },
             hoverBg: itemHoverBg,
             textColor: textPrimary,

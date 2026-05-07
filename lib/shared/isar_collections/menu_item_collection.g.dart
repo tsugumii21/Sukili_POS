@@ -63,53 +63,38 @@ const MenuItemCollectionSchema = CollectionSchema(
       name: r'isSynced',
       type: IsarType.bool,
     ),
-    r'lowStockThreshold': PropertySchema(
-      id: 9,
-      name: r'lowStockThreshold',
-      type: IsarType.double,
-    ),
     r'modifiersJson': PropertySchema(
-      id: 10,
+      id: 9,
       name: r'modifiersJson',
       type: IsarType.stringList,
     ),
     r'name': PropertySchema(
-      id: 11,
+      id: 10,
       name: r'name',
       type: IsarType.string,
     ),
     r'sortOrder': PropertySchema(
-      id: 12,
+      id: 11,
       name: r'sortOrder',
       type: IsarType.long,
     ),
-    r'stockQuantity': PropertySchema(
-      id: 13,
-      name: r'stockQuantity',
-      type: IsarType.double,
-    ),
     r'syncId': PropertySchema(
-      id: 14,
+      id: 12,
       name: r'syncId',
       type: IsarType.string,
     ),
-    r'trackInventory': PropertySchema(
-      id: 15,
-      name: r'trackInventory',
-      type: IsarType.bool,
-    ),
     r'updatedAt': PropertySchema(
-      id: 16,
+      id: 13,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
     r'variantGroupsJson': PropertySchema(
-      id: 17,
+      id: 14,
       name: r'variantGroupsJson',
       type: IsarType.stringList,
     ),
     r'variantsJson': PropertySchema(
-      id: 18,
+      id: 15,
       name: r'variantsJson',
       type: IsarType.stringList,
     )
@@ -167,19 +152,6 @@ const MenuItemCollectionSchema = CollectionSchema(
       properties: [
         IndexPropertySchema(
           name: r'isFavorite',
-          type: IndexType.value,
-          caseSensitive: false,
-        )
-      ],
-    ),
-    r'trackInventory': IndexSchema(
-      id: -246698112177752755,
-      name: r'trackInventory',
-      unique: false,
-      replace: false,
-      properties: [
-        IndexPropertySchema(
-          name: r'trackInventory',
           type: IndexType.value,
           caseSensitive: false,
         )
@@ -254,16 +226,13 @@ void _menuItemCollectionSerialize(
   writer.writeBool(offsets[6], object.isDeleted);
   writer.writeBool(offsets[7], object.isFavorite);
   writer.writeBool(offsets[8], object.isSynced);
-  writer.writeDouble(offsets[9], object.lowStockThreshold);
-  writer.writeStringList(offsets[10], object.modifiersJson);
-  writer.writeString(offsets[11], object.name);
-  writer.writeLong(offsets[12], object.sortOrder);
-  writer.writeDouble(offsets[13], object.stockQuantity);
-  writer.writeString(offsets[14], object.syncId);
-  writer.writeBool(offsets[15], object.trackInventory);
-  writer.writeDateTime(offsets[16], object.updatedAt);
-  writer.writeStringList(offsets[17], object.variantGroupsJson);
-  writer.writeStringList(offsets[18], object.variantsJson);
+  writer.writeStringList(offsets[9], object.modifiersJson);
+  writer.writeString(offsets[10], object.name);
+  writer.writeLong(offsets[11], object.sortOrder);
+  writer.writeString(offsets[12], object.syncId);
+  writer.writeDateTime(offsets[13], object.updatedAt);
+  writer.writeStringList(offsets[14], object.variantGroupsJson);
+  writer.writeStringList(offsets[15], object.variantsJson);
 }
 
 MenuItemCollection _menuItemCollectionDeserialize(
@@ -283,16 +252,13 @@ MenuItemCollection _menuItemCollectionDeserialize(
   object.isDeleted = reader.readBool(offsets[6]);
   object.isFavorite = reader.readBool(offsets[7]);
   object.isSynced = reader.readBool(offsets[8]);
-  object.lowStockThreshold = reader.readDoubleOrNull(offsets[9]);
-  object.modifiersJson = reader.readStringList(offsets[10]) ?? [];
-  object.name = reader.readString(offsets[11]);
-  object.sortOrder = reader.readLong(offsets[12]);
-  object.stockQuantity = reader.readDoubleOrNull(offsets[13]);
-  object.syncId = reader.readString(offsets[14]);
-  object.trackInventory = reader.readBool(offsets[15]);
-  object.updatedAt = reader.readDateTime(offsets[16]);
-  object.variantGroupsJson = reader.readStringList(offsets[17]) ?? [];
-  object.variantsJson = reader.readStringList(offsets[18]) ?? [];
+  object.modifiersJson = reader.readStringList(offsets[9]) ?? [];
+  object.name = reader.readString(offsets[10]);
+  object.sortOrder = reader.readLong(offsets[11]);
+  object.syncId = reader.readString(offsets[12]);
+  object.updatedAt = reader.readDateTime(offsets[13]);
+  object.variantGroupsJson = reader.readStringList(offsets[14]) ?? [];
+  object.variantsJson = reader.readStringList(offsets[15]) ?? [];
   return object;
 }
 
@@ -322,24 +288,18 @@ P _menuItemCollectionDeserializeProp<P>(
     case 8:
       return (reader.readBool(offset)) as P;
     case 9:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 10:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readString(offset)) as P;
     case 11:
-      return (reader.readString(offset)) as P;
-    case 12:
       return (reader.readLong(offset)) as P;
-    case 13:
-      return (reader.readDoubleOrNull(offset)) as P;
-    case 14:
+    case 12:
       return (reader.readString(offset)) as P;
-    case 15:
-      return (reader.readBool(offset)) as P;
-    case 16:
+    case 13:
       return (reader.readDateTime(offset)) as P;
-    case 17:
+    case 14:
       return (reader.readStringList(offset) ?? []) as P;
-    case 18:
+    case 15:
       return (reader.readStringList(offset) ?? []) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -437,15 +397,6 @@ extension MenuItemCollectionQueryWhereSort
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         const IndexWhereClause.any(indexName: r'isFavorite'),
-      );
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterWhere>
-      anyTrackInventory() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        const IndexWhereClause.any(indexName: r'trackInventory'),
       );
     });
   }
@@ -695,51 +646,6 @@ extension MenuItemCollectionQueryWhere
               indexName: r'isFavorite',
               lower: [],
               upper: [isFavorite],
-              includeUpper: false,
-            ));
-      }
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterWhereClause>
-      trackInventoryEqualTo(bool trackInventory) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'trackInventory',
-        value: [trackInventory],
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterWhereClause>
-      trackInventoryNotEqualTo(bool trackInventory) {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'trackInventory',
-              lower: [],
-              upper: [trackInventory],
-              includeUpper: false,
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'trackInventory',
-              lower: [trackInventory],
-              includeLower: false,
-              upper: [],
-            ));
-      } else {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'trackInventory',
-              lower: [trackInventory],
-              includeLower: false,
-              upper: [],
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'trackInventory',
-              lower: [],
-              upper: [trackInventory],
               includeUpper: false,
             ));
       }
@@ -1412,90 +1318,6 @@ extension MenuItemCollectionQueryFilter
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      lowStockThresholdIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'lowStockThreshold',
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      lowStockThresholdIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'lowStockThreshold',
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      lowStockThresholdEqualTo(
-    double? value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'lowStockThreshold',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      lowStockThresholdGreaterThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'lowStockThreshold',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      lowStockThresholdLessThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'lowStockThreshold',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      lowStockThresholdBetween(
-    double? lower,
-    double? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'lowStockThreshold',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
       modifiersJsonElementEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1913,90 +1735,6 @@ extension MenuItemCollectionQueryFilter
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      stockQuantityIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'stockQuantity',
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      stockQuantityIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'stockQuantity',
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      stockQuantityEqualTo(
-    double? value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'stockQuantity',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      stockQuantityGreaterThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'stockQuantity',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      stockQuantityLessThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'stockQuantity',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      stockQuantityBetween(
-    double? lower,
-    double? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'stockQuantity',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
       syncIdEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -2128,16 +1866,6 @@ extension MenuItemCollectionQueryFilter
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'syncId',
         value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
-      trackInventoryEqualTo(bool value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'trackInventory',
-        value: value,
       ));
     });
   }
@@ -2786,20 +2514,6 @@ extension MenuItemCollectionQuerySortBy
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      sortByLowStockThreshold() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lowStockThreshold', Sort.asc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      sortByLowStockThresholdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lowStockThreshold', Sort.desc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
       sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -2828,20 +2542,6 @@ extension MenuItemCollectionQuerySortBy
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      sortByStockQuantity() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'stockQuantity', Sort.asc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      sortByStockQuantityDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'stockQuantity', Sort.desc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
       sortBySyncId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncId', Sort.asc);
@@ -2852,20 +2552,6 @@ extension MenuItemCollectionQuerySortBy
       sortBySyncIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncId', Sort.desc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      sortByTrackInventory() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'trackInventory', Sort.asc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      sortByTrackInventoryDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'trackInventory', Sort.desc);
     });
   }
 
@@ -3027,20 +2713,6 @@ extension MenuItemCollectionQuerySortThenBy
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      thenByLowStockThreshold() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lowStockThreshold', Sort.asc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      thenByLowStockThresholdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lowStockThreshold', Sort.desc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
       thenByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -3069,20 +2741,6 @@ extension MenuItemCollectionQuerySortThenBy
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      thenByStockQuantity() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'stockQuantity', Sort.asc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      thenByStockQuantityDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'stockQuantity', Sort.desc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
       thenBySyncId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncId', Sort.asc);
@@ -3093,20 +2751,6 @@ extension MenuItemCollectionQuerySortThenBy
       thenBySyncIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncId', Sort.desc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      thenByTrackInventory() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'trackInventory', Sort.asc);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
-      thenByTrackInventoryDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'trackInventory', Sort.desc);
     });
   }
 
@@ -3191,13 +2835,6 @@ extension MenuItemCollectionQueryWhereDistinct
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QDistinct>
-      distinctByLowStockThreshold() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'lowStockThreshold');
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QDistinct>
       distinctByModifiersJson() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'modifiersJson');
@@ -3219,23 +2856,9 @@ extension MenuItemCollectionQueryWhereDistinct
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QDistinct>
-      distinctByStockQuantity() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'stockQuantity');
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QDistinct>
       distinctBySyncId({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'syncId', caseSensitive: caseSensitive);
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, MenuItemCollection, QDistinct>
-      distinctByTrackInventory() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'trackInventory');
     });
   }
 
@@ -3330,13 +2953,6 @@ extension MenuItemCollectionQueryProperty
     });
   }
 
-  QueryBuilder<MenuItemCollection, double?, QQueryOperations>
-      lowStockThresholdProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'lowStockThreshold');
-    });
-  }
-
   QueryBuilder<MenuItemCollection, List<String>, QQueryOperations>
       modifiersJsonProperty() {
     return QueryBuilder.apply(this, (query) {
@@ -3356,23 +2972,9 @@ extension MenuItemCollectionQueryProperty
     });
   }
 
-  QueryBuilder<MenuItemCollection, double?, QQueryOperations>
-      stockQuantityProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'stockQuantity');
-    });
-  }
-
   QueryBuilder<MenuItemCollection, String, QQueryOperations> syncIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'syncId');
-    });
-  }
-
-  QueryBuilder<MenuItemCollection, bool, QQueryOperations>
-      trackInventoryProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'trackInventory');
     });
   }
 

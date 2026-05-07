@@ -23,11 +23,6 @@ class MenuItemCollection {
   @Index()
   late bool isFavorite;
 
-  @Index()
-  late bool trackInventory;
-
-  double? stockQuantity;
-  double? lowStockThreshold;
   late int sortOrder;
 
   /// Legacy flat variant format: [{name, priceDelta}].

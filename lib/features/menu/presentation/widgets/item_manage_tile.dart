@@ -104,18 +104,6 @@ class ItemManageTile extends ConsumerWidget {
                           ],
                         ],
                       ),
-                      if (item.trackInventory &&
-                          item.stockQuantity != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          'Stock: ${item.stockQuantity!.toStringAsFixed(0)}',
-                          style: GoogleFonts.dmSans(
-                            color: _stockColor(item),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -167,13 +155,6 @@ class ItemManageTile extends ConsumerWidget {
         .slideY(begin: 0.06, end: 0);
   }
 
-  Color _stockColor(MenuItemCollection item) {
-    final stock = item.stockQuantity ?? 0;
-    final threshold = item.lowStockThreshold ?? 5;
-    if (stock <= 0) return AppColors.errorLight;
-    if (stock <= threshold) return AppColors.warningLight;
-    return AppColors.successLight;
-  }
 }
 
 // ── Thumbnail ─────────────────────────────────────────────────────────────────

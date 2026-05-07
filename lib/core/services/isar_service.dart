@@ -6,7 +6,6 @@ import '../../shared/isar_collections/user_collection.dart';
 import '../../shared/isar_collections/category_collection.dart';
 import '../../shared/isar_collections/menu_item_collection.dart';
 import '../../shared/isar_collections/order_collection.dart';
-import '../../shared/isar_collections/inventory_log_collection.dart';
 import '../../shared/isar_collections/sync_queue_collection.dart';
 import '../errors/app_exception.dart';
 
@@ -39,7 +38,6 @@ class IsarService {
           CategoryCollectionSchema,
           MenuItemCollectionSchema,
           OrderCollectionSchema,
-          InventoryLogCollectionSchema,
           SyncQueueCollectionSchema,
         ],
         directory: dir.path,
