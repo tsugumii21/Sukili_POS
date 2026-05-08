@@ -102,6 +102,13 @@ class AppTextStyles {
         color: _textPrimary(context),
       );
 
+  static TextStyle captionSemiBold(BuildContext context) => GoogleFonts.dmSans(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        height: 1.5,
+        color: _textPrimary(context),
+      );
+
   static TextStyle captionSecondary(BuildContext context) => GoogleFonts.dmSans(
         fontSize: 12,
         fontWeight: FontWeight.w400,

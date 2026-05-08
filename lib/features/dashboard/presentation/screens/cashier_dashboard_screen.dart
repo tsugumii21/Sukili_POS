@@ -344,8 +344,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                                         children: [
                                           Text(
                                             shortNum,
-                                            style:
-                                                GoogleFonts.dmSans(
+                                            style: GoogleFonts.dmSans(
                                               color: textPrimary,
                                               fontSize: 16,
                                               fontWeight: FontWeight.w700,

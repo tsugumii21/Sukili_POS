@@ -69,16 +69,26 @@ class AdminDashboardScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          'Sukli',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: GoogleFonts.dmSans(
-                            color: textPrimary,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.5,
-                          ),
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/images/sukli_logo_transparent.png',
+                              height: 24,
+                              width: 24,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Sukli',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: GoogleFonts.dmSans(
+                                color: textPrimary,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -112,14 +122,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  // Logout button
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    icon: Icon(Icons.logout_rounded,
-                        color: AppColors.errorLight, size: 22),
-                    onPressed: () => _confirmLogout(context, ref),
-                  ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 16),
                 ],
               ),
             ),

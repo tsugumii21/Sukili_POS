@@ -172,7 +172,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 22),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 20),
           onPressed: () {
             if (context.canPop()) {
               context.pop();

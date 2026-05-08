@@ -45,7 +45,7 @@ class CategoryManagementScreen extends ConsumerWidget {
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
         label: Text('Add Category',
-            style: GoogleFonts.dmSans(fontWeight: FontWeight.w700)),
+            style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white)),
       ).animate().slideY(begin: 0.3, end: 0, duration: 400.ms).fadeIn(),
       body: categoriesAsync.when(
         loading: () =>

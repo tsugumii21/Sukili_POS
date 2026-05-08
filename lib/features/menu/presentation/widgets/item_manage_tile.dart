@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/isar_collections/menu_item_collection.dart';
 import '../providers/item_provider.dart';
@@ -53,10 +53,10 @@ class ItemManageTile extends ConsumerWidget {
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.largeBR,
         child: InkWell(
           onTap: onEdit,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: AppRadius.largeBR,
           splashColor: _maroon.withValues(alpha: 0.06),
           highlightColor: _maroon.withValues(alpha: 0.03),
           child: Padding(
@@ -76,21 +76,15 @@ class ItemManageTile extends ConsumerWidget {
                         item.name,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: GoogleFonts.dmSans(
-                          color: textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: AppTextStyles.bodySemiBold(context).copyWith(color: textPrimary),
                       ),
                       const SizedBox(height: 2),
                       Row(
                         children: [
                           Text(
                             CurrencyFormatter.format(item.basePrice),
-                            style: GoogleFonts.dmSans(
+                            style: AppTextStyles.captionMedium(context).copyWith(
                               color: _maroon,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
                             ),
                           ),
                           if (categoryName.isNotEmpty) ...[
@@ -235,12 +229,10 @@ class _CategoryChip extends StatelessWidget {
           label,
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
-          style: GoogleFonts.dmSans(
+          style: AppTextStyles.caption(context).copyWith(
             color: isDark
                 ? AppColors.textSecondaryDark
                 : const Color(0xFF6B4B3E),
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
           ),
         ),
       );

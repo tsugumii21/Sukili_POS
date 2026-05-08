@@ -80,7 +80,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
         icon: const Icon(Icons.person_add_rounded),
         label: Text(
           'Add User',
-          style: GoogleFonts.dmSans(fontWeight: FontWeight.w700),
+          style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white),
         ),
       ).animate().slideY(begin: 0.3, end: 0, duration: 400.ms).fadeIn(),
       body: usersAsync.when(
@@ -118,12 +118,11 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
       elevation: 0,
       leading: _showSearch
           ? IconButton(
-              icon: Icon(Icons.arrow_back_rounded, color: textPrimary),
+              icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 20),
               onPressed: _closeSearch,
             )
           : IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_rounded,
-                  color: textPrimary, size: 20),
+              icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 20),
               onPressed: () => context.pop(),
             ),
       title: _showSearch
@@ -224,8 +223,6 @@ class _FilterChipsRow extends StatelessWidget {
 
   static const _filters = [
     (UsersFilter.all, 'All'),
-    (UsersFilter.cashiers, 'Cashiers'),
-    (UsersFilter.admins, 'Admins'),
     (UsersFilter.active, 'Active'),
     (UsersFilter.inactive, 'Inactive'),
   ];

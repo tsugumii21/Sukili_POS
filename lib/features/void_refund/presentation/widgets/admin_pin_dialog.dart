@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/isar_collections/user_collection.dart';
 import '../providers/void_refund_provider.dart';
 
@@ -180,19 +180,12 @@ class _AdminPinDialogState extends State<AdminPinDialog>
                   // ── Title & subtitle ───────────────────────────────────
                   Text(
                     widget.title,
-                    style: GoogleFonts.dmSans(
-                      color: textPrimary,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: AppTextStyles.h3(context),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     widget.subtitle,
-                    style: GoogleFonts.dmSans(
-                      color: textSecondary,
-                      fontSize: 14,
-                    ),
+                    style: AppTextStyles.captionSecondary(context),
                     textAlign: TextAlign.center,
                   ),
 
@@ -253,10 +246,8 @@ class _AdminPinDialogState extends State<AdminPinDialog>
                             padding: const EdgeInsets.only(top: 10),
                             child: Text(
                               _errorText,
-                              style: GoogleFonts.dmSans(
+                              style: AppTextStyles.captionMedium(context).copyWith(
                                 color: AppColors.errorLight,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           )
@@ -398,11 +389,7 @@ class _KeyButton extends StatelessWidget {
                 size: 20, color: textPrimary.withValues(alpha: 0.6))
             : Text(
                 label,
-                style: GoogleFonts.dmSans(
-                  color: textPrimary,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTextStyles.h3(context),
               ),
       ),
     );

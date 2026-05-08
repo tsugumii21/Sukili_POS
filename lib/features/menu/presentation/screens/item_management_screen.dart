@@ -61,7 +61,7 @@ class _ItemManagementScreenState
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.largeBR),
         title: Text('Delete Item?',
             style: AppTextStyles.bodySemiBold(context)),
         content: Text(
@@ -72,14 +72,12 @@ class _ItemManagementScreenState
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx, false),
             child: Text('Cancel',
-                style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
+                style: AppTextStyles.bodySemiBold(context)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx, true),
             child: Text('Delete',
-                style: GoogleFonts.dmSans(
-                    color: AppColors.errorLight,
-                    fontWeight: FontWeight.w700)),
+                style: AppTextStyles.bodySemiBold(context).copyWith(color: AppColors.errorLight)),
           ),
         ],
       ),
@@ -89,11 +87,10 @@ class _ItemManagementScreenState
       if (mounted) {
         messenger.showSnackBar(SnackBar(
           content: Text('${item.name} deleted',
-              style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
+              style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white)),
           backgroundColor: AppColors.errorLight,
           behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.mediumBR),
         ));
       }
     }
@@ -117,7 +114,7 @@ class _ItemManagementScreenState
       backgroundColor: Colors.transparent,
       elevation: 0,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_rounded, color: textPrimary),
+        icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 20),
         onPressed: () => context.pop(),
       ),
       title: _showSearch
@@ -125,15 +122,15 @@ class _ItemManagementScreenState
               controller: _searchCtrl,
               focusNode: _searchFocus,
               onChanged: ref.read(itemProvider.notifier).setSearch,
-              style: GoogleFonts.dmSans(color: textPrimary, fontSize: 15),
+              style: AppTextStyles.body(context).copyWith(color: textPrimary),
               decoration: InputDecoration(
                 hintText: 'Search items…',
-                hintStyle: GoogleFonts.dmSans(
-                    color: textPrimary.withValues(alpha: 0.4), fontSize: 15),
+                hintStyle: AppTextStyles.body(context).copyWith(
+                    color: textPrimary.withValues(alpha: 0.4)),
                 border: InputBorder.none,
               ),
             )
-          : Text('Menu Items', style: AppTextStyles.bodySemiBold(context)),
+          : Text('Menu Items', style: AppTextStyles.h3(context)),
       actions: [
         IconButton(
           icon: Icon(
@@ -164,7 +161,7 @@ class _ItemManagementScreenState
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
         label: Text('Add Item',
-            style: GoogleFonts.dmSans(fontWeight: FontWeight.w700)),
+            style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white)),
       )
           .animate()
           .slideY(begin: 0.3, end: 0, duration: 400.ms)
@@ -353,13 +350,10 @@ class _Tab extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: GoogleFonts.dmSans(
+                style: AppTextStyles.captionMedium(context).copyWith(
                   color: isSelected
                       ? Colors.white
                       : textPrimary.withValues(alpha: 0.7),
-                  fontSize: 13,
-                  fontWeight:
-                      isSelected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
               const SizedBox(width: 6),
@@ -370,14 +364,13 @@ class _Tab extends StatelessWidget {
                   color: isSelected
                       ? Colors.white.withValues(alpha: 0.2)
                       : maroon.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: AppRadius.pillBR,
                 ),
                 child: Text(
                   '$count',
-                  style: GoogleFonts.dmSans(
+                  style: AppTextStyles.captionMedium(context).copyWith(
                     color: isSelected ? Colors.white : maroon,
                     fontSize: 11,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -421,10 +414,8 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             message,
-            style: GoogleFonts.dmSans(
+            style: AppTextStyles.body(context).copyWith(
               color: textPrimary.withValues(alpha: 0.4),
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
             ),
           ),
           if (!hasSearch) ...[
@@ -434,7 +425,7 @@ class _EmptyState extends StatelessWidget {
               icon: const Icon(Icons.add_rounded),
               label: Text('Add First Item',
                   style:
-                      GoogleFonts.dmSans(fontWeight: FontWeight.w700)),
+                      AppTextStyles.bodySemiBold(context)),
               style: TextButton.styleFrom(
                   foregroundColor: const Color(0xFF8B4049)),
             ),

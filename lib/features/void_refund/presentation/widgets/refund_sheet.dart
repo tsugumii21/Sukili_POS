@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/isar_collections/order_collection.dart';
 
@@ -28,9 +29,14 @@ class RefundResult {
 ///
 /// Returns a [RefundResult] on confirm, or null if dismissed.
 class RefundSheet extends StatefulWidget {
-  const RefundSheet({super.key, required this.order});
+  const RefundSheet({
+    super.key,
+    required this.order,
+    this.scrollController,
+  });
 
   final OrderCollection order;
+  final ScrollController? scrollController;
 
   static Future<RefundResult?> show(
     BuildContext context,
@@ -40,7 +46,17 @@ class RefundSheet extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => RefundSheet(order: order),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.62,
+        minChildSize: 0.45,
+        maxChildSize: 0.95,
+        snap: true,
+        snapSizes: const [0.62, 0.95],
+        builder: (_, scrollCtrl) => RefundSheet(
+          order: order,
+          scrollController: scrollCtrl,
+        ),
+      ),
     );
   }
 
@@ -81,82 +97,72 @@ class _RefundSheetState extends State<RefundSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final sheetBg = isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
+    final sheetBg = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final cardBg = isDark ? AppColors.cardDark : AppColors.cardLight;
     final textPrimary =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final textSecondary =
         isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-    const maroon = Color(0xFF8B4049);
+    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final borderCol = isDark ? AppColors.borderDark : AppColors.primaryLight;
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.65,
-      minChildSize: 0.5,
-      maxChildSize: 0.9,
-      builder: (_, scrollCtrl) {
-        return Container(
-          decoration: BoxDecoration(
-            color: sheetBg,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(28)),
-          ),
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              controller: scrollCtrl,
-              padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.xl),
+    return Container(
+      decoration: BoxDecoration(
+        color: sheetBg,
+        borderRadius: const BorderRadius.vertical(top: AppRadius.large),
+        boxShadow: AppShadow.level4,
+      ),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          controller: widget.scrollController,
+          padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.xl),
+          children: [
+            // ── Handle bar ───────────────────────────────────────────
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: AppSpacing.sm, bottom: AppSpacing.md),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: textSecondary.withValues(alpha: 0.3),
+                  borderRadius: AppRadius.pillBR,
+                ),
+              ),
+            ),
+
+            // ── Header ───────────────────────────────────────────────
+            Row(
               children: [
-                // ── Handle bar ───────────────────────────────────────────
-                Center(
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 12, bottom: 16),
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: textPrimary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(99),
-                    ),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.receipt_long_rounded,
+                      color: accent, size: 20),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Process Refund',
+                        style: AppTextStyles.h3(context),
+                      ),
+                      Text(
+                        widget.order.orderNumber,
+                        style: AppTextStyles.captionSecondary(context),
+                      ),
+                    ],
                   ),
                 ),
-
-                // ── Header ───────────────────────────────────────────────
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppColors.warningLight.withValues(alpha: 0.12),
-                        borderRadius: AppRadius.mediumBR,
-                      ),
-                      child: Icon(Icons.replay_rounded,
-                          color: AppColors.warningLight, size: 22),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Process Refund',
-                            style: GoogleFonts.dmSans(
-                              color: textPrimary,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            widget.order.orderNumber,
-                            style: GoogleFonts.dmSans(
-                              color: textSecondary,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              ],
+            ),
 
                 const SizedBox(height: AppSpacing.lg),
 
@@ -165,7 +171,7 @@ class _RefundSheetState extends State<RefundSheet> {
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
                     color: cardBg,
-                    borderRadius: AppRadius.largeBR,
+                    borderRadius: AppRadius.mediumBR,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -176,18 +182,20 @@ class _RefundSheetState extends State<RefundSheet> {
                         textSecondary: textSecondary,
                         textPrimary: textPrimary,
                       ),
+                      Container(width: 1, height: 32, color: borderCol),
                       _SummaryPair(
                         label: 'Payment',
                         value: _capitalize(widget.order.paymentMethod),
                         textSecondary: textSecondary,
                         textPrimary: textPrimary,
                       ),
+                      Container(width: 1, height: 32, color: borderCol),
                       _SummaryPair(
                         label: 'Total',
                         value: CurrencyFormatter.format(
                             widget.order.totalAmount),
                         textSecondary: textSecondary,
-                        textPrimary: maroon,
+                        textPrimary: accent,
                         bold: true,
                       ),
                     ],
@@ -199,7 +207,6 @@ class _RefundSheetState extends State<RefundSheet> {
                 // ── Refund type toggle ────────────────────────────────────
                 _SectionLabel(
                     label: 'REFUND TYPE', textSecondary: textSecondary),
-                const SizedBox(height: AppSpacing.xs),
                 Row(
                   children: [
                     _TypeBtn(
@@ -208,17 +215,21 @@ class _RefundSheetState extends State<RefundSheet> {
                           CurrencyFormatter.format(widget.order.totalAmount),
                       selected: _type == RefundType.full,
                       isDark: isDark,
-                      maroon: maroon,
+                      accent: accent,
+                      cardBg: cardBg,
+                      borderCol: borderCol,
                       textPrimary: textPrimary,
                       onTap: () => setState(() => _type = RefundType.full),
                     ),
-                    const SizedBox(width: AppSpacing.xs),
+                    const SizedBox(width: AppSpacing.sm),
                     _TypeBtn(
                       label: 'Partial Refund',
                       amount: 'Enter amount',
                       selected: _type == RefundType.partial,
                       isDark: isDark,
-                      maroon: maroon,
+                      accent: accent,
+                      cardBg: cardBg,
+                      borderCol: borderCol,
                       textPrimary: textPrimary,
                       onTap: () => setState(() => _type = RefundType.partial),
                     ),
@@ -238,7 +249,6 @@ class _RefundSheetState extends State<RefundSheet> {
                               _SectionLabel(
                                   label: 'REFUND AMOUNT',
                                   textSecondary: textSecondary),
-                              const SizedBox(height: AppSpacing.xs),
                               TextFormField(
                                 controller: _amountCtrl,
                                 keyboardType:
@@ -249,14 +259,13 @@ class _RefundSheetState extends State<RefundSheet> {
                                       RegExp(r'[\d.]'))
                                 ],
                                 style:
-                                    GoogleFonts.dmSans(color: textPrimary),
+                                    AppTextStyles.body(context).copyWith(color: textPrimary),
                                 decoration: InputDecoration(
                                   prefixText: '₱ ',
                                   prefixStyle:
-                                      GoogleFonts.dmSans(color: maroon),
+                                      AppTextStyles.bodyMedium(context).copyWith(color: accent),
                                   hintText: '0.00',
-                                  hintStyle: GoogleFonts.dmSans(
-                                      color: textSecondary),
+                                  hintStyle: AppTextStyles.body(context).copyWith(color: textSecondary),
                                   filled: true,
                                   fillColor: cardBg,
                                   border: OutlineInputBorder(
@@ -291,15 +300,16 @@ class _RefundSheetState extends State<RefundSheet> {
                 _SectionLabel(
                     label: 'REASON (REQUIRED)',
                     textSecondary: textSecondary),
-                const SizedBox(height: AppSpacing.xs),
                 TextFormField(
                   controller: _reasonCtrl,
                   maxLines: 3,
-                  style: GoogleFonts.dmSans(color: textPrimary),
+                  minLines: 2,
+                  style: AppTextStyles.body(context).copyWith(color: textPrimary),
+                  onChanged: (v) => setState(() {}),
                   decoration: InputDecoration(
                     hintText: 'e.g. Customer received wrong order',
                     hintStyle:
-                        GoogleFonts.dmSans(color: textSecondary, fontSize: 14),
+                        AppTextStyles.body(context).copyWith(color: textSecondary),
                     filled: true,
                     fillColor: cardBg,
                     border: OutlineInputBorder(
@@ -317,27 +327,25 @@ class _RefundSheetState extends State<RefundSheet> {
 
                 // ── Summary line ──────────────────────────────────────────
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                  padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: AppColors.warningLight.withValues(alpha: 0.08),
+                    color: accent.withValues(alpha: 0.08),
                     borderRadius: AppRadius.mediumBR,
                     border: Border.all(
-                        color: AppColors.warningLight.withValues(alpha: 0.2)),
+                        color: accent.withValues(alpha: 0.25)),
                   ),
                   child: Row(
                     children: [
                       Icon(Icons.info_outline_rounded,
-                          size: 16, color: AppColors.warningLight),
-                      const SizedBox(width: 8),
+                          size: 16, color: accent),
+                      const SizedBox(width: AppSpacing.xs),
                       Expanded(
                         child: Text(
                           _type == RefundType.full
                               ? 'Full refund of ${CurrencyFormatter.format(widget.order.totalAmount)} will be processed.'
                               : 'Partial refund — amount will be confirmed after entry.',
-                          style: GoogleFonts.dmSans(
-                            color: AppColors.warningLight,
-                            fontSize: 13,
+                          style: AppTextStyles.caption(context).copyWith(
+                            color: accent,
                           ),
                         ),
                       ),
@@ -352,36 +360,36 @@ class _RefundSheetState extends State<RefundSheet> {
                   width: double.infinity,
                   height: 52,
                   child: ElevatedButton(
-                    onPressed: _confirm,
+                    onPressed: _reasonCtrl.text.trim().isEmpty ? null : _confirm,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: maroon,
+                      backgroundColor: accent,
+                      disabledBackgroundColor: accent.withValues(alpha: 0.4),
                       foregroundColor: Colors.white,
+                      disabledForegroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                          borderRadius: AppRadius.largeBR),
+                          borderRadius: AppRadius.mediumBR),
                     ),
                     child: Text(
                       'Continue to Admin Verification',
-                      style: GoogleFonts.dmSans(
-                          fontSize: 15, fontWeight: FontWeight.w700),
+                      style: AppTextStyles.bodyMedium(context).copyWith(color: Colors.white),
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: TextButton(
-                    onPressed: () => Navigator.of(context).pop(null),
-                    style: TextButton.styleFrom(
-                      foregroundColor: textSecondary,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: AppRadius.largeBR),
-                    ),
-                    child: Text(
-                      'Cancel',
-                      style: GoogleFonts.dmSans(
-                          fontSize: 15, fontWeight: FontWeight.w600),
+                Container(
+                  margin: const EdgeInsets.only(top: AppSpacing.xs, bottom: AppSpacing.md),
+                  child: Center(
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(null),
+                      style: TextButton.styleFrom(
+                        foregroundColor: textSecondary,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: AppRadius.mediumBR),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: AppTextStyles.bodyMedium(context).copyWith(color: textSecondary),
+                      ),
                     ),
                   ),
                 ),
@@ -389,8 +397,6 @@ class _RefundSheetState extends State<RefundSheet> {
             ),
           ),
         );
-      },
-    );
   }
 
   String _capitalize(String s) =>
@@ -408,13 +414,14 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: GoogleFonts.dmSans(
-        color: textSecondary,
-        fontSize: 11,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 1.2,
+    return Container(
+      margin: const EdgeInsets.only(top: AppSpacing.lg, bottom: AppSpacing.sm),
+      child: Text(
+        label.toUpperCase(),
+        style: AppTextStyles.caption(context).copyWith(
+          color: textSecondary,
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }
@@ -439,17 +446,16 @@ class _SummaryPair extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: GoogleFonts.dmSans(
-                color: textSecondary, fontSize: 11)),
+        Text(
+          label.toUpperCase(),
+          style: AppTextStyles.caption(context).copyWith(color: textSecondary),
+        ),
         const SizedBox(height: 2),
         Text(
           value,
-          style: GoogleFonts.dmSans(
-            color: textPrimary,
-            fontSize: 14,
-            fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
-          ),
+          style: bold 
+            ? AppTextStyles.bodySemiBold(context).copyWith(color: textPrimary)
+            : AppTextStyles.bodySemiBold(context).copyWith(color: textPrimary),
         ),
       ],
     );
@@ -462,7 +468,9 @@ class _TypeBtn extends StatelessWidget {
     required this.amount,
     required this.selected,
     required this.isDark,
-    required this.maroon,
+    required this.accent,
+    required this.cardBg,
+    required this.borderCol,
     required this.textPrimary,
     required this.onTap,
   });
@@ -471,50 +479,41 @@ class _TypeBtn extends StatelessWidget {
   final String amount;
   final bool selected;
   final bool isDark;
-  final Color maroon;
+  final Color accent;
+  final Color cardBg;
+  final Color borderCol;
   final Color textPrimary;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final unselectedBg = isDark
-        ? AppColors.surfaceDarkElevated
-        : AppColors.cardLight;
-
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
           duration: AppDuration.fast,
-          padding: const EdgeInsets.symmetric(
-              vertical: AppSpacing.sm, horizontal: AppSpacing.xs),
+          height: 72,
           decoration: BoxDecoration(
-            color: selected ? maroon : unselectedBg,
+            color: selected ? accent : cardBg,
             borderRadius: AppRadius.mediumBR,
-            border: selected
-                ? null
-                : Border.all(
-                    color: Colors.black.withValues(alpha: 0.06)),
+            border: selected ? null : Border.all(color: borderCol),
+            boxShadow: selected ? AppShadow.level2 : null,
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 label,
-                style: GoogleFonts.dmSans(
+                style: AppTextStyles.bodyMedium(context).copyWith(
                   color: selected ? Colors.white : textPrimary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 amount,
-                style: GoogleFonts.dmSans(
-                  color: selected
-                      ? Colors.white.withValues(alpha: 0.75)
-                      : textPrimary.withValues(alpha: 0.5),
-                  fontSize: 12,
-                ),
+                style: selected 
+                  ? AppTextStyles.captionMedium(context).copyWith(color: Colors.white.withValues(alpha: 0.8))
+                  : AppTextStyles.captionSecondary(context),
               ),
             ],
           ),

@@ -105,7 +105,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
               top: AppSpacing.sm,
               left: AppSpacing.sm,
               child: IconButton(
-                icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 22),
+                icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 20),
                 onPressed: () => context.go(RouteConstants.cashierSelect),
               ),
             ),

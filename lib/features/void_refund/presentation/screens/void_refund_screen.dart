@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';import 'package:go_router/go_router.dart';import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/isar_collections/order_collection.dart';
 import '../providers/void_refund_provider.dart';
 import '../widgets/admin_pin_dialog.dart';
 import '../widgets/refund_sheet.dart';
+import '../../../../shared/widgets/app_card.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // VoidRefundScreen — 3-tab view: Void Orders | Refunds | History
@@ -58,7 +58,10 @@ class _VoidRefundScreenState extends ConsumerState<VoidRefundScreen>
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
     final textPrimary =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    const maroon = Color(0xFF8B4049);
+    final primary = isDark ? AppColors.primaryDark : AppColors.primaryLight;
+    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final border = isDark ? AppColors.borderDark : AppColors.primaryLight;
+    final textSecondary = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
 
     // Show error snackbar if present
     ref.listen<VoidRefundState>(voidRefundProvider, (_, next) {
@@ -66,7 +69,7 @@ class _VoidRefundScreenState extends ConsumerState<VoidRefundScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!,
-                style: GoogleFonts.dmSans(color: Colors.white)),
+                style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white)),
             backgroundColor: AppColors.errorLight,
             behavior: SnackBarBehavior.floating,
             shape:
@@ -80,39 +83,38 @@ class _VoidRefundScreenState extends ConsumerState<VoidRefundScreen>
     return Scaffold(
       backgroundColor: bg,
       appBar: AppBar(
-        backgroundColor: bg,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: textPrimary, size: 20),
-          onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
-            }
-          },
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 20),
+          onPressed: () => context.pop(),
         ),
         title: Text(
           'Voids & Refunds',
-          style: GoogleFonts.dmSans(
-            color: textPrimary,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
+          style: AppTextStyles.h3(context),
         ),
         centerTitle: false,
-        bottom: TabBar(
-          controller: _tabCtrl,
-          tabs: _tabs,
-          labelStyle:
-              GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w700),
-          unselectedLabelStyle:
-              GoogleFonts.dmSans(fontSize: 14, fontWeight: FontWeight.w500),
-          labelColor: maroon,
-          unselectedLabelColor: textPrimary.withValues(alpha: 0.45),
-          indicatorColor: maroon,
-          indicatorWeight: 3,
-          indicatorSize: TabBarIndicatorSize.label,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              border: Border(bottom: BorderSide(color: border.withValues(alpha: 0.5), width: 1)),
+            ),
+            child: TabBar(
+              controller: _tabCtrl,
+              tabs: _tabs,
+              labelStyle: AppTextStyles.bodySemiBold(context).copyWith(color: textPrimary),
+              unselectedLabelStyle: AppTextStyles.body(context).copyWith(color: textSecondary),
+              labelColor: textPrimary,
+              unselectedLabelColor: textSecondary,
+              indicatorColor: accent,
+              indicatorWeight: 3.0,
+              indicatorSize: TabBarIndicatorSize.label,
+              dividerColor: Colors.transparent,
+            ),
+          ),
         ),
       ),
       body: state.isLoading
@@ -243,10 +245,8 @@ class _OrdersTabState extends ConsumerState<_OrdersTab> {
                       const SizedBox(width: 4),
                       Text(
                         _newestFirst ? 'Newest first' : 'Oldest first',
-                        style: GoogleFonts.dmSans(
+                        style: AppTextStyles.captionMedium(context).copyWith(
                           color: maroon,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -310,175 +310,121 @@ class _OrderRow extends ConsumerWidget {
 
   static final _timeFmt = DateFormat('MMM d, h:mm a');
 
-  Color _statusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return AppColors.successLight;
-      case 'voided':
-        return AppColors.errorLight;
-      case 'refunded':
-        return AppColors.warningLight;
-      default:
-        return AppColors.textSecondaryLight;
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const maroon = Color(0xFF8B4049);
-    final cardBg = isDark ? AppColors.cardDark : const Color(0xFFF0E8DC);
-    final statusColor = _statusColor(order.status);
+    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final error = isDark ? AppColors.errorDark : AppColors.errorLight;
+    final warning = isDark ? AppColors.warningDark : AppColors.warningLight;
+    final borderCol = isDark ? AppColors.borderDark : AppColors.primaryLight;
+    
+    Color actionColor;
+    if (mode == _TabMode.history) {
+      actionColor = order.status.toLowerCase() == 'voided' ? error : warning;
+      if (order.status.toLowerCase() == 'completed') {
+        actionColor = AppColors.successLight;
+      }
+    } else {
+      actionColor = mode == _TabMode.voidOrder ? error : warning;
+    }
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: AppRadius.largeBR,
-        border: isDark
-            ? Border.all(color: AppColors.borderDark)
-            : null,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.sm),
+    return AppCard(
+      padding: EdgeInsets.zero,
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+      child: IntrinsicHeight(
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ── Status accent bar ──────────────────────────────────────
+            // Left accent border
             Container(
-              width: 4,
-              height: 56,
+              width: 3,
               decoration: BoxDecoration(
-                color: statusColor,
-                borderRadius: BorderRadius.circular(99),
+                color: mode == _TabMode.history 
+                    ? actionColor 
+                    : error,
+                borderRadius: const BorderRadius.horizontal(left: AppRadius.small),
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
-
-            // ── Order info ─────────────────────────────────────────────
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    order.orderNumber,
-                    style: GoogleFonts.dmSans(
-                      color: textPrimary,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                child: Row(
+                  children: [
+                    // Order info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            order.orderNumber,
+                            style: AppTextStyles.bodySemiBold(context).copyWith(color: textPrimary),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${order.cashierName}  ·  ${_timeFmt.format(order.orderedAt)}',
+                            style: AppTextStyles.captionSecondary(context),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    '${order.cashierName}  ·  ${_timeFmt.format(order.orderedAt)}',
-                    style: GoogleFonts.dmSans(
-                      color: textSecondary,
-                      fontSize: 12,
+                    // Total + action
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          CurrencyFormatter.format(order.totalAmount),
+                          style: AppTextStyles.bodyMedium(context).copyWith(color: accent),
+                        ),
+                        const SizedBox(height: 4),
+                        _buildActionButton(context, ref, actionColor),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-
-            // ── Total + action ─────────────────────────────────────────
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  CurrencyFormatter.format(order.totalAmount),
-                  style: GoogleFonts.dmSans(
-                    color: maroon,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                _ActionButton(
-                  order: order,
-                  mode: mode,
-                  isDark: isDark,
-                  maroon: maroon,
-                  statusColor: statusColor,
-                ),
-              ],
             ),
           ],
         ),
       ),
     );
   }
-}
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Action button (Void / Refund / status chip for History)
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _ActionButton extends ConsumerWidget {
-  const _ActionButton({
-    required this.order,
-    required this.mode,
-    required this.isDark,
-    required this.maroon,
-    required this.statusColor,
-  });
-
-  final OrderCollection order;
-  final _TabMode mode;
-  final bool isDark;
-  final Color maroon;
-  final Color statusColor;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // History tab — show a read-only status chip
+  Widget _buildActionButton(BuildContext context, WidgetRef ref, Color actionColor) {
     if (mode == _TabMode.history) {
       return Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        height: 32,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: statusColor.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(999),
+          color: actionColor.withValues(alpha: 0.12),
+          borderRadius: AppRadius.pillBR,
+          border: Border.all(color: actionColor.withValues(alpha: 0.4)),
         ),
         child: Text(
           _capitalize(order.status),
-          style: GoogleFonts.dmSans(
-            color: statusColor,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTextStyles.captionMedium(context).copyWith(color: actionColor),
         ),
       );
     }
 
-    // Void / Refund action buttons
     final isVoid = mode == _TabMode.voidOrder;
     final label = isVoid ? 'Void' : 'Refund';
-    final color = isVoid ? AppColors.errorLight : AppColors.warningLight;
 
     return GestureDetector(
-      onTap: () => isVoid
-          ? _handleVoid(context, ref)
-          : _handleRefund(context, ref),
+      onTap: () => isVoid ? _handleVoid(context, ref) : _handleRefund(context, ref),
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        height: 32,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
+          color: actionColor.withValues(alpha: 0.12),
+          borderRadius: AppRadius.pillBR,
+          border: Border.all(color: actionColor.withValues(alpha: 0.4)),
         ),
         child: Text(
           label,
-          style: GoogleFonts.dmSans(
-            color: color,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
+          style: AppTextStyles.captionMedium(context).copyWith(color: actionColor),
         ),
       ),
     );
@@ -515,7 +461,7 @@ class _ActionButton extends ConsumerWidget {
         SnackBar(
           content: Text(
             ok ? '${order.orderNumber} voided successfully.' : 'Void failed.',
-            style: GoogleFonts.dmSans(color: Colors.white),
+            style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white),
           ),
           backgroundColor: ok ? AppColors.successLight : AppColors.errorLight,
           behavior: SnackBarBehavior.floating,
@@ -547,21 +493,17 @@ class _ActionButton extends ConsumerWidget {
               RoundedRectangleBorder(borderRadius: AppRadius.largeBR),
           title: Text(
             'Void Reason',
-            style: GoogleFonts.dmSans(
-              color: textPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
+            style: AppTextStyles.h3(context),
           ),
           content: TextField(
             controller: ctrl,
             autofocus: true,
             maxLines: 3,
-            style: GoogleFonts.dmSans(color: textPrimary),
+            style: AppTextStyles.body(context),
             decoration: InputDecoration(
               hintText: 'Enter void reason (required)',
-              hintStyle: GoogleFonts.dmSans(
-                  color: textSecondary, fontSize: 13),
+              hintStyle: AppTextStyles.body(context).copyWith(
+                  color: textSecondary),
               filled: true,
               fillColor: isDark
                   ? AppColors.cardDark
@@ -570,14 +512,14 @@ class _ActionButton extends ConsumerWidget {
                 borderRadius: AppRadius.mediumBR,
                 borderSide: BorderSide.none,
               ),
-              contentPadding: const EdgeInsets.all(AppSpacing.sm),
+              contentPadding: const EdgeInsets.all(AppSpacing.md),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogCtx).pop(null),
               child: Text('Cancel',
-                  style: GoogleFonts.dmSans(color: textSecondary)),
+                  style: AppTextStyles.bodySemiBold(context).copyWith(color: textSecondary)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -593,7 +535,7 @@ class _ActionButton extends ConsumerWidget {
                     borderRadius: AppRadius.mediumBR),
               ),
               child: Text('Confirm Void',
-                  style: GoogleFonts.dmSans(fontWeight: FontWeight.w700)),
+                  style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white)),
             ),
           ],
         );
@@ -636,7 +578,7 @@ class _ActionButton extends ConsumerWidget {
             ok
                 ? '${order.orderNumber} refunded ${CurrencyFormatter.format(result.amount)}.'
                 : 'Refund failed.',
-            style: GoogleFonts.dmSans(color: Colors.white),
+            style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white),
           ),
           backgroundColor:
               ok ? AppColors.successLight : AppColors.errorLight,
@@ -686,9 +628,7 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               title,
-              style: GoogleFonts.dmSans(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+              style: AppTextStyles.bodySemiBold(context).copyWith(
                 color: textSecondary,
               ),
               textAlign: TextAlign.center,
@@ -696,7 +636,7 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
             Text(
               subtitle,
-              style: GoogleFonts.dmSans(fontSize: 13, color: textSecondary),
+              style: AppTextStyles.captionMedium(context).copyWith(color: textSecondary),
               textAlign: TextAlign.center,
             ),
           ],
