@@ -70,18 +70,14 @@ class AdminDashboardScreen extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Sukli POS',
+                          'Sukli',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
-                          style: AppTextStyles.bodySemiBold(context)
-                              .copyWith(color: textPrimary),
-                        ),
-                        Text(
-                          'Admin',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: AppTextStyles.caption(context).copyWith(
-                            color: textPrimary.withValues(alpha: 0.5),
+                          style: GoogleFonts.dmSans(
+                            color: textPrimary,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
                           ),
                         ),
                       ],
@@ -903,6 +899,17 @@ class _AdminNavDrawer extends ConsumerWidget {
             label: 'Home',
             delay: 180,
             onTap: () => Navigator.pop(context),
+            hoverBg: itemHoverBg,
+            textColor: textPrimary,
+          ),
+          _AdminNavItem(
+            icon: Icons.people_outline_rounded,
+            label: 'Users',
+            delay: 200,
+            onTap: () {
+              Navigator.pop(context);
+              context.push(RouteConstants.adminUsers);
+            },
             hoverBg: itemHoverBg,
             textColor: textPrimary,
           ),

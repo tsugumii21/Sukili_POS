@@ -145,7 +145,11 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
             )
           : Text(
               'User Management',
-              style: AppTextStyles.bodySemiBold(context),
+              style: GoogleFonts.dmSans(
+                color: textPrimary,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+              ),
             ),
       actions: [
         if (!_showSearch)
