@@ -36,6 +36,12 @@ class OrderCollection {
   String? refundReason;
   String? voidedById;
   DateTime? voidedAt;
+  String? voidedByName;
+  bool isPartialRefund = false;
+  double? refundAmount;
+  DateTime? refundedAt;
+  String? refundedById;
+  String? refundedByName;
 
   @Index()
   late DateTime orderedAt;
@@ -45,4 +51,3 @@ class OrderCollection {
   late bool isSynced;
   late bool isDeleted;
 }
-

@@ -20,46 +20,7 @@ enum VoidRefundTab { voidOrders, refunds, history }
 // State
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Represents a refund details payload stored in [OrderCollection.refundReason].
-///
-/// To avoid a schema migration, we encode refund metadata as JSON inside the
-/// existing [refundReason] String field:
-/// {"reason": "...", "amount": 250.0, "isPartial": true, "by": "syncId"}
-class RefundMeta {
-  final String reason;
-  final double amount;
-  final bool isPartial;
-  final String refundedById;
-
-  const RefundMeta({
-    required this.reason,
-    required this.amount,
-    required this.isPartial,
-    required this.refundedById,
-  });
-
-  String toJson() => jsonEncode({
-        'reason': reason,
-        'amount': amount,
-        'isPartial': isPartial,
-        'by': refundedById,
-      });
-
-  static RefundMeta? tryParse(String? raw) {
-    if (raw == null) return null;
-    try {
-      final map = jsonDecode(raw) as Map<String, dynamic>;
-      return RefundMeta(
-        reason: map['reason'] as String? ?? '',
-        amount: (map['amount'] as num?)?.toDouble() ?? 0,
-        isPartial: map['isPartial'] as bool? ?? false,
-        refundedById: map['by'] as String? ?? '',
-      );
-    } catch (_) {
-      return null;
-    }
-  }
-}
+// No RefundMeta needed since we have direct fields on OrderCollection now.
 
 /// Immutable state for the Void & Refund screen.
 class VoidRefundState {
@@ -204,6 +165,7 @@ class VoidRefundNotifier extends Notifier<VoidRefundState> {
         order.status = SupabaseConstants.orderStatusVoided;
         order.voidReason = reason;
         order.voidedById = admin.syncId;
+        order.voidedByName = admin.name;
         order.voidedAt = now;
         order.updatedAt = now;
         order.isSynced = false;
@@ -219,6 +181,7 @@ class VoidRefundNotifier extends Notifier<VoidRefundState> {
           SupabaseConstants.orderStatus: SupabaseConstants.orderStatusVoided,
           'void_reason': reason,
           'voided_by_id': admin.syncId,
+          'voided_by_name': admin.name,
           'voided_at': now.toIso8601String(),
           SupabaseConstants.updatedAt: now.toIso8601String(),
         },
@@ -234,8 +197,6 @@ class VoidRefundNotifier extends Notifier<VoidRefundState> {
   // ── Refund order ─────────────────────────────────────────────────────────────
 
   /// Marks an order as refunded after admin PIN verification.
-  /// Refund metadata (amount, isPartial, reason) is stored as JSON in
-  /// [OrderCollection.refundReason] to avoid a schema migration.
   Future<bool> refundOrder({
     required OrderCollection order,
     required UserCollection admin,
@@ -245,18 +206,15 @@ class VoidRefundNotifier extends Notifier<VoidRefundState> {
   }) async {
     try {
       final now = DateTime.now();
-      final meta = RefundMeta(
-        reason: reason,
-        amount: refundAmount,
-        isPartial: isPartial,
-        refundedById: admin.syncId,
-      );
 
       await _isar.isar.writeTxn(() async {
         order.status = SupabaseConstants.orderStatusRefunded;
-        order.refundReason = meta.toJson();
-        order.voidedById = admin.syncId;
-        order.voidedAt = now;
+        order.refundReason = reason;
+        order.refundAmount = refundAmount;
+        order.isPartialRefund = isPartial;
+        order.refundedById = admin.syncId;
+        order.refundedByName = admin.name;
+        order.refundedAt = now;
         order.updatedAt = now;
         order.isSynced = false;
         await _isar.isar.orderCollections.put(order);
@@ -269,8 +227,11 @@ class VoidRefundNotifier extends Notifier<VoidRefundState> {
         payload: {
           SupabaseConstants.syncId: order.syncId,
           SupabaseConstants.orderStatus: SupabaseConstants.orderStatusRefunded,
-          'refund_reason': meta.toJson(),
+          'refund_reason': reason,
+          'refund_amount': refundAmount,
+          'is_partial_refund': isPartial,
           'refunded_by_id': admin.syncId,
+          'refunded_by_name': admin.name,
           'refunded_at': now.toIso8601String(),
           SupabaseConstants.updatedAt: now.toIso8601String(),
         },

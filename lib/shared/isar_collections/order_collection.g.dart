@@ -57,84 +57,114 @@ const OrderCollectionSchema = CollectionSchema(
       name: r'isDeleted',
       type: IsarType.bool,
     ),
-    r'isSynced': PropertySchema(
+    r'isPartialRefund': PropertySchema(
       id: 8,
+      name: r'isPartialRefund',
+      type: IsarType.bool,
+    ),
+    r'isSynced': PropertySchema(
+      id: 9,
       name: r'isSynced',
       type: IsarType.bool,
     ),
     r'orderItemsJson': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'orderItemsJson',
       type: IsarType.stringList,
     ),
     r'orderNumber': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'orderNumber',
       type: IsarType.string,
     ),
     r'orderedAt': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'orderedAt',
       type: IsarType.dateTime,
     ),
     r'paymentMethod': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'paymentMethod',
       type: IsarType.string,
     ),
     r'paymentReference': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'paymentReference',
       type: IsarType.string,
     ),
+    r'refundAmount': PropertySchema(
+      id: 15,
+      name: r'refundAmount',
+      type: IsarType.double,
+    ),
     r'refundReason': PropertySchema(
-      id: 14,
+      id: 16,
       name: r'refundReason',
       type: IsarType.string,
     ),
+    r'refundedAt': PropertySchema(
+      id: 17,
+      name: r'refundedAt',
+      type: IsarType.dateTime,
+    ),
+    r'refundedById': PropertySchema(
+      id: 18,
+      name: r'refundedById',
+      type: IsarType.string,
+    ),
+    r'refundedByName': PropertySchema(
+      id: 19,
+      name: r'refundedByName',
+      type: IsarType.string,
+    ),
     r'status': PropertySchema(
-      id: 15,
+      id: 20,
       name: r'status',
       type: IsarType.string,
     ),
     r'subtotal': PropertySchema(
-      id: 16,
+      id: 21,
       name: r'subtotal',
       type: IsarType.double,
     ),
     r'syncId': PropertySchema(
-      id: 17,
+      id: 22,
       name: r'syncId',
       type: IsarType.string,
     ),
     r'taxAmount': PropertySchema(
-      id: 18,
+      id: 23,
       name: r'taxAmount',
       type: IsarType.double,
     ),
     r'totalAmount': PropertySchema(
-      id: 19,
+      id: 24,
       name: r'totalAmount',
       type: IsarType.double,
     ),
     r'updatedAt': PropertySchema(
-      id: 20,
+      id: 25,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
     r'voidReason': PropertySchema(
-      id: 21,
+      id: 26,
       name: r'voidReason',
       type: IsarType.string,
     ),
     r'voidedAt': PropertySchema(
-      id: 22,
+      id: 27,
       name: r'voidedAt',
       type: IsarType.dateTime,
     ),
     r'voidedById': PropertySchema(
-      id: 23,
+      id: 28,
       name: r'voidedById',
+      type: IsarType.string,
+    ),
+    r'voidedByName': PropertySchema(
+      id: 29,
+      name: r'voidedByName',
       type: IsarType.string,
     )
   },
@@ -266,6 +296,18 @@ int _orderCollectionEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  {
+    final value = object.refundedById;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.refundedByName;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.status.length * 3;
   bytesCount += 3 + object.syncId.length * 3;
   {
@@ -276,6 +318,12 @@ int _orderCollectionEstimateSize(
   }
   {
     final value = object.voidedById;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.voidedByName;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
@@ -297,22 +345,28 @@ void _orderCollectionSerialize(
   writer.writeDouble(offsets[5], object.discountAmount);
   writer.writeString(offsets[6], object.discountReason);
   writer.writeBool(offsets[7], object.isDeleted);
-  writer.writeBool(offsets[8], object.isSynced);
-  writer.writeStringList(offsets[9], object.orderItemsJson);
-  writer.writeString(offsets[10], object.orderNumber);
-  writer.writeDateTime(offsets[11], object.orderedAt);
-  writer.writeString(offsets[12], object.paymentMethod);
-  writer.writeString(offsets[13], object.paymentReference);
-  writer.writeString(offsets[14], object.refundReason);
-  writer.writeString(offsets[15], object.status);
-  writer.writeDouble(offsets[16], object.subtotal);
-  writer.writeString(offsets[17], object.syncId);
-  writer.writeDouble(offsets[18], object.taxAmount);
-  writer.writeDouble(offsets[19], object.totalAmount);
-  writer.writeDateTime(offsets[20], object.updatedAt);
-  writer.writeString(offsets[21], object.voidReason);
-  writer.writeDateTime(offsets[22], object.voidedAt);
-  writer.writeString(offsets[23], object.voidedById);
+  writer.writeBool(offsets[8], object.isPartialRefund);
+  writer.writeBool(offsets[9], object.isSynced);
+  writer.writeStringList(offsets[10], object.orderItemsJson);
+  writer.writeString(offsets[11], object.orderNumber);
+  writer.writeDateTime(offsets[12], object.orderedAt);
+  writer.writeString(offsets[13], object.paymentMethod);
+  writer.writeString(offsets[14], object.paymentReference);
+  writer.writeDouble(offsets[15], object.refundAmount);
+  writer.writeString(offsets[16], object.refundReason);
+  writer.writeDateTime(offsets[17], object.refundedAt);
+  writer.writeString(offsets[18], object.refundedById);
+  writer.writeString(offsets[19], object.refundedByName);
+  writer.writeString(offsets[20], object.status);
+  writer.writeDouble(offsets[21], object.subtotal);
+  writer.writeString(offsets[22], object.syncId);
+  writer.writeDouble(offsets[23], object.taxAmount);
+  writer.writeDouble(offsets[24], object.totalAmount);
+  writer.writeDateTime(offsets[25], object.updatedAt);
+  writer.writeString(offsets[26], object.voidReason);
+  writer.writeDateTime(offsets[27], object.voidedAt);
+  writer.writeString(offsets[28], object.voidedById);
+  writer.writeString(offsets[29], object.voidedByName);
 }
 
 OrderCollection _orderCollectionDeserialize(
@@ -331,22 +385,28 @@ OrderCollection _orderCollectionDeserialize(
   object.discountReason = reader.readStringOrNull(offsets[6]);
   object.id = id;
   object.isDeleted = reader.readBool(offsets[7]);
-  object.isSynced = reader.readBool(offsets[8]);
-  object.orderItemsJson = reader.readStringList(offsets[9]) ?? [];
-  object.orderNumber = reader.readString(offsets[10]);
-  object.orderedAt = reader.readDateTime(offsets[11]);
-  object.paymentMethod = reader.readString(offsets[12]);
-  object.paymentReference = reader.readStringOrNull(offsets[13]);
-  object.refundReason = reader.readStringOrNull(offsets[14]);
-  object.status = reader.readString(offsets[15]);
-  object.subtotal = reader.readDouble(offsets[16]);
-  object.syncId = reader.readString(offsets[17]);
-  object.taxAmount = reader.readDouble(offsets[18]);
-  object.totalAmount = reader.readDouble(offsets[19]);
-  object.updatedAt = reader.readDateTime(offsets[20]);
-  object.voidReason = reader.readStringOrNull(offsets[21]);
-  object.voidedAt = reader.readDateTimeOrNull(offsets[22]);
-  object.voidedById = reader.readStringOrNull(offsets[23]);
+  object.isPartialRefund = reader.readBool(offsets[8]);
+  object.isSynced = reader.readBool(offsets[9]);
+  object.orderItemsJson = reader.readStringList(offsets[10]) ?? [];
+  object.orderNumber = reader.readString(offsets[11]);
+  object.orderedAt = reader.readDateTime(offsets[12]);
+  object.paymentMethod = reader.readString(offsets[13]);
+  object.paymentReference = reader.readStringOrNull(offsets[14]);
+  object.refundAmount = reader.readDoubleOrNull(offsets[15]);
+  object.refundReason = reader.readStringOrNull(offsets[16]);
+  object.refundedAt = reader.readDateTimeOrNull(offsets[17]);
+  object.refundedById = reader.readStringOrNull(offsets[18]);
+  object.refundedByName = reader.readStringOrNull(offsets[19]);
+  object.status = reader.readString(offsets[20]);
+  object.subtotal = reader.readDouble(offsets[21]);
+  object.syncId = reader.readString(offsets[22]);
+  object.taxAmount = reader.readDouble(offsets[23]);
+  object.totalAmount = reader.readDouble(offsets[24]);
+  object.updatedAt = reader.readDateTime(offsets[25]);
+  object.voidReason = reader.readStringOrNull(offsets[26]);
+  object.voidedAt = reader.readDateTimeOrNull(offsets[27]);
+  object.voidedById = reader.readStringOrNull(offsets[28]);
+  object.voidedByName = reader.readStringOrNull(offsets[29]);
   return object;
 }
 
@@ -376,34 +436,46 @@ P _orderCollectionDeserializeProp<P>(
     case 8:
       return (reader.readBool(offset)) as P;
     case 9:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readBool(offset)) as P;
     case 10:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 11:
-      return (reader.readDateTime(offset)) as P;
-    case 12:
       return (reader.readString(offset)) as P;
+    case 12:
+      return (reader.readDateTime(offset)) as P;
     case 13:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 14:
       return (reader.readStringOrNull(offset)) as P;
     case 15:
-      return (reader.readString(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 16:
-      return (reader.readDouble(offset)) as P;
-    case 17:
-      return (reader.readString(offset)) as P;
-    case 18:
-      return (reader.readDouble(offset)) as P;
-    case 19:
-      return (reader.readDouble(offset)) as P;
-    case 20:
-      return (reader.readDateTime(offset)) as P;
-    case 21:
       return (reader.readStringOrNull(offset)) as P;
-    case 22:
+    case 17:
       return (reader.readDateTimeOrNull(offset)) as P;
+    case 18:
+      return (reader.readStringOrNull(offset)) as P;
+    case 19:
+      return (reader.readStringOrNull(offset)) as P;
+    case 20:
+      return (reader.readString(offset)) as P;
+    case 21:
+      return (reader.readDouble(offset)) as P;
+    case 22:
+      return (reader.readString(offset)) as P;
     case 23:
+      return (reader.readDouble(offset)) as P;
+    case 24:
+      return (reader.readDouble(offset)) as P;
+    case 25:
+      return (reader.readDateTime(offset)) as P;
+    case 26:
+      return (reader.readStringOrNull(offset)) as P;
+    case 27:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 28:
+      return (reader.readStringOrNull(offset)) as P;
+    case 29:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1688,6 +1760,16 @@ extension OrderCollectionQueryFilter
   }
 
   QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      isPartialRefundEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isPartialRefund',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
       isSyncedEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -2406,6 +2488,90 @@ extension OrderCollectionQueryFilter
   }
 
   QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundAmountIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'refundAmount',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundAmountIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'refundAmount',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundAmountEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'refundAmount',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundAmountGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'refundAmount',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundAmountLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'refundAmount',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundAmountBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'refundAmount',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
       refundReasonIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -2554,6 +2720,388 @@ extension OrderCollectionQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'refundReason',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'refundedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'refundedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'refundedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedAtGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'refundedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedAtLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'refundedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'refundedAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'refundedById',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'refundedById',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'refundedById',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'refundedById',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'refundedById',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'refundedById',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'refundedById',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'refundedById',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'refundedById',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'refundedById',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'refundedById',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'refundedById',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'refundedByName',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'refundedByName',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'refundedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'refundedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'refundedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'refundedByName',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'refundedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'refundedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'refundedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'refundedByName',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'refundedByName',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      refundedByNameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'refundedByName',
         value: '',
       ));
     });
@@ -3466,6 +4014,160 @@ extension OrderCollectionQueryFilter
       ));
     });
   }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'voidedByName',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'voidedByName',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'voidedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'voidedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'voidedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'voidedByName',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'voidedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'voidedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'voidedByName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'voidedByName',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'voidedByName',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      voidedByNameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'voidedByName',
+        value: '',
+      ));
+    });
+  }
 }
 
 extension OrderCollectionQueryObject
@@ -3589,6 +4291,20 @@ extension OrderCollectionQuerySortBy
   }
 
   QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByIsPartialRefund() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPartialRefund', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByIsPartialRefundDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPartialRefund', Sort.desc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
       sortByIsSynced() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isSynced', Sort.asc);
@@ -3659,6 +4375,20 @@ extension OrderCollectionQuerySortBy
   }
 
   QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByRefundAmount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundAmount', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByRefundAmountDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundAmount', Sort.desc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
       sortByRefundReason() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'refundReason', Sort.asc);
@@ -3669,6 +4399,48 @@ extension OrderCollectionQuerySortBy
       sortByRefundReasonDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'refundReason', Sort.desc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByRefundedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByRefundedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByRefundedById() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedById', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByRefundedByIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedById', Sort.desc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByRefundedByName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedByName', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByRefundedByNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedByName', Sort.desc);
     });
   }
 
@@ -3793,6 +4565,20 @@ extension OrderCollectionQuerySortBy
       sortByVoidedByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'voidedById', Sort.desc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByVoidedByName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'voidedByName', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByVoidedByNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'voidedByName', Sort.desc);
     });
   }
 }
@@ -3924,6 +4710,20 @@ extension OrderCollectionQuerySortThenBy
   }
 
   QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByIsPartialRefund() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPartialRefund', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByIsPartialRefundDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPartialRefund', Sort.desc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
       thenByIsSynced() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isSynced', Sort.asc);
@@ -3994,6 +4794,20 @@ extension OrderCollectionQuerySortThenBy
   }
 
   QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByRefundAmount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundAmount', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByRefundAmountDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundAmount', Sort.desc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
       thenByRefundReason() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'refundReason', Sort.asc);
@@ -4004,6 +4818,48 @@ extension OrderCollectionQuerySortThenBy
       thenByRefundReasonDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'refundReason', Sort.desc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByRefundedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByRefundedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByRefundedById() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedById', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByRefundedByIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedById', Sort.desc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByRefundedByName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedByName', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByRefundedByNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'refundedByName', Sort.desc);
     });
   }
 
@@ -4130,6 +4986,20 @@ extension OrderCollectionQuerySortThenBy
       return query.addSortBy(r'voidedById', Sort.desc);
     });
   }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByVoidedByName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'voidedByName', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByVoidedByNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'voidedByName', Sort.desc);
+    });
+  }
 }
 
 extension OrderCollectionQueryWhereDistinct
@@ -4192,6 +5062,13 @@ extension OrderCollectionQueryWhereDistinct
   }
 
   QueryBuilder<OrderCollection, OrderCollection, QDistinct>
+      distinctByIsPartialRefund() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isPartialRefund');
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QDistinct>
       distinctByIsSynced() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isSynced');
@@ -4236,9 +5113,38 @@ extension OrderCollectionQueryWhereDistinct
   }
 
   QueryBuilder<OrderCollection, OrderCollection, QDistinct>
+      distinctByRefundAmount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'refundAmount');
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QDistinct>
       distinctByRefundReason({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'refundReason', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QDistinct>
+      distinctByRefundedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'refundedAt');
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QDistinct>
+      distinctByRefundedById({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'refundedById', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QDistinct>
+      distinctByRefundedByName({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'refundedByName',
+          caseSensitive: caseSensitive);
     });
   }
 
@@ -4302,6 +5208,13 @@ extension OrderCollectionQueryWhereDistinct
       distinctByVoidedById({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'voidedById', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QDistinct>
+      distinctByVoidedByName({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'voidedByName', caseSensitive: caseSensitive);
     });
   }
 }
@@ -4368,6 +5281,13 @@ extension OrderCollectionQueryProperty
     });
   }
 
+  QueryBuilder<OrderCollection, bool, QQueryOperations>
+      isPartialRefundProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isPartialRefund');
+    });
+  }
+
   QueryBuilder<OrderCollection, bool, QQueryOperations> isSyncedProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isSynced');
@@ -4409,10 +5329,38 @@ extension OrderCollectionQueryProperty
     });
   }
 
+  QueryBuilder<OrderCollection, double?, QQueryOperations>
+      refundAmountProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'refundAmount');
+    });
+  }
+
   QueryBuilder<OrderCollection, String?, QQueryOperations>
       refundReasonProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'refundReason');
+    });
+  }
+
+  QueryBuilder<OrderCollection, DateTime?, QQueryOperations>
+      refundedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'refundedAt');
+    });
+  }
+
+  QueryBuilder<OrderCollection, String?, QQueryOperations>
+      refundedByIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'refundedById');
+    });
+  }
+
+  QueryBuilder<OrderCollection, String?, QQueryOperations>
+      refundedByNameProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'refundedByName');
     });
   }
 
@@ -4472,6 +5420,13 @@ extension OrderCollectionQueryProperty
       voidedByIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'voidedById');
+    });
+  }
+
+  QueryBuilder<OrderCollection, String?, QQueryOperations>
+      voidedByNameProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'voidedByName');
     });
   }
 }
