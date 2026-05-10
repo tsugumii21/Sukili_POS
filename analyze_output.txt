@@ -1,0 +1,100 @@
+Analyzing sukli_pos...
+
+  error - lib\features\void_refund\presentation\widgets\admin_pin_dialog.dart:182:28 - Undefined name 'AppTextStyles'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\void_refund\presentation\widgets\admin_pin_dialog.dart:187:28 - Undefined name 'AppTextStyles'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\void_refund\presentation\widgets\admin_pin_dialog.dart:248:38 - Undefined name 'AppTextStyles'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\void_refund\presentation\widgets\admin_pin_dialog.dart:391:24 - Undefined name 'AppTextStyles'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+warning - lib\features\menu\presentation\screens\item_management_screen.dart:5:8 - Unused import: 'package:google_fonts/google_fonts.dart'. Try removing the import directive. - unused_import
+warning - lib\features\void_refund\presentation\providers\void_refund_provider.dart:1:8 - Unused import: 'dart:convert'. Try removing the import directive. - unused_import
+warning - lib\features\void_refund\presentation\screens\void_refund_screen.dart:62:11 - The value of the local variable 'primary' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\features\void_refund\presentation\screens\void_refund_screen.dart:323:11 - The value of the local variable 'borderCol' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\features\void_refund\presentation\screens\void_refund_screen.dart:488:15 - The value of the local variable 'textPrimary' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\features\void_refund\presentation\widgets\admin_pin_dialog.dart:131:11 - The value of the local variable 'textSecondary' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\features\void_refund\presentation\widgets\refund_sheet.dart:3:8 - Unused import: 'package:google_fonts/google_fonts.dart'. Try removing the import directive. - unused_import
+warning - lib\shared\isar_collections\category_collection.g.dart:264:12 - 'getByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\category_collection.g.dart:268:12 - 'getByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\category_collection.g.dart:272:12 - 'deleteByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\category_collection.g.dart:276:12 - 'deleteByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\category_collection.g.dart:281:12 - 'getAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\category_collection.g.dart:286:12 - 'getAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\category_collection.g.dart:291:12 - 'deleteAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\category_collection.g.dart:296:12 - 'deleteAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\category_collection.g.dart:300:12 - 'putByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\category_collection.g.dart:304:12 - 'putByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\category_collection.g.dart:308:12 - 'putAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\category_collection.g.dart:313:12 - 'putAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:325:12 - 'getByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:329:12 - 'getByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:333:12 - 'deleteByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:337:12 - 'deleteByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:342:12 - 'getAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:347:12 - 'getAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:352:12 - 'deleteAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:357:12 - 'deleteAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:361:12 - 'putByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:365:12 - 'putByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:369:12 - 'putAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\menu_item_collection.g.dart:374:12 - 'putAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:500:12 - 'getByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:504:12 - 'getByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:508:12 - 'deleteByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:512:12 - 'deleteByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:517:12 - 'getAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:522:12 - 'getAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:527:12 - 'deleteAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:532:12 - 'deleteAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:536:12 - 'putByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:540:12 - 'putByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:544:12 - 'putAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:549:12 - 'putAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:553:12 - 'getByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:557:12 - 'getByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:561:12 - 'deleteByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:565:12 - 'deleteByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:571:12 - 'getAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:577:12 - 'getAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:582:12 - 'deleteAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:587:12 - 'deleteAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:591:12 - 'putByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:595:12 - 'putByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:599:12 - 'putAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\order_collection.g.dart:604:12 - 'putAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:265:12 - 'getByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:269:12 - 'getByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:273:12 - 'deleteByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:277:12 - 'deleteByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:283:12 - 'getAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:289:12 - 'getAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:294:12 - 'deleteAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:299:12 - 'deleteAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:303:12 - 'putByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:307:12 - 'putByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:311:12 - 'putAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\sync_queue_collection.g.dart:316:12 - 'putAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:259:12 - 'getByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:263:12 - 'getByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:267:12 - 'deleteByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:271:12 - 'deleteByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:276:12 - 'getAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:281:12 - 'getAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:286:12 - 'deleteAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:291:12 - 'deleteAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:295:12 - 'putByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:299:12 - 'putByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:303:12 - 'putAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:308:12 - 'putAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:312:12 - 'getByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:316:12 - 'getByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:320:12 - 'deleteByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:324:12 - 'deleteByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:329:12 - 'getAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:334:12 - 'getAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:339:12 - 'deleteAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:344:12 - 'deleteAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:348:12 - 'putByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:352:12 - 'putByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:356:12 - 'putAllByIndex' is experimental and could be removed or changed at any time. - experimental_member_use
+warning - lib\shared\isar_collections\user_collection.g.dart:361:12 - 'putAllByIndexSync' is experimental and could be removed or changed at any time. - experimental_member_use
+   info - lib\features\menu\presentation\screens\item_management_screen.dart:90:49 - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext. - use_build_context_synchronously
+
+96 issues found.

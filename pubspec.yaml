@@ -44,6 +44,7 @@ dependencies:
   printing: any
   excel: any
   esc_pos_utils_plus: any
+  share_plus: ^7.2.1
 
   # Utils
   crypto: ^3.0.3
