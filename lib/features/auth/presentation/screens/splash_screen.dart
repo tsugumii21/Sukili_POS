@@ -3,8 +3,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:isar_community/isar.dart';
 import '../../../../core/constants/route_constants.dart';
+import '../../../../core/services/isar_service.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/isar_collections/store_collection.dart';
 
 /// SplashScreen — The "Modern Brand Evolution" design.
 /// Features a rounded-rectangle logo container, Plus Jakarta Sans, and fintech gradient.
@@ -24,7 +27,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   Future<void> _navigate() async {
     await Future.delayed(const Duration(milliseconds: 3500));
-    if (mounted) {
+    if (!mounted) return;
+
+    // Check if a store has been set up locally
+    final isar = IsarService.instance.isar;
+    final store = await isar.storeCollections
+        .filter()
+        .isDeletedEqualTo(false)
+        .findFirst();
+
+    if (!mounted) return;
+
+    if (store == null) {
+      // No store set up yet → show welcome/onboarding
+      context.go(RouteConstants.welcome);
+    } else {
+      // Store exists → go to cashier selection (existing behavior)
       context.go(RouteConstants.cashierSelect);
     }
   }

@@ -78,23 +78,28 @@ const MenuItemCollectionSchema = CollectionSchema(
       name: r'sortOrder',
       type: IsarType.long,
     ),
-    r'syncId': PropertySchema(
+    r'storeId': PropertySchema(
       id: 12,
+      name: r'storeId',
+      type: IsarType.string,
+    ),
+    r'syncId': PropertySchema(
+      id: 13,
       name: r'syncId',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
     r'variantGroupsJson': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'variantGroupsJson',
       type: IsarType.stringList,
     ),
     r'variantsJson': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'variantsJson',
       type: IsarType.stringList,
     )
@@ -193,6 +198,12 @@ int _menuItemCollectionEstimateSize(
     }
   }
   bytesCount += 3 + object.name.length * 3;
+  {
+    final value = object.storeId;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.syncId.length * 3;
   bytesCount += 3 + object.variantGroupsJson.length * 3;
   {
@@ -229,10 +240,11 @@ void _menuItemCollectionSerialize(
   writer.writeStringList(offsets[9], object.modifiersJson);
   writer.writeString(offsets[10], object.name);
   writer.writeLong(offsets[11], object.sortOrder);
-  writer.writeString(offsets[12], object.syncId);
-  writer.writeDateTime(offsets[13], object.updatedAt);
-  writer.writeStringList(offsets[14], object.variantGroupsJson);
-  writer.writeStringList(offsets[15], object.variantsJson);
+  writer.writeString(offsets[12], object.storeId);
+  writer.writeString(offsets[13], object.syncId);
+  writer.writeDateTime(offsets[14], object.updatedAt);
+  writer.writeStringList(offsets[15], object.variantGroupsJson);
+  writer.writeStringList(offsets[16], object.variantsJson);
 }
 
 MenuItemCollection _menuItemCollectionDeserialize(
@@ -255,10 +267,11 @@ MenuItemCollection _menuItemCollectionDeserialize(
   object.modifiersJson = reader.readStringList(offsets[9]) ?? [];
   object.name = reader.readString(offsets[10]);
   object.sortOrder = reader.readLong(offsets[11]);
-  object.syncId = reader.readString(offsets[12]);
-  object.updatedAt = reader.readDateTime(offsets[13]);
-  object.variantGroupsJson = reader.readStringList(offsets[14]) ?? [];
-  object.variantsJson = reader.readStringList(offsets[15]) ?? [];
+  object.storeId = reader.readStringOrNull(offsets[12]);
+  object.syncId = reader.readString(offsets[13]);
+  object.updatedAt = reader.readDateTime(offsets[14]);
+  object.variantGroupsJson = reader.readStringList(offsets[15]) ?? [];
+  object.variantsJson = reader.readStringList(offsets[16]) ?? [];
   return object;
 }
 
@@ -294,12 +307,14 @@ P _menuItemCollectionDeserializeProp<P>(
     case 11:
       return (reader.readLong(offset)) as P;
     case 12:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 13:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 14:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readDateTime(offset)) as P;
     case 15:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 16:
       return (reader.readStringList(offset) ?? []) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1735,6 +1750,160 @@ extension MenuItemCollectionQueryFilter
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'storeId',
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'storeId',
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'storeId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'storeId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'storeId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
+      storeIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'storeId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterFilterCondition>
       syncIdEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -2542,6 +2711,20 @@ extension MenuItemCollectionQuerySortBy
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
+      sortByStoreId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
+      sortByStoreIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
       sortBySyncId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncId', Sort.asc);
@@ -2741,6 +2924,20 @@ extension MenuItemCollectionQuerySortThenBy
   }
 
   QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
+      thenByStoreId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
+      thenByStoreIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QAfterSortBy>
       thenBySyncId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'syncId', Sort.asc);
@@ -2852,6 +3049,13 @@ extension MenuItemCollectionQueryWhereDistinct
       distinctBySortOrder() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'sortOrder');
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, MenuItemCollection, QDistinct>
+      distinctByStoreId({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'storeId', caseSensitive: caseSensitive);
     });
   }
 
@@ -2969,6 +3173,13 @@ extension MenuItemCollectionQueryProperty
   QueryBuilder<MenuItemCollection, int, QQueryOperations> sortOrderProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'sortOrder');
+    });
+  }
+
+  QueryBuilder<MenuItemCollection, String?, QQueryOperations>
+      storeIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'storeId');
     });
   }
 

@@ -24,6 +24,9 @@ class UserCollection {
 
   String? avatarUrl;
 
+  /// syncId of StoreCollection — nullable for migration safety.
+  String? storeId;
+
   late DateTime createdAt;
   late DateTime updatedAt;
   late bool isSynced;

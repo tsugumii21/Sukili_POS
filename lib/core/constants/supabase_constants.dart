@@ -51,4 +51,15 @@ class SupabaseConstants {
   static const String orderStatusCompleted = 'completed';
   static const String orderStatusVoided = 'voided';
   static const String orderStatusRefunded = 'refunded';
+
+  // Stores table
+  static const String storesTable = 'stores';
+  static const String storeName = 'name';
+  static const String storeLogoUrl = 'logo_url';
+  static const String storeOwnerId = 'owner_id';
+  static const String storeAuthUid = 'supabase_auth_uid';
+  static const String storeId = 'store_id';
+
+  // Storage bucket
+  static const String storageStoreAssets = 'store-assets';
 }

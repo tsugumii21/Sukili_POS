@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:isar_community/isar.dart';
 import 'package:uuid/uuid.dart';
+import '../constants/app_constants.dart';
 import 'pin_helper.dart';
 import '../../shared/isar_collections/user_collection.dart';
 import '../../shared/isar_collections/category_collection.dart';
@@ -75,6 +76,8 @@ class SeedData {
   }
 
   static Future<void> seedInitialData(Isar isar) async {
+    if (AppConstants.isProduction) return; // skip in production
+
     final now = DateTime.now();
 
     // 1. Seed Users (Admin & Cashiers)

@@ -4,6 +4,12 @@ class RouteConstants {
   static const String splash         = '/';
   static const String cashierSelect  = '/cashier-select';
 
+  // ── Onboarding ─────────────────────────────────────────────
+  static const String welcome        = '/welcome';
+  static const String signup         = '/signup';
+  static const String verifyEmail    = '/verify-email';
+  static const String setupWizard    = '/setup-wizard';
+
   // ── Auth ──────────────────────────────────────────────────
   static const String cashierPin     = '/cashier/pin';
   static const String adminLogin     = '/admin/login';

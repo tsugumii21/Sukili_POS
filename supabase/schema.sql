@@ -1,5 +1,18 @@
 -- SUKLI POS CLOUD BACKEND SCHEMA
 -- Strategy: Last-Write-Wins (LWW) Sync with soft deletes
+--
+-- SUPABASE SETUP CHECKLIST (do these in the Supabase dashboard):
+-- 1. Run this entire schema.sql in the SQL editor
+-- 2. Go to Authentication → Email → Enable "Confirm email"
+-- 3. Go to Authentication → Email → Set "Site URL" to your app's deep link
+--    (for local testing use: com.suklipos.sukli_pos://login-callback)
+-- 4. Go to Authentication → Email Templates → customize the confirmation email
+-- 5. Go to Storage → Create bucket "store-assets" (public)
+--
+-- TO CLEAR ALL DATA (run in Supabase SQL editor):
+-- TRUNCATE users, categories, menu_items, orders,
+--   inventory_logs, stores CASCADE;
+-- WARNING: This deletes ALL data permanently.
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -159,3 +172,55 @@ CREATE POLICY "Allow authenticated update" ON categories FOR UPDATE TO authentic
 CREATE POLICY "Allow authenticated update" ON menu_items FOR UPDATE TO authenticated USING (TRUE);
 CREATE POLICY "Allow authenticated update" ON orders FOR UPDATE TO authenticated USING (TRUE);
 CREATE POLICY "Allow authenticated update" ON inventory_logs FOR UPDATE TO authenticated USING (TRUE);
+
+-- --- STORES TABLE ---
+
+CREATE TABLE stores (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  sync_id TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  logo_url TEXT,
+  owner_id TEXT NOT NULL,
+  supabase_auth_uid UUID,
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  is_deleted BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TRIGGER update_stores_updated_at
+  BEFORE UPDATE ON stores
+  FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+CREATE INDEX idx_stores_sync_id ON stores(sync_id);
+CREATE INDEX idx_stores_owner ON stores(owner_id);
+CREATE INDEX idx_stores_auth_uid ON stores(supabase_auth_uid);
+
+-- Add store_id to all existing tables
+ALTER TABLE users ADD COLUMN store_id TEXT REFERENCES stores(sync_id);
+ALTER TABLE categories ADD COLUMN store_id TEXT REFERENCES stores(sync_id);
+ALTER TABLE menu_items ADD COLUMN store_id TEXT REFERENCES stores(sync_id);
+ALTER TABLE orders ADD COLUMN store_id TEXT REFERENCES stores(sync_id);
+ALTER TABLE inventory_logs ADD COLUMN store_id TEXT REFERENCES stores(sync_id);
+
+-- RLS for stores
+ALTER TABLE stores ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow authenticated read" ON stores
+  FOR SELECT TO authenticated USING (is_deleted = FALSE);
+CREATE POLICY "Allow authenticated insert" ON stores
+  FOR INSERT TO authenticated WITH CHECK (TRUE);
+CREATE POLICY "Allow authenticated update" ON stores
+  FOR UPDATE TO authenticated USING (TRUE);
+
+-- Storage bucket for store logos and avatars
+INSERT INTO storage.buckets (id, name, public)
+  VALUES ('store-assets', 'store-assets', true)
+  ON CONFLICT DO NOTHING;
+
+CREATE POLICY "Public read store assets"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'store-assets');
+
+CREATE POLICY "Auth upload store assets"
+  ON storage.objects FOR INSERT
+  TO authenticated WITH CHECK (bucket_id = 'store-assets');

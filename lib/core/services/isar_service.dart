@@ -7,7 +7,13 @@ import '../../shared/isar_collections/category_collection.dart';
 import '../../shared/isar_collections/menu_item_collection.dart';
 import '../../shared/isar_collections/order_collection.dart';
 import '../../shared/isar_collections/sync_queue_collection.dart';
+import '../../shared/isar_collections/store_collection.dart';
 import '../errors/app_exception.dart';
+
+// TO RESET LOCAL DATA FOR TESTING:
+// 1. Uninstall the app from the device/emulator
+// 2. Reinstall with: flutter run
+// This is safer than programmatic deletion.
 
 /// IsarService manages the local NoSQL database.
 class IsarService {
@@ -39,6 +45,7 @@ class IsarService {
           MenuItemCollectionSchema,
           OrderCollectionSchema,
           SyncQueueCollectionSchema,
+          StoreCollectionSchema,
         ],
         directory: dir.path,
         inspector: true,

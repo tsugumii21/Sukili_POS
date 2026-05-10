@@ -5,6 +5,10 @@ import 'core/constants/route_constants.dart';
 
 // ── Auth Screens ──────────────────────────────────────────────────────────────
 import 'features/auth/presentation/screens/splash_screen.dart';
+import 'features/auth/presentation/screens/welcome_screen.dart';
+import 'features/auth/presentation/screens/sign_up_screen.dart';
+import 'features/auth/presentation/screens/verify_email_screen.dart';
+import 'features/auth/presentation/screens/setup_wizard_screen.dart';
 import 'features/auth/presentation/screens/cashier_selection_screen.dart';
 import 'features/auth/presentation/screens/cashier_pin_screen.dart';
 import 'features/auth/presentation/screens/admin_login_screen.dart';
@@ -36,6 +40,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteConstants.splash,
         builder: (c, s) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.welcome,
+        builder: (c, s) => const WelcomeScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.signup,
+        builder: (c, s) => const SignUpScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.verifyEmail,
+        builder: (c, s) => const VerifyEmailScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.setupWizard,
+        builder: (c, s) => const SetupWizardScreen(),
       ),
       GoRoute(
         path: RouteConstants.cashierSelect,

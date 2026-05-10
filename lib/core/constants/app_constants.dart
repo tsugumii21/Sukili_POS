@@ -2,6 +2,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// AppConstants defines the logic-based constants for Sukli POS.
 class AppConstants {
+  /// Set to true for production builds.
+  /// When true, skips all demo seed data on first launch.
+  static const bool isProduction = true;
+
   // App info
   static const String appName = 'Sukli POS';
   static const String appVersion = '1.0.0';

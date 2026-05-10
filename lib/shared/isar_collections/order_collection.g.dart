@@ -122,48 +122,53 @@ const OrderCollectionSchema = CollectionSchema(
       name: r'status',
       type: IsarType.string,
     ),
-    r'subtotal': PropertySchema(
+    r'storeId': PropertySchema(
       id: 21,
+      name: r'storeId',
+      type: IsarType.string,
+    ),
+    r'subtotal': PropertySchema(
+      id: 22,
       name: r'subtotal',
       type: IsarType.double,
     ),
     r'syncId': PropertySchema(
-      id: 22,
+      id: 23,
       name: r'syncId',
       type: IsarType.string,
     ),
     r'taxAmount': PropertySchema(
-      id: 23,
+      id: 24,
       name: r'taxAmount',
       type: IsarType.double,
     ),
     r'totalAmount': PropertySchema(
-      id: 24,
+      id: 25,
       name: r'totalAmount',
       type: IsarType.double,
     ),
     r'updatedAt': PropertySchema(
-      id: 25,
+      id: 26,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
     r'voidReason': PropertySchema(
-      id: 26,
+      id: 27,
       name: r'voidReason',
       type: IsarType.string,
     ),
     r'voidedAt': PropertySchema(
-      id: 27,
+      id: 28,
       name: r'voidedAt',
       type: IsarType.dateTime,
     ),
     r'voidedById': PropertySchema(
-      id: 28,
+      id: 29,
       name: r'voidedById',
       type: IsarType.string,
     ),
     r'voidedByName': PropertySchema(
-      id: 29,
+      id: 30,
       name: r'voidedByName',
       type: IsarType.string,
     )
@@ -309,6 +314,12 @@ int _orderCollectionEstimateSize(
     }
   }
   bytesCount += 3 + object.status.length * 3;
+  {
+    final value = object.storeId;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.syncId.length * 3;
   {
     final value = object.voidReason;
@@ -358,15 +369,16 @@ void _orderCollectionSerialize(
   writer.writeString(offsets[18], object.refundedById);
   writer.writeString(offsets[19], object.refundedByName);
   writer.writeString(offsets[20], object.status);
-  writer.writeDouble(offsets[21], object.subtotal);
-  writer.writeString(offsets[22], object.syncId);
-  writer.writeDouble(offsets[23], object.taxAmount);
-  writer.writeDouble(offsets[24], object.totalAmount);
-  writer.writeDateTime(offsets[25], object.updatedAt);
-  writer.writeString(offsets[26], object.voidReason);
-  writer.writeDateTime(offsets[27], object.voidedAt);
-  writer.writeString(offsets[28], object.voidedById);
-  writer.writeString(offsets[29], object.voidedByName);
+  writer.writeString(offsets[21], object.storeId);
+  writer.writeDouble(offsets[22], object.subtotal);
+  writer.writeString(offsets[23], object.syncId);
+  writer.writeDouble(offsets[24], object.taxAmount);
+  writer.writeDouble(offsets[25], object.totalAmount);
+  writer.writeDateTime(offsets[26], object.updatedAt);
+  writer.writeString(offsets[27], object.voidReason);
+  writer.writeDateTime(offsets[28], object.voidedAt);
+  writer.writeString(offsets[29], object.voidedById);
+  writer.writeString(offsets[30], object.voidedByName);
 }
 
 OrderCollection _orderCollectionDeserialize(
@@ -398,15 +410,16 @@ OrderCollection _orderCollectionDeserialize(
   object.refundedById = reader.readStringOrNull(offsets[18]);
   object.refundedByName = reader.readStringOrNull(offsets[19]);
   object.status = reader.readString(offsets[20]);
-  object.subtotal = reader.readDouble(offsets[21]);
-  object.syncId = reader.readString(offsets[22]);
-  object.taxAmount = reader.readDouble(offsets[23]);
-  object.totalAmount = reader.readDouble(offsets[24]);
-  object.updatedAt = reader.readDateTime(offsets[25]);
-  object.voidReason = reader.readStringOrNull(offsets[26]);
-  object.voidedAt = reader.readDateTimeOrNull(offsets[27]);
-  object.voidedById = reader.readStringOrNull(offsets[28]);
-  object.voidedByName = reader.readStringOrNull(offsets[29]);
+  object.storeId = reader.readStringOrNull(offsets[21]);
+  object.subtotal = reader.readDouble(offsets[22]);
+  object.syncId = reader.readString(offsets[23]);
+  object.taxAmount = reader.readDouble(offsets[24]);
+  object.totalAmount = reader.readDouble(offsets[25]);
+  object.updatedAt = reader.readDateTime(offsets[26]);
+  object.voidReason = reader.readStringOrNull(offsets[27]);
+  object.voidedAt = reader.readDateTimeOrNull(offsets[28]);
+  object.voidedById = reader.readStringOrNull(offsets[29]);
+  object.voidedByName = reader.readStringOrNull(offsets[30]);
   return object;
 }
 
@@ -460,22 +473,24 @@ P _orderCollectionDeserializeProp<P>(
     case 20:
       return (reader.readString(offset)) as P;
     case 21:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 22:
-      return (reader.readString(offset)) as P;
-    case 23:
       return (reader.readDouble(offset)) as P;
+    case 23:
+      return (reader.readString(offset)) as P;
     case 24:
       return (reader.readDouble(offset)) as P;
     case 25:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readDouble(offset)) as P;
     case 26:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 27:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 28:
       return (reader.readStringOrNull(offset)) as P;
+    case 28:
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 29:
+      return (reader.readStringOrNull(offset)) as P;
+    case 30:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -3244,6 +3259,160 @@ extension OrderCollectionQueryFilter
   }
 
   QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'storeId',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'storeId',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'storeId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'storeId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'storeId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'storeId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
+      storeIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'storeId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterFilterCondition>
       subtotalEqualTo(
     double value, {
     double epsilon = Query.epsilon,
@@ -4457,6 +4626,19 @@ extension OrderCollectionQuerySortBy
     });
   }
 
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy> sortByStoreId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      sortByStoreIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeId', Sort.desc);
+    });
+  }
+
   QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
       sortBySubtotal() {
     return QueryBuilder.apply(this, (query) {
@@ -4876,6 +5058,19 @@ extension OrderCollectionQuerySortThenBy
     });
   }
 
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy> thenByStoreId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
+      thenByStoreIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeId', Sort.desc);
+    });
+  }
+
   QueryBuilder<OrderCollection, OrderCollection, QAfterSortBy>
       thenBySubtotal() {
     return QueryBuilder.apply(this, (query) {
@@ -5155,6 +5350,13 @@ extension OrderCollectionQueryWhereDistinct
     });
   }
 
+  QueryBuilder<OrderCollection, OrderCollection, QDistinct> distinctByStoreId(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'storeId', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<OrderCollection, OrderCollection, QDistinct>
       distinctBySubtotal() {
     return QueryBuilder.apply(this, (query) {
@@ -5367,6 +5569,12 @@ extension OrderCollectionQueryProperty
   QueryBuilder<OrderCollection, String, QQueryOperations> statusProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'status');
+    });
+  }
+
+  QueryBuilder<OrderCollection, String?, QQueryOperations> storeIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'storeId');
     });
   }
 

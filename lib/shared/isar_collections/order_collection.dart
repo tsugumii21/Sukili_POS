@@ -46,6 +46,9 @@ class OrderCollection {
   @Index()
   late DateTime orderedAt;
 
+  /// syncId of StoreCollection — nullable for migration safety.
+  String? storeId;
+
   late DateTime createdAt;
   late DateTime updatedAt;
   late bool isSynced;

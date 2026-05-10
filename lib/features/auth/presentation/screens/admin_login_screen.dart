@@ -3,9 +3,14 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:isar_community/isar.dart';
+
 import '../../../../core/constants/route_constants.dart';
+import '../../../../core/services/isar_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../shared/isar_collections/category_collection.dart';
+import '../../../../shared/isar_collections/user_collection.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../providers/admin_auth_provider.dart';
@@ -47,7 +52,25 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
           );
 
       if (success && mounted) {
-        context.go(RouteConstants.adminHome);
+        // After successful login, check if setup is complete
+        final isar = IsarService.instance.isar;
+        final cashierCount = await isar.userCollections
+            .filter()
+            .roleEqualTo('cashier')
+            .isDeletedEqualTo(false)
+            .count();
+        final categoryCount = await isar.categoryCollections
+            .filter()
+            .isDeletedEqualTo(false)
+            .count();
+
+        if (!mounted) return;
+
+        if (cashierCount == 0 || categoryCount == 0) {
+          context.go(RouteConstants.setupWizard);
+        } else {
+          context.go(RouteConstants.adminHome);
+        }
       }
     } catch (e) {
       if (mounted) {
