@@ -48,8 +48,7 @@ class PaymentMethodCard extends StatelessWidget {
             ),
           ],
         ),
-        padding:
-            const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -94,8 +93,7 @@ class PaymentMethodCard extends StatelessWidget {
               method.label,
               style: AppTextStyles.captionMedium(context).copyWith(
                 color: isSelected ? maroon : textPrimary,
-                fontWeight:
-                    isSelected ? FontWeight.w700 : FontWeight.w500,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
           ],

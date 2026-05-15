@@ -29,18 +29,22 @@ class CashierDashboardScreen extends ConsumerWidget {
     final dashboardAsync = ref.watch(dashboardProvider);
     final isOnline = ref.watch(isOnlineProvider);
     final isSyncing = ref.watch(isSyncingProvider);
-    
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textPrimary =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final cardBg = isDark ? AppColors.cardDark : AppColors.white;
 
     final cashierName = authState.selectedCashier?.name ?? 'Cashier';
     final initials =
         cashierName.isNotEmpty ? cashierName[0].toUpperCase() : '?';
     final hour = DateTime.now().hour;
-    final greeting =
-        hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+    final greeting = hour < 12
+        ? 'morning'
+        : hour < 17
+            ? 'afternoon'
+            : 'evening';
 
     return Scaffold(
       backgroundColor: bg,
@@ -66,8 +70,8 @@ class CashierDashboardScreen extends ConsumerWidget {
                     width: 48,
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      icon:
-                          Icon(Icons.menu_rounded, color: textPrimary, size: 28),
+                      icon: Icon(Icons.menu_rounded,
+                          color: textPrimary, size: 28),
                       onPressed: () => Scaffold.of(context).openDrawer(),
                     ),
                   ),
@@ -127,131 +131,57 @@ class CashierDashboardScreen extends ConsumerWidget {
         ),
       ),
       body: dashboardAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator.adaptive()),
-        error: (err, st) => Center(child: Text('Error loading dashboard: $err')),
+        loading: () =>
+            const Center(child: CircularProgressIndicator.adaptive()),
+        error: (err, st) =>
+            Center(child: Text('Error loading dashboard: $err')),
         data: (data) => SafeArea(
           top: false,
           child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
-              AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.xxl),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Stats Row (60/40 asymmetric) ─────────────────────────────
-              Row(
-                children: [
-                  Expanded(
-                    flex: 6,
-                    child: StatsCard(
-                      title: "Today's Sales",
-                      value: CurrencyFormatter.format(data.todaySales),
-                      icon: Icons.payments_outlined,
-                      valueColor: const Color(0xFF8B4049),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    flex: 4,
-                    child: StatsCard(
-                      title: "Orders Today",
-                      value: data.todayOrders.toString(),
-                      icon: Icons.shopping_bag_outlined,
-                    ),
-                  ),
-                ],
-              ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1, end: 0),
-
-              const SizedBox(height: AppSpacing.lg),
-
-              // ── Main Action ──────────────────────────────────────────────
-              AppPrimaryButton(
-                label: 'Take Order',
-                icon: Icons.add_circle_outline_rounded,
-                onPressed: () => context.push(RouteConstants.newOrder),
-              ).animate().fadeIn(duration: 600.ms, delay: 200.ms),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              // ── Favorites / Quick Picks Section ──────────────────────────
-              if (data.favorites.isNotEmpty) ...[
-                Text(
-                  'Quick Picks',
-                  style: GoogleFonts.dmSans(
-                    color: textPrimary,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                // Stack adds a right-edge fade so the list naturally trails off.
-                Stack(
+            padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.xxl),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Stats Row (60/40 asymmetric) ─────────────────────────────
+                Row(
                   children: [
-                    SizedBox(
-                      height: 48,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: data.favorites.length,
-                        itemBuilder: (context, index) {
-                          final item = data.favorites[index];
-                          return Container(
-                            margin: const EdgeInsets.only(right: 12),
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: cardBg,
-                              borderRadius: BorderRadius.circular(99),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.03),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Text(
-                                item.name,
-                                style: GoogleFonts.dmSans(
-                                  color: textPrimary,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
+                    Expanded(
+                      flex: 6,
+                      child: StatsCard(
+                        title: "Today's Sales",
+                        value: CurrencyFormatter.format(data.todaySales),
+                        icon: Icons.payments_outlined,
+                        valueColor: const Color(0xFF8B4049),
                       ),
                     ),
-                    // Right-edge fade gradient
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: IgnorePointer(
-                        child: Container(
-                          width: 48,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [bg.withAlpha(0), bg],
-                            ),
-                          ),
-                        ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      flex: 4,
+                      child: StatsCard(
+                        title: "Orders Today",
+                        value: data.todayOrders.toString(),
+                        icon: Icons.shopping_bag_outlined,
                       ),
                     ),
                   ],
-                ).animate().fadeIn(duration: 600.ms, delay: 400.ms).slideX(begin: 0.1, end: 0),
-                const SizedBox(height: AppSpacing.xl),
-              ],
+                ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1, end: 0),
 
-              // ── Recent Orders ────────────────────────────────────────────
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                const SizedBox(height: AppSpacing.lg),
+
+                // ── Main Action ──────────────────────────────────────────────
+                AppPrimaryButton(
+                  label: 'Take Order',
+                  icon: Icons.add_circle_outline_rounded,
+                  onPressed: () => context.push(RouteConstants.newOrder),
+                ).animate().fadeIn(duration: 600.ms, delay: 200.ms),
+
+                const SizedBox(height: AppSpacing.xl),
+
+                // ── Favorites / Quick Picks Section ──────────────────────────
+                if (data.favorites.isNotEmpty) ...[
                   Text(
-                    'Recent Orders',
+                    'Quick Picks',
                     style: GoogleFonts.dmSans(
                       color: textPrimary,
                       fontSize: 20,
@@ -259,134 +189,213 @@ class CashierDashboardScreen extends ConsumerWidget {
                       letterSpacing: -0.5,
                     ),
                   ),
-                  TextButton(
-                    onPressed: () => context.push(RouteConstants.orderHistory),
-                    child: Text(
-                      'See All',
-                      style: GoogleFonts.dmSans(
-                        color: const Color(0xFF8B4049),
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.md),
-              if (data.recentOrders.isEmpty)
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Text(
-                      'No orders yet today.',
-                      style: GoogleFonts.dmSans(
-                          color: textPrimary.withValues(alpha: 0.4)),
-                    ),
-                  ),
-                )
-              else
-                ...data.recentOrders.asMap().entries.map((entry) {
-                  final idx = entry.key;
-                  final order = entry.value;
-                  // Show only the last 4 chars of the order number, e.g. #0004
-                  final rawNum = order.orderNumber;
-                  final shortNum =
-                      '#${rawNum.length > 4 ? rawNum.substring(rawNum.length - 4) : rawNum}';
-                  final accentColor = order.status == 'completed'
-                      ? AppColors.successDark
-                      : order.status == 'voided'
-                          ? AppColors.errorDark
-                          : AppColors.warningDark;
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: cardBg,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: IntrinsicHeight(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // 3px left accent bar
-                            Container(width: 3, color: accentColor),
-                            // Card content
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF8B4049)
-                                            .withValues(alpha: 0.1),
-                                        borderRadius:
-                                            BorderRadius.circular(12),
-                                      ),
-                                      child: const Icon(
-                                          Icons.receipt_long_rounded,
-                                          color: Color(0xFF8B4049)),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            shortNum,
-                                            style: GoogleFonts.dmSans(
-                                              color: textPrimary,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${order.orderedAt.hour}:${order.orderedAt.minute.toString().padLeft(2, '0')}',
-                                            style: GoogleFonts.dmSans(
-                                              color: textPrimary
-                                                  .withValues(alpha: 0.5),
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Text(
-                                      CurrencyFormatter.format(
-                                          order.totalAmount),
-                                      style: GoogleFonts.dmSans(
-                                        color: textPrimary,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ],
+                  const SizedBox(height: AppSpacing.md),
+                  // Stack adds a right-edge fade so the list naturally trails off.
+                  Stack(
+                    children: [
+                      SizedBox(
+                        height: 48,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: data.favorites.length,
+                          itemBuilder: (context, index) {
+                            final item = data.favorites[index];
+                            return Container(
+                              margin: const EdgeInsets.only(right: 12),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              decoration: BoxDecoration(
+                                color: cardBg,
+                                borderRadius: BorderRadius.circular(99),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.03),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Text(
+                                  item.name,
+                                  style: GoogleFonts.dmSans(
+                                    color: textPrimary,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
+                      ),
+                      // Right-edge fade gradient
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: IgnorePointer(
+                          child: Container(
+                            width: 48,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [bg.withAlpha(0), bg],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                      .animate()
+                      .fadeIn(duration: 600.ms, delay: 400.ms)
+                      .slideX(begin: 0.1, end: 0),
+                  const SizedBox(height: AppSpacing.xl),
+                ],
+
+                // ── Recent Orders ────────────────────────────────────────────
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Recent Orders',
+                      style: GoogleFonts.dmSans(
+                        color: textPrimary,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () =>
+                          context.push(RouteConstants.orderHistory),
+                      child: Text(
+                        'See All',
+                        style: GoogleFonts.dmSans(
+                          color: const Color(0xFF8B4049),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                if (data.recentOrders.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Text(
+                        'No orders yet today.',
+                        style: GoogleFonts.dmSans(
+                            color: textPrimary.withValues(alpha: 0.4)),
                       ),
                     ),
                   )
-                      .animate(
-                          delay: Duration(milliseconds: idx * 50))
-                      .fadeIn(duration: 300.ms)
-                      .slideY(begin: 0.08, end: 0);
-                }),
-            ],
+                else
+                  ...data.recentOrders.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final order = entry.value;
+                    // Show only the last 4 chars of the order number, e.g. #0004
+                    final rawNum = order.orderNumber;
+                    final shortNum =
+                        '#${rawNum.length > 4 ? rawNum.substring(rawNum.length - 4) : rawNum}';
+                    final accentColor = order.status == 'completed'
+                        ? AppColors.successDark
+                        : order.status == 'voided'
+                            ? AppColors.errorDark
+                            : AppColors.warningDark;
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: cardBg,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // 3px left accent bar
+                              Container(width: 3, color: accentColor),
+                              // Card content
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF8B4049)
+                                              .withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: const Icon(
+                                            Icons.receipt_long_rounded,
+                                            color: Color(0xFF8B4049)),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              shortNum,
+                                              style: GoogleFonts.dmSans(
+                                                color: textPrimary,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            Text(
+                                              '${order.orderedAt.hour}:${order.orderedAt.minute.toString().padLeft(2, '0')}',
+                                              style: GoogleFonts.dmSans(
+                                                color: textPrimary.withValues(
+                                                    alpha: 0.5),
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        CurrencyFormatter.format(
+                                            order.totalAmount),
+                                        style: GoogleFonts.dmSans(
+                                          color: textPrimary,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                        .animate(delay: Duration(milliseconds: idx * 50))
+                        .fadeIn(duration: 300.ms)
+                        .slideY(begin: 0.08, end: 0);
+                  }),
+              ],
+            ),
           ),
-        ),
         ),
       ),
     );
@@ -407,8 +416,7 @@ class _DashboardDrawer extends ConsumerWidget {
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final itemHoverBg =
         isDark ? const Color(0xFF3E2723) : const Color(0xFFF9F0F1);
-    final initial =
-        cashierName.isNotEmpty ? cashierName[0].toUpperCase() : '?';
+    final initial = cashierName.isNotEmpty ? cashierName[0].toUpperCase() : '?';
 
     return Drawer(
       backgroundColor: drawerBg,
@@ -588,8 +596,7 @@ class _DashboardDrawer extends ConsumerWidget {
           ),
 
           SizedBox(
-            height:
-                MediaQuery.of(context).padding.bottom + AppSpacing.lg,
+            height: MediaQuery.of(context).padding.bottom + AppSpacing.lg,
           ),
         ],
       ),
@@ -632,8 +639,7 @@ class _NavItem extends StatelessWidget {
           splashColor: ic.withValues(alpha: 0.1),
           highlightColor: hoverBg,
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
                 Icon(icon, size: 21, color: ic),
@@ -651,10 +657,13 @@ class _NavItem extends StatelessWidget {
           ),
         ),
       ),
-    ).animate().fadeIn(
+    )
+        .animate()
+        .fadeIn(
           duration: 280.ms,
           delay: delay.ms,
-        ).slideX(
+        )
+        .slideX(
           begin: -0.06,
           end: 0,
           duration: 280.ms,
@@ -697,9 +706,7 @@ class _ThemeToggleTile extends ConsumerWidget {
             child: Row(
               children: [
                 Icon(
-                  isDark
-                      ? Icons.dark_mode_rounded
-                      : Icons.light_mode_rounded,
+                  isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
                   size: 21,
                   color: isDark ? AppColors.accentDarkLight : _maroon,
                 ),
@@ -716,8 +723,7 @@ class _ThemeToggleTile extends ConsumerWidget {
                 ),
                 Switch.adaptive(
                   value: isDark,
-                  onChanged: (_) =>
-                      ref.read(themeProvider.notifier).toggle(),
+                  onChanged: (_) => ref.read(themeProvider.notifier).toggle(),
                   activeThumbColor: AppColors.accentDark,
                   activeTrackColor: AppColors.accentDark.withValues(alpha: 0.5),
                   inactiveThumbColor: _maroon,

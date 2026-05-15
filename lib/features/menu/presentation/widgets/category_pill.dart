@@ -20,8 +20,7 @@ class CategoryPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final selectedBg =
-        isDark ? AppColors.accentDark : AppColors.accentLight;
+    final selectedBg = isDark ? AppColors.accentDark : AppColors.accentLight;
     final unselectedBg =
         isDark ? AppColors.surfaceDarkElevated : AppColors.cardLight;
     final selectedText = AppColors.white;
@@ -33,8 +32,7 @@ class CategoryPill extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
-        padding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected ? selectedBg : unselectedBg,
           borderRadius: BorderRadius.circular(99),
@@ -56,8 +54,7 @@ class CategoryPill extends StatelessWidget {
           style: GoogleFonts.dmSans(
             color: isSelected ? selectedText : unselectedText,
             fontSize: 14,
-            fontWeight:
-                isSelected ? FontWeight.w700 : FontWeight.w600,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
           ),
         ),
       ),

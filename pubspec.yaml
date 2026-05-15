@@ -60,6 +60,9 @@ dependencies:
   logger: any
   collection: any
   url_launcher: ^6.3.2
+  flutter_image_compress: ^2.4.0
+  path: ^1.9.1
+  app_links: ^6.1.1
 
 dev_dependencies:
   flutter_test:

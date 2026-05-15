@@ -2,8 +2,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:isar_community/isar.dart';
 
 import '../../../../shared/isar_collections/order_collection.dart';
+import '../../../../shared/providers/isar_provider.dart';
+import '../../../../shared/providers/store_provider.dart';
 
 export 'reports_provider.dart';
 
@@ -128,13 +131,11 @@ class ReportState {
     for (final order in orders) {
       for (final json in order.orderItemsJson) {
         // Each entry is a JSON-like "name:qty:price" or full JSON.
-        // We attempt a minimal parse: look for "name" and "totalPrice" keys.
         try {
           final nameMatch = RegExp(r'"name"\s*:\s*"([^"]+)"').firstMatch(json);
           final priceMatch =
               RegExp(r'"totalPrice"\s*:\s*([\d.]+)').firstMatch(json);
-          final qtyMatch =
-              RegExp(r'"quantity"\s*:\s*(\d+)').firstMatch(json);
+          final qtyMatch = RegExp(r'"quantity"\s*:\s*(\d+)').firstMatch(json);
 
           if (nameMatch == null) continue;
           final name = nameMatch.group(1)!;
@@ -150,7 +151,8 @@ class ReportState {
     }
 
     final items = revenue.entries
-        .map((e) => TopItem(name: e.key, qtySold: qty[e.key] ?? 0, revenue: e.value))
+        .map((e) =>
+            TopItem(name: e.key, qtySold: qty[e.key] ?? 0, revenue: e.value))
         .toList()
       ..sort((a, b) => b.revenue.compareTo(a.revenue));
 
@@ -243,7 +245,10 @@ class ReportState {
 class ReportsNotifier extends Notifier<ReportState> {
   @override
   ReportState build() {
-    _loadData();
+    final storeId = ref.watch(currentStoreIdProvider);
+    if (storeId.isEmpty) return const ReportState(period: ReportPeriod.day);
+
+    _loadData(storeId);
     return const ReportState(period: ReportPeriod.day);
   }
 
@@ -252,17 +257,51 @@ class ReportsNotifier extends Notifier<ReportState> {
     DateTime? customStart,
     DateTime? customEnd,
   }) {
+    final storeId = ref.read(currentStoreIdProvider);
     state = state.copyWith(
       period: period,
       customStart: customStart,
       customEnd: customEnd,
     );
-    _loadData();
+    _loadData(storeId);
   }
 
-  void _loadData() {
-    // TODO: query Isar for the selected date range and call:
-    // state = state.copyWith(orders: filteredOrders);
+  Future<void> _loadData(String storeId) async {
+    if (storeId.isEmpty) return;
+
+    final isar = ref.read(isarProvider);
+    DateTime start;
+    DateTime end = DateTime.now();
+
+    switch (state.period) {
+      case ReportPeriod.day:
+        start = DateTime(end.year, end.month, end.day);
+        break;
+      case ReportPeriod.week:
+        start = end.subtract(const Duration(days: 7));
+        break;
+      case ReportPeriod.month:
+        start = DateTime(end.year, end.month, 1);
+        break;
+      case ReportPeriod.year:
+        start = DateTime(end.year, 1, 1);
+        break;
+      case ReportPeriod.custom:
+        start = state.customStart ?? end.subtract(const Duration(days: 7));
+        end = state.customEnd ?? end;
+        break;
+    }
+
+    final filteredOrders = await isar.orderCollections
+        .filter()
+        .storeIdEqualTo(storeId)
+        .and()
+        .orderedAtBetween(start, end)
+        .and()
+        .isDeletedEqualTo(false)
+        .findAll();
+
+    state = state.copyWith(orders: filteredOrders);
   }
 }
 

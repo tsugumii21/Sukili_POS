@@ -20,8 +20,7 @@ class AdminDashboardData {
 }
 
 /// AdminDashboardNotifier manages state for the Admin Dashboard screen.
-class AdminDashboardNotifier
-    extends Notifier<AsyncValue<AdminDashboardData>> {
+class AdminDashboardNotifier extends Notifier<AsyncValue<AdminDashboardData>> {
   @override
   AsyncValue<AdminDashboardData> build() {
     _init();

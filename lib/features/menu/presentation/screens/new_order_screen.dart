@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,22 +47,19 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
 
   void _showContinueDialog(BuildContext context, dynamic order) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final dialogBg =
-        isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
+    final dialogBg = isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
     final textPrimary =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final textSecondary =
         isDark ? AppColors.textSecondaryDark : const Color(0xFF6B6B6B);
-    final accentColor =
-        isDark ? AppColors.accentDark : const Color(0xFF8B4049);
+    final accentColor = isDark ? AppColors.accentDark : const Color(0xFF8B4049);
 
     showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => Dialog(
         backgroundColor: dialogBg,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -164,7 +160,8 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
     final orderState = ref.watch(orderProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textPrimary =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
     return Scaffold(
       backgroundColor: bg,
@@ -172,7 +169,8 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded,
+              color: textPrimary, size: 20),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -196,7 +194,8 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
           Stack(
             children: [
               IconButton(
-                icon: Icon(Icons.shopping_cart_outlined, color: textPrimary, size: 26),
+                icon: Icon(Icons.shopping_cart_outlined,
+                    color: textPrimary, size: 26),
                 onPressed: orderState.isNotEmpty
                     ? () => _showCartSheet(context)
                     : null,
@@ -208,7 +207,9 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.accentDark : const Color(0xFF8B4049),
+                      color: isDark
+                          ? AppColors.accentDark
+                          : const Color(0xFF8B4049),
                       shape: BoxShape.circle,
                     ),
                     child: Text(
@@ -239,7 +240,8 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
               ),
               child: TextField(
                 controller: _searchController,
-                onChanged: (v) => ref.read(menuProvider.notifier).updateSearch(v),
+                onChanged: (v) =>
+                    ref.read(menuProvider.notifier).updateSearch(v),
                 style: GoogleFonts.dmSans(color: textPrimary, fontSize: 15),
                 decoration: InputDecoration(
                   hintText: 'Search items...',
@@ -254,7 +256,9 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                   ),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: Icon(Icons.close_rounded, color: textPrimary.withValues(alpha: 0.35), size: 20),
+                          icon: Icon(Icons.close_rounded,
+                              color: textPrimary.withValues(alpha: 0.35),
+                              size: 20),
                           onPressed: () {
                             _searchController.clear();
                             ref.read(menuProvider.notifier).updateSearch('');
@@ -262,7 +266,8 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                         )
                       : null,
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 ),
               ),
             ),
@@ -278,7 +283,8 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                 CategoryPill(
                   label: 'All',
                   isSelected: menuState.selectedCategoryId == null,
-                  onTap: () => ref.read(menuProvider.notifier).selectCategory(null),
+                  onTap: () =>
+                      ref.read(menuProvider.notifier).selectCategory(null),
                 ),
                 const SizedBox(width: 10),
                 ...menuState.categories.map((cat) => Padding(
@@ -286,7 +292,9 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                       child: CategoryPill(
                         label: cat.name,
                         isSelected: menuState.selectedCategoryId == cat.syncId,
-                        onTap: () => ref.read(menuProvider.notifier).selectCategory(cat.syncId),
+                        onTap: () => ref
+                            .read(menuProvider.notifier)
+                            .selectCategory(cat.syncId),
                       ),
                     )),
               ],
@@ -304,7 +312,9 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.search_off_rounded, size: 48, color: textPrimary.withValues(alpha: 0.2)),
+                            Icon(Icons.search_off_rounded,
+                                size: 48,
+                                color: textPrimary.withValues(alpha: 0.2)),
                             const SizedBox(height: 12),
                             Text(
                               'No items found',
@@ -332,8 +342,7 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                           final item = menuState.items[index];
                           return ItemCard(
                             item: item,
-                            onTap: () =>
-                                _showItemCustomization(context, item),
+                            onTap: () => _showItemCustomization(context, item),
                           )
                               .animate()
                               .fadeIn(
@@ -361,9 +370,11 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
               child: FloatingActionButton.extended(
                 backgroundColor: const Color(0xFF8B4049),
                 elevation: 8,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18)),
                 onPressed: () => context.push(RouteConstants.checkout),
-                icon: const Icon(Icons.shopping_cart_checkout_rounded, color: AppColors.white),
+                icon: const Icon(Icons.shopping_cart_checkout_rounded,
+                    color: AppColors.white),
                 label: Text(
                   'Checkout  •  ${CurrencyFormatter.format(orderState.total)}',
                   style: GoogleFonts.dmSans(
@@ -373,10 +384,8 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                   ),
                 ),
               ),
-            )
-              .animate()
-              .fadeIn(duration: 300.ms)
-              .slideY(begin: 0.5, end: 0, duration: 300.ms, curve: Curves.easeOut)
+            ).animate().fadeIn(duration: 300.ms).slideY(
+              begin: 0.5, end: 0, duration: 300.ms, curve: Curves.easeOut)
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
@@ -391,7 +400,8 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
   void _showCartSheet(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final sheetBg = isDark ? AppColors.surfaceDark : AppColors.white;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textPrimary =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
     showModalBottomSheet(
       context: context,
@@ -407,7 +417,8 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
               ),
               decoration: BoxDecoration(
                 color: sheetBg,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(28)),
               ),
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
               child: Column(
@@ -462,7 +473,9 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                           margin: const EdgeInsets.only(bottom: 12),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: isDark ? AppColors.cardDark : AppColors.backgroundLight,
+                            color: isDark
+                                ? AppColors.cardDark
+                                : AppColors.backgroundLight,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
@@ -483,12 +496,14 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                                       Text(
                                         cartItem.variantName!,
                                         style: GoogleFonts.dmSans(
-                                          color: textPrimary.withValues(alpha: 0.5),
+                                          color: textPrimary.withValues(
+                                              alpha: 0.5),
                                           fontSize: 12,
                                         ),
                                       ),
                                     Text(
-                                      CurrencyFormatter.format(cartItem.subtotal),
+                                      CurrencyFormatter.format(
+                                          cartItem.subtotal),
                                       style: GoogleFonts.dmSans(
                                         color: const Color(0xFF8B4049),
                                         fontWeight: FontWeight.w800,
@@ -502,11 +517,14 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                                 children: [
                                   _QtyButton(
                                     icon: Icons.remove_rounded,
-                                    onTap: () => ref.read(orderProvider.notifier)
-                                        .updateQuantity(cartItem.cartKey, cartItem.quantity - 1),
+                                    onTap: () => ref
+                                        .read(orderProvider.notifier)
+                                        .updateQuantity(cartItem.cartKey,
+                                            cartItem.quantity - 1),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14),
                                     child: Text(
                                       cartItem.quantity.toString(),
                                       style: GoogleFonts.dmSans(
@@ -518,8 +536,10 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                                   ),
                                   _QtyButton(
                                     icon: Icons.add_rounded,
-                                    onTap: () => ref.read(orderProvider.notifier)
-                                        .updateQuantity(cartItem.cartKey, cartItem.quantity + 1),
+                                    onTap: () => ref
+                                        .read(orderProvider.notifier)
+                                        .updateQuantity(cartItem.cartKey,
+                                            cartItem.quantity + 1),
                                   ),
                                 ],
                               ),
@@ -538,13 +558,15 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
                       onPressed: () {
                         Navigator.pop(context);
                         this.context.mounted
-                            ? GoRouter.of(this.context).push(RouteConstants.checkout)
+                            ? GoRouter.of(this.context)
+                                .push(RouteConstants.checkout)
                             : null;
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF8B4049),
                         foregroundColor: AppColors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18)),
                         elevation: 0,
                       ),
                       child: Text(
@@ -565,7 +587,6 @@ class _NewOrderScreenState extends ConsumerState<NewOrderScreen> {
     );
   }
 }
-
 
 /// Small +/- button used in the cart quantity controls.
 class _QtyButton extends StatelessWidget {

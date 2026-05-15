@@ -14,9 +14,7 @@ class AppTheme {
       brightness: Brightness.light,
       primaryColor: AppColors.accentLight,
       scaffoldBackgroundColor: AppColors.backgroundLight,
-      textTheme:
-          GoogleFonts.dmSansTextTheme(ThemeData.light().textTheme),
-
+      textTheme: GoogleFonts.dmSansTextTheme(ThemeData.light().textTheme),
       colorScheme: const ColorScheme.light(
         primary: AppColors.accentLight,
         secondary: AppColors.secondaryLight,
@@ -26,7 +24,6 @@ class AppTheme {
         onSecondary: Colors.white,
         onSurface: AppColors.textPrimaryLight,
       ),
-
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.primaryLight,
         foregroundColor: AppColors.textPrimaryLight,
@@ -38,13 +35,11 @@ class AppTheme {
           color: AppColors.textPrimaryLight,
         ),
       ),
-
       cardTheme: CardThemeData(
         color: AppColors.cardLight,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: AppRadius.mediumBR),
       ),
-
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.accentLight,
@@ -57,7 +52,6 @@ class AppTheme {
           ),
         ),
       ),
-
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.accentLight,
@@ -66,11 +60,9 @@ class AppTheme {
           shape: RoundedRectangleBorder(borderRadius: AppRadius.pillBR),
         ),
       ),
-
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(foregroundColor: AppColors.accentLight),
       ),
-
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceLight,
@@ -90,13 +82,11 @@ class AppTheme {
               const BorderSide(color: AppColors.accentLight, width: 1.5),
         ),
       ),
-
       dividerTheme: const DividerThemeData(
         color: AppColors.primaryLight,
         thickness: 1,
         space: 1,
       ),
-
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.cardLight,
         selectedColor: AppColors.accentLight,
@@ -104,7 +94,6 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         shape: const StadiumBorder(side: BorderSide.none),
       ),
-
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.textPrimaryLight,
         contentTextStyle: GoogleFonts.dmSans(
@@ -112,7 +101,6 @@ class AppTheme {
           color: AppColors.textPrimaryDark,
         ),
       ),
-
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surfaceLight,
         shape: RoundedRectangleBorder(borderRadius: AppRadius.largeBR),
@@ -126,9 +114,7 @@ class AppTheme {
       brightness: Brightness.dark,
       primaryColor: AppColors.primaryDark,
       scaffoldBackgroundColor: AppColors.backgroundDark,
-      textTheme:
-          GoogleFonts.dmSansTextTheme(ThemeData.dark().textTheme),
-
+      textTheme: GoogleFonts.dmSansTextTheme(ThemeData.dark().textTheme),
       colorScheme: const ColorScheme.dark(
         primary: AppColors.accentDark,
         secondary: AppColors.secondaryDark,
@@ -138,7 +124,6 @@ class AppTheme {
         onSecondary: AppColors.backgroundDark,
         onSurface: AppColors.textPrimaryDark,
       ),
-
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.surfaceDark,
         foregroundColor: AppColors.textPrimaryDark,
@@ -150,13 +135,11 @@ class AppTheme {
           color: AppColors.textPrimaryDark,
         ),
       ),
-
       cardTheme: CardThemeData(
         color: AppColors.cardDark,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: AppRadius.mediumBR),
       ),
-
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.accentDark,
@@ -169,7 +152,6 @@ class AppTheme {
           ),
         ),
       ),
-
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.accentDark,
@@ -178,11 +160,9 @@ class AppTheme {
           shape: RoundedRectangleBorder(borderRadius: AppRadius.pillBR),
         ),
       ),
-
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(foregroundColor: AppColors.accentDark),
       ),
-
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceDarkElevated,
@@ -198,17 +178,14 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.mediumBR,
-          borderSide:
-              const BorderSide(color: AppColors.accentDark, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.accentDark, width: 1.5),
         ),
       ),
-
       dividerTheme: const DividerThemeData(
         color: AppColors.borderDark,
         thickness: 1,
         space: 1,
       ),
-
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceDarkElevated,
         selectedColor: AppColors.accentDark,
@@ -219,7 +196,6 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         shape: const StadiumBorder(side: BorderSide.none),
       ),
-
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.textPrimaryDark,
         contentTextStyle: GoogleFonts.dmSans(
@@ -227,7 +203,6 @@ class AppTheme {
           color: AppColors.textPrimaryLight,
         ),
       ),
-
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surfaceDark,
         shape: RoundedRectangleBorder(borderRadius: AppRadius.largeBR),

@@ -132,8 +132,7 @@ class AdminDashboardScreen extends ConsumerWidget {
       body: dashboardAsync.when(
         loading: () =>
             const Center(child: CircularProgressIndicator.adaptive()),
-        error: (err, _) =>
-            Center(child: Text('Error loading dashboard: $err')),
+        error: (err, _) => Center(child: Text('Error loading dashboard: $err')),
         data: (data) => SafeArea(
           top: false,
           child: RefreshIndicator(
@@ -224,22 +223,19 @@ class AdminDashboardScreen extends ConsumerWidget {
                         icon: Icons.bar_chart_rounded,
                         label: 'Reports',
                         delay: 240,
-                        onTap: () =>
-                            context.push(RouteConstants.adminReports),
+                        onTap: () => context.push(RouteConstants.adminReports),
                       ),
                       _QuickActionCard(
                         icon: Icons.night_shelter_outlined,
                         label: 'End of Day',
                         delay: 300,
-                        onTap: () =>
-                            context.push(RouteConstants.adminEndOfDay),
+                        onTap: () => context.push(RouteConstants.adminEndOfDay),
                       ),
                       _QuickActionCard(
                         icon: Icons.settings_outlined,
                         label: 'Settings',
                         delay: 360,
-                        onTap: () =>
-                            context.push(RouteConstants.adminSettings),
+                        onTap: () => context.push(RouteConstants.adminSettings),
                       ),
                     ],
                   ),
@@ -255,8 +251,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _SectionLabel(
-                          label: 'Recent Activity', context: context),
+                      _SectionLabel(label: 'Recent Activity', context: context),
                       TextButton(
                         onPressed: () =>
                             context.push(RouteConstants.orderHistory),
@@ -377,8 +372,7 @@ class _AdminStatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // Per spec: card=#F0E8DC light / #5D2832 dark
-    final cardBg =
-        isDark ? const Color(0xFF5D2832) : AppColors.cardLight;
+    final cardBg = isDark ? const Color(0xFF5D2832) : AppColors.cardLight;
     final textPrimary =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
@@ -578,7 +572,8 @@ class _SyncNowButtonState extends ConsumerState<_SyncNowButton> {
         onPressed: (isOnline && !_isSyncing) ? _sync : null,
         style: FilledButton.styleFrom(
           backgroundColor: const Color(0xFF8B4049),
-          disabledBackgroundColor: const Color(0xFF8B4049).withValues(alpha: 0.4),
+          disabledBackgroundColor:
+              const Color(0xFF8B4049).withValues(alpha: 0.4),
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -650,8 +645,7 @@ class _RecentOrderTile extends StatelessWidget {
     final orderedAt = order.orderedAt as DateTime;
     final timeStr =
         '${orderedAt.hour.toString().padLeft(2, '0')}:${orderedAt.minute.toString().padLeft(2, '0')}';
-    final dateStr =
-        '${orderedAt.day}/${orderedAt.month}/${orderedAt.year}';
+    final dateStr = '${orderedAt.day}/${orderedAt.month}/${orderedAt.year}';
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -782,8 +776,7 @@ class _AdminNavDrawer extends ConsumerWidget {
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final itemHoverBg =
         isDark ? const Color(0xFF3E2723) : const Color(0xFFF9F0F1);
-    final initial =
-        adminEmail.isNotEmpty ? adminEmail[0].toUpperCase() : 'A';
+    final initial = adminEmail.isNotEmpty ? adminEmail[0].toUpperCase() : 'A';
 
     return Drawer(
       backgroundColor: drawerBg,
@@ -1027,8 +1020,7 @@ class _AdminNavItem extends StatelessWidget {
           splashColor: ic.withValues(alpha: 0.1),
           highlightColor: hoverBg,
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
                 Icon(icon, size: 21, color: ic),
@@ -1046,10 +1038,7 @@ class _AdminNavItem extends StatelessWidget {
           ),
         ),
       ),
-    )
-        .animate()
-        .fadeIn(duration: 280.ms, delay: delay.ms)
-        .slideX(
+    ).animate().fadeIn(duration: 280.ms, delay: delay.ms).slideX(
           begin: -0.06,
           end: 0,
           duration: 280.ms,
@@ -1087,14 +1076,11 @@ class _AdminThemeToggleTile extends ConsumerWidget {
           splashColor: textColor.withValues(alpha: 0.08),
           highlightColor: hoverBg,
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
                 Icon(
-                  isDark
-                      ? Icons.dark_mode_rounded
-                      : Icons.light_mode_rounded,
+                  isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
                   size: 21,
                   color: isDark ? AppColors.accentDarkLight : _maroon,
                 ),
@@ -1111,11 +1097,9 @@ class _AdminThemeToggleTile extends ConsumerWidget {
                 ),
                 Switch.adaptive(
                   value: isDark,
-                  onChanged: (_) =>
-                      ref.read(themeProvider.notifier).toggle(),
+                  onChanged: (_) => ref.read(themeProvider.notifier).toggle(),
                   activeThumbColor: AppColors.accentDark,
-                  activeTrackColor:
-                      AppColors.accentDark.withValues(alpha: 0.5),
+                  activeTrackColor: AppColors.accentDark.withValues(alpha: 0.5),
                   inactiveThumbColor: _maroon,
                   inactiveTrackColor: _maroon.withValues(alpha: 0.2),
                 ),

@@ -166,9 +166,7 @@ class _AddButton extends StatelessWidget {
         ),
         child: Icon(
           // Arrow-forward when options are needed; plus when a direct add.
-          hasOptions
-              ? Icons.arrow_forward_rounded
-              : Icons.add_rounded,
+          hasOptions ? Icons.arrow_forward_rounded : Icons.add_rounded,
           color: Colors.white,
           size: 16,
         ),

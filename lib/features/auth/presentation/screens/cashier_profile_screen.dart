@@ -12,14 +12,18 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/route_constants.dart';
+import '../../../../core/constants/supabase_constants.dart';
+import '../../../../core/services/supabase_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/image_compress_helper.dart';
 import '../../../../core/utils/pin_helper.dart';
 import '../../../../shared/isar_collections/sync_queue_collection.dart';
 import '../../../../shared/isar_collections/user_collection.dart';
 import '../../../../shared/providers/isar_provider.dart';
 import '../../../../shared/providers/theme_provider.dart';
 import '../../../../shared/widgets/app_card.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 import '../providers/auth_provider.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -34,8 +38,7 @@ class CashierProfileScreen extends ConsumerStatefulWidget {
       _CashierProfileScreenState();
 }
 
-class _CashierProfileScreenState
-    extends ConsumerState<CashierProfileScreen> {
+class _CashierProfileScreenState extends ConsumerState<CashierProfileScreen> {
   // ── Controllers ─────────────────────────────────────────────────────────────
   final _nameCtrl = TextEditingController();
   final _currentPinCtrl = TextEditingController();
@@ -87,10 +90,10 @@ class _CashierProfileScreenState
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
     final textPrimary =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSecondary =
-        isDark ? AppColors.textSecondaryDark.withAlpha(180) : const Color(0xFF8A8A8A);
-    final inputBorder =
-        isDark ? AppColors.cardDark : const Color(0xFFE0D0C8);
+    final textSecondary = isDark
+        ? AppColors.textSecondaryDark.withAlpha(180)
+        : const Color(0xFF8A8A8A);
+    final inputBorder = isDark ? AppColors.cardDark : const Color(0xFFE0D0C8);
 
     final authState = ref.watch(authProvider);
     final cashier = authState.selectedCashier;
@@ -157,10 +160,9 @@ class _CashierProfileScreenState
                               textPrimary: textPrimary,
                               textSecondary: textSecondary,
                               inputBorder: inputBorder,
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty)
-                                      ? 'Name cannot be empty'
-                                      : null,
+                              validator: (v) => (v == null || v.trim().isEmpty)
+                                  ? 'Name cannot be empty'
+                                  : null,
                             ),
                             _RowDivider(color: textSecondary),
                             _ReadOnlyRow(
@@ -178,8 +180,7 @@ class _CashierProfileScreenState
                             ),
                           ],
                         ),
-                      ).animate().fadeIn(delay: 80.ms, duration: 320.ms)
-                          .slideY(
+                      ).animate().fadeIn(delay: 80.ms, duration: 320.ms).slideY(
                             begin: 0.04,
                             end: 0,
                             delay: 80.ms,
@@ -238,7 +239,9 @@ class _CashierProfileScreenState
                             ),
                           ],
                         ),
-                      ).animate().fadeIn(delay: 130.ms, duration: 320.ms)
+                      )
+                          .animate()
+                          .fadeIn(delay: 130.ms, duration: 320.ms)
                           .slideY(
                             begin: 0.04,
                             end: 0,
@@ -487,8 +490,7 @@ class _CashierProfileScreenState
             style: GoogleFonts.dmSans()),
         backgroundColor: AppColors.secondaryLight,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-            borderRadius: AppRadius.smallBR),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.smallBR),
       ));
     }
   }
@@ -516,8 +518,7 @@ class _CashierProfileScreenState
         }
       }
       if (_newPinCtrl.text.length != AppConstants.pinLength) {
-        _showError(
-            'New PIN must be exactly ${AppConstants.pinLength} digits.');
+        _showError('New PIN must be exactly ${AppConstants.pinLength} digits.');
         return;
       }
       if (_newPinCtrl.text != _confirmPinCtrl.text) {
@@ -534,9 +535,14 @@ class _CashierProfileScreenState
 
       cashier
         ..name = _nameCtrl.text.trim()
-        ..avatarUrl = _localAvatarPath ?? cashier.avatarUrl
         ..updatedAt = now
         ..isSynced = false;
+
+      if (_localAvatarPath != null && !_localAvatarPath!.startsWith('http')) {
+        final url =
+            await _uploadAvatar(File(_localAvatarPath!), cashier.syncId);
+        if (url != null) cashier.avatarUrl = url;
+      }
 
       if (isChangingPin) {
         cashier.pinHash = PinHelper.hashPin(_newPinCtrl.text);
@@ -595,8 +601,7 @@ class _CashierProfileScreenState
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: AppRadius.largeBR),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.largeBR),
         title: Text(
           'Logout',
           style: GoogleFonts.dmSans(fontWeight: FontWeight.w700),
@@ -641,10 +646,37 @@ class _CashierProfileScreenState
         content: Text(message, style: GoogleFonts.dmSans()),
         backgroundColor: AppColors.secondaryLight,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-            borderRadius: AppRadius.smallBR),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.smallBR),
       ),
     );
+  }
+
+  Future<String?> _uploadAvatar(File avatarFile, String userSyncId) async {
+    try {
+      final compressed = await ImageCompressHelper.compressAvatar(avatarFile);
+      final bytes = await compressed.readAsBytes();
+      final storagePath = 'avatars/$userSyncId.jpg';
+
+      await SupabaseService.instance.client.storage
+          .from(SupabaseConstants.storageStoreAssets)
+          .uploadBinary(
+            storagePath,
+            bytes,
+            fileOptions: const sb.FileOptions(
+              contentType: 'image/jpeg',
+              upsert: true,
+            ),
+          );
+
+      await ImageCompressHelper.deleteTempFile(compressed);
+
+      return SupabaseService.instance.client.storage
+          .from(SupabaseConstants.storageStoreAssets)
+          .getPublicUrl(storagePath);
+    } catch (e) {
+      debugPrint('Avatar upload failed: $e');
+      return null;
+    }
   }
 }
 
@@ -860,8 +892,7 @@ class _EditableRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconBg =
-        isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final iconBg = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -906,8 +937,7 @@ class _EditableRow extends StatelessWidget {
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     focusedBorder: UnderlineInputBorder(
-                      borderSide:
-                          BorderSide(color: inputBorder, width: 1),
+                      borderSide: BorderSide(color: inputBorder, width: 1),
                     ),
                     errorBorder: InputBorder.none,
                     focusedErrorBorder: InputBorder.none,
@@ -944,8 +974,7 @@ class _ReadOnlyRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconBg =
-        isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final iconBg = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -1017,8 +1046,7 @@ class _RoleRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconBg =
-        isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final iconBg = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -1121,8 +1149,9 @@ class _PinInputRowState extends State<_PinInputRow> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final text = widget.controller.text;
     final isFocused = _focusNode.hasFocus;
-    final textSecondary =
-        isDark ? AppColors.textSecondaryDark.withAlpha(160) : const Color(0xFF8A8A8A);
+    final textSecondary = isDark
+        ? AppColors.textSecondaryDark.withAlpha(160)
+        : const Color(0xFF8A8A8A);
     final boxBg = isDark ? AppColors.surfaceDark : AppColors.cardLight;
 
     return Padding(
@@ -1230,9 +1259,8 @@ class _PinInputRowState extends State<_PinInputRow> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.surfaceDark
-                        : AppColors.surfaceLight,
+                    color:
+                        isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
                     borderRadius: AppRadius.smallBR,
                   ),
                   child: Icon(

@@ -24,8 +24,7 @@ class ThemeNotifier extends Notifier<ThemeMode> {
   Future<void> setMode(ThemeMode mode) async {
     state = mode;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-        _themeKey, mode == ThemeMode.dark ? 'dark' : 'light');
+    await prefs.setString(_themeKey, mode == ThemeMode.dark ? 'dark' : 'light');
   }
 }
 

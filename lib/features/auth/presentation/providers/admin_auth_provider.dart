@@ -51,7 +51,6 @@ class AdminAuthNotifier extends AsyncNotifier<User?> {
   }
 }
 
-final adminAuthProvider =
-    AsyncNotifierProvider<AdminAuthNotifier, User?>(
+final adminAuthProvider = AsyncNotifierProvider<AdminAuthNotifier, User?>(
   AdminAuthNotifier.new,
 );

@@ -3,6 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -28,8 +30,7 @@ class ItemManagementScreen extends ConsumerStatefulWidget {
       _ItemManagementScreenState();
 }
 
-class _ItemManagementScreenState
-    extends ConsumerState<ItemManagementScreen>
+class _ItemManagementScreenState extends ConsumerState<ItemManagementScreen>
     with SingleTickerProviderStateMixin {
   bool _showSearch = false;
   final _searchCtrl = TextEditingController();
@@ -62,8 +63,7 @@ class _ItemManagementScreenState
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: AppRadius.largeBR),
-        title: Text('Delete Item?',
-            style: AppTextStyles.bodySemiBold(context)),
+        title: Text('Delete Item?', style: AppTextStyles.bodySemiBold(context)),
         content: Text(
           'Are you sure you want to delete "${item.name}"? This cannot be undone.',
           style: AppTextStyles.body(context),
@@ -71,13 +71,13 @@ class _ItemManagementScreenState
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx, false),
-            child: Text('Cancel',
-                style: AppTextStyles.bodySemiBold(context)),
+            child: Text('Cancel', style: AppTextStyles.bodySemiBold(context)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx, true),
             child: Text('Delete',
-                style: AppTextStyles.bodySemiBold(context).copyWith(color: AppColors.errorLight)),
+                style: AppTextStyles.bodySemiBold(context)
+                    .copyWith(color: AppColors.errorLight)),
           ),
         ],
       ),
@@ -87,7 +87,8 @@ class _ItemManagementScreenState
       if (mounted) {
         messenger.showSnackBar(SnackBar(
           content: Text('${item.name} deleted',
-              style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white)),
+              style: AppTextStyles.bodySemiBold(context)
+                  .copyWith(color: Colors.white)),
           backgroundColor: AppColors.errorLight,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: AppRadius.mediumBR),
@@ -114,8 +115,15 @@ class _ItemManagementScreenState
       backgroundColor: Colors.transparent,
       elevation: 0,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 20),
-        onPressed: () => context.pop(),
+        icon: Icon(Icons.arrow_back_ios_new_rounded,
+            color: textPrimary, size: 20),
+        onPressed: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go(RouteConstants.adminHome);
+          }
+        },
       ),
       title: _showSearch
           ? TextField(
@@ -125,8 +133,8 @@ class _ItemManagementScreenState
               style: AppTextStyles.body(context).copyWith(color: textPrimary),
               decoration: InputDecoration(
                 hintText: 'Search items…',
-                hintStyle: AppTextStyles.body(context).copyWith(
-                    color: textPrimary.withValues(alpha: 0.4)),
+                hintStyle: AppTextStyles.body(context)
+                    .copyWith(color: textPrimary.withValues(alpha: 0.4)),
                 border: InputBorder.none,
               ),
             )
@@ -161,13 +169,15 @@ class _ItemManagementScreenState
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
         label: Text('Add Item',
-            style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white)),
+            style: AppTextStyles.bodySemiBold(context)
+                .copyWith(color: Colors.white)),
       )
           .animate()
           .slideY(begin: 0.3, end: 0, duration: 400.ms)
           .fadeIn(duration: 400.ms),
       body: itemsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator.adaptive()),
+        loading: () =>
+            const Center(child: CircularProgressIndicator.adaptive()),
         error: (e, _) => Center(
           child: Text('Error loading items: $e',
               style: AppTextStyles.body(context)),
@@ -211,20 +221,16 @@ class _ItemManagementScreenState
                   onAdd: () => _openForm(),
                 )
               : RefreshIndicator(
-                  onRefresh: () =>
-                      ref.read(itemProvider.notifier).refresh(),
+                  onRefresh: () => ref.read(itemProvider.notifier).refresh(),
                   color: _maroon,
                   child: ListView.builder(
                     padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.md,
-                        AppSpacing.sm,
-                        AppSpacing.md,
-                        80),
+                        AppSpacing.md, AppSpacing.sm, AppSpacing.md, 80),
                     itemCount: filtered.length,
                     itemBuilder: (_, i) {
                       final item = filtered[i];
-                      final catName = _categoryName(
-                          state.categories, item.categoryId);
+                      final catName =
+                          _categoryName(state.categories, item.categoryId);
                       return ItemManageTile(
                         key: ValueKey(item.syncId),
                         item: item,
@@ -241,8 +247,7 @@ class _ItemManagementScreenState
     );
   }
 
-  String _categoryName(
-      List<CategoryCollection> cats, String categoryId) {
+  String _categoryName(List<CategoryCollection> cats, String categoryId) {
     try {
       return cats.firstWhere((c) => c.syncId == categoryId).name;
     } catch (_) {
@@ -276,14 +281,13 @@ class _CategoryTabsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final textPrimary =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final unselectedBg =
-        isDark ? AppColors.cardDark : AppColors.cardLight;
+    final unselectedBg = isDark ? AppColors.cardDark : AppColors.cardLight;
 
     return SizedBox(
       height: 48,
       child: ListView(
-        padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md, vertical: 6),
+        padding:
+            const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
         scrollDirection: Axis.horizontal,
         children: [
           // All tab
@@ -339,8 +343,7 @@ class _Tab extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           margin: const EdgeInsets.only(right: 8),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
           decoration: BoxDecoration(
             color: isSelected ? maroon : unselectedBg,
             borderRadius: BorderRadius.circular(999),
@@ -358,8 +361,7 @@ class _Tab extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 6, vertical: 1),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? Colors.white.withValues(alpha: 0.2)
@@ -409,8 +411,7 @@ class _EmptyState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.restaurant_menu_outlined,
-              size: 64,
-              color: textPrimary.withValues(alpha: 0.15)),
+              size: 64, color: textPrimary.withValues(alpha: 0.15)),
           const SizedBox(height: 16),
           Text(
             message,
@@ -424,14 +425,16 @@ class _EmptyState extends StatelessWidget {
               onPressed: onAdd,
               icon: const Icon(Icons.add_rounded),
               label: Text('Add First Item',
-                  style:
-                      AppTextStyles.bodySemiBold(context)),
+                  style: AppTextStyles.bodySemiBold(context)),
               style: TextButton.styleFrom(
                   foregroundColor: const Color(0xFF8B4049)),
             ),
           ],
         ],
-      ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.95, 0.95)),
+      )
+          .animate()
+          .fadeIn(duration: 400.ms)
+          .scale(begin: const Offset(0.95, 0.95)),
     );
   }
 }

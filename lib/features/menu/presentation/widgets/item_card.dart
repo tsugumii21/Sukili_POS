@@ -25,8 +25,7 @@ class ItemCard extends StatelessWidget {
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final priceColor =
         isDark ? AppColors.accentDarkLight : const Color(0xFF8B4049);
-    final accentColor =
-        isDark ? AppColors.accentDark : const Color(0xFF8B4049);
+    final accentColor = isDark ? AppColors.accentDark : const Color(0xFF8B4049);
     final isUnavailable = !item.isAvailable;
 
     final variants = _parseVariants(item.variantsJson);
@@ -61,15 +60,15 @@ class ItemCard extends StatelessWidget {
                       child: SizedBox(
                         height: 80,
                         width: double.infinity,
-                        child: item.imageUrl != null &&
-                                item.imageUrl!.isNotEmpty
-                            ? Image.network(
-                                item.imageUrl!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
-                                    _buildPlaceholder(isDark),
-                              )
-                            : _buildPlaceholder(isDark),
+                        child:
+                            item.imageUrl != null && item.imageUrl!.isNotEmpty
+                                ? Image.network(
+                                    item.imageUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        _buildPlaceholder(isDark),
+                                  )
+                                : _buildPlaceholder(isDark),
                       ),
                     ),
 
@@ -113,8 +112,8 @@ class ItemCard extends StatelessWidget {
                   top: 12,
                   right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.errorLight.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(8),
@@ -136,8 +135,8 @@ class ItemCard extends StatelessWidget {
                   top: 12,
                   right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: accentColor.withAlpha(204), // ~80% opacity
                       borderRadius: BorderRadius.circular(999),
@@ -161,14 +160,11 @@ class ItemCard extends StatelessWidget {
 
   /// Gradient placeholder shown when no image URL is available.
   Widget _buildPlaceholder(bool isDark) {
-    final gradientStart =
-        isDark ? AppColors.cardDark : AppColors.cardLight;
-    final gradientEnd =
-        isDark ? AppColors.surfaceDark : AppColors.primaryLight;
-    final hintColor = (isDark
-            ? AppColors.textSecondaryDark
-            : AppColors.textSecondaryLight)
-        .withValues(alpha: 0.4);
+    final gradientStart = isDark ? AppColors.cardDark : AppColors.cardLight;
+    final gradientEnd = isDark ? AppColors.surfaceDark : AppColors.primaryLight;
+    final hintColor =
+        (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight)
+            .withValues(alpha: 0.4);
 
     return Container(
       decoration: BoxDecoration(
@@ -199,9 +195,7 @@ class ItemCard extends StatelessWidget {
 
   List<Map<String, dynamic>> _parseVariants(List<String> json) {
     try {
-      return json
-          .map((v) => jsonDecode(v) as Map<String, dynamic>)
-          .toList();
+      return json.map((v) => jsonDecode(v) as Map<String, dynamic>).toList();
     } catch (_) {
       return [];
     }

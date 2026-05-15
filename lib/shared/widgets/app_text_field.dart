@@ -45,10 +45,14 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final fillColor = isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
-    final focusedBorderColor = isDark ? AppColors.accentDark : AppColors.accentLight;
-    final hintColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-    final labelColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final fillColor =
+        isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
+    final focusedBorderColor =
+        isDark ? AppColors.accentDark : AppColors.accentLight;
+    final hintColor =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final labelColor =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
     return Opacity(
       opacity: isReadOnly ? 0.6 : 1.0,
@@ -96,11 +100,17 @@ class AppTextField extends StatelessWidget {
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.05)),
+            borderSide: BorderSide(
+                color: isDark
+                    ? Colors.white12
+                    : Colors.black.withValues(alpha: 0.05)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.05)),
+            borderSide: BorderSide(
+                color: isDark
+                    ? Colors.white12
+                    : Colors.black.withValues(alpha: 0.05)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
@@ -108,11 +118,13 @@ class AppTextField extends StatelessWidget {
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.errorLight, width: 1.5),
+            borderSide:
+                const BorderSide(color: AppColors.errorLight, width: 1.5),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: AppColors.errorLight, width: 2.0),
+            borderSide:
+                const BorderSide(color: AppColors.errorLight, width: 2.0),
           ),
         ),
       ),

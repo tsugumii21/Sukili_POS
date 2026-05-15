@@ -88,6 +88,7 @@ class _ItemCustomizationModalState
   late List<_Variant> _variants;
   // New multi-group variants
   late List<_VariantGroup> _variantGroups;
+
   /// One selected index per group (for new format).
   late List<int> _selectedGroupIndices;
 
@@ -122,16 +123,13 @@ class _ItemCustomizationModalState
         .map((json) {
           try {
             final map = jsonDecode(json) as Map<String, dynamic>;
-            final options = (map['options'] as List<dynamic>?)
-                    ?.map((o) {
-                      final om = o as Map<String, dynamic>;
-                      return _Variant(
-                        name: om['name'] as String? ?? '',
-                        priceDelta:
-                            (om['priceDelta'] as num?)?.toDouble() ?? 0,
-                      );
-                    })
-                    .toList() ??
+            final options = (map['options'] as List<dynamic>?)?.map((o) {
+                  final om = o as Map<String, dynamic>;
+                  return _Variant(
+                    name: om['name'] as String? ?? '',
+                    priceDelta: (om['priceDelta'] as num?)?.toDouble() ?? 0,
+                  );
+                }).toList() ??
                 [];
             return _VariantGroup(
               groupName: map['groupName'] as String? ?? '',
@@ -205,8 +203,7 @@ class _ItemCustomizationModalState
     } else {
       // Legacy restore
       if (existing.variantName != null && _variants.isNotEmpty) {
-        final idx =
-            _variants.indexWhere((v) => v.name == existing.variantName);
+        final idx = _variants.indexWhere((v) => v.name == existing.variantName);
         if (idx != -1) _selectedVariantIndex = idx;
       }
     }
@@ -228,9 +225,8 @@ class _ItemCustomizationModalState
     if (_useGroups) {
       for (int gi = 0; gi < _variantGroups.length; gi++) {
         final g = _variantGroups[gi];
-        final selIdx = gi < _selectedGroupIndices.length
-            ? _selectedGroupIndices[gi]
-            : 0;
+        final selIdx =
+            gi < _selectedGroupIndices.length ? _selectedGroupIndices[gi] : 0;
         if (selIdx < g.options.length) {
           price += g.options[selIdx].priceDelta;
         }
@@ -251,9 +247,8 @@ class _ItemCustomizationModalState
       final parts = <String>[];
       for (int gi = 0; gi < _variantGroups.length; gi++) {
         final g = _variantGroups[gi];
-        final selIdx = gi < _selectedGroupIndices.length
-            ? _selectedGroupIndices[gi]
-            : 0;
+        final selIdx =
+            gi < _selectedGroupIndices.length ? _selectedGroupIndices[gi] : 0;
         if (selIdx < g.options.length) {
           parts.add(g.options[selIdx].name);
         }
@@ -269,9 +264,8 @@ class _ItemCustomizationModalState
   void _addOrUpdateCart() {
     final variantName = _selectedVariantLabel;
 
-    final selectedModNames = _selectedModifierIndices
-        .map((i) => _allModifiers[i].name)
-        .toList();
+    final selectedModNames =
+        _selectedModifierIndices.map((i) => _allModifiers[i].name).toList();
 
     final cartItem = CartItem(
       itemSyncId: widget.item.syncId,
@@ -341,8 +335,7 @@ class _ItemCustomizationModalState
         return Container(
           decoration: BoxDecoration(
             color: sheetBg,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(28)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: Column(
             children: [
@@ -428,8 +421,7 @@ class _ItemCustomizationModalState
                             Text(
                               widget.item.description!,
                               style: GoogleFonts.dmSans(
-                                color:
-                                    textPrimary.withValues(alpha: 0.5),
+                                color: textPrimary.withValues(alpha: 0.5),
                                 fontSize: 14,
                                 height: 1.4,
                               ),
@@ -440,21 +432,16 @@ class _ItemCustomizationModalState
 
                           // ── Variant Selection (new multi-group) ───────
                           if (_useGroups) ...[
-                            ..._variantGroups
-                                .asMap()
-                                .entries
-                                .map((entry) {
+                            ..._variantGroups.asMap().entries.map((entry) {
                               final gi = entry.key;
                               final group = entry.value;
                               return Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     group.groupName.toUpperCase(),
                                     style: GoogleFonts.dmSans(
-                                      color: textPrimary
-                                          .withValues(alpha: 0.4),
+                                      color: textPrimary.withValues(alpha: 0.4),
                                       fontSize: 11,
                                       fontWeight: FontWeight.w800,
                                       letterSpacing: 1.5,
@@ -467,54 +454,44 @@ class _ItemCustomizationModalState
                                       final opt = group.options[oi];
                                       final isSelected =
                                           _selectedGroupIndices[gi] == oi;
-                                      final price =
-                                          widget.item.basePrice +
-                                              opt.priceDelta;
+                                      final price = widget.item.basePrice +
+                                          opt.priceDelta;
                                       return Expanded(
                                         child: GestureDetector(
                                           onTap: () => setState(() =>
-                                              _selectedGroupIndices[gi] =
-                                                  oi),
+                                              _selectedGroupIndices[gi] = oi),
                                           child: AnimatedContainer(
                                             duration: const Duration(
                                                 milliseconds: 200),
                                             margin: EdgeInsets.only(
                                                 right: oi <
-                                                        group.options
-                                                                .length -
-                                                            1
+                                                        group.options.length - 1
                                                     ? 10
                                                     : 0),
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    vertical: 14),
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 14),
                                             decoration: BoxDecoration(
                                               color: isSelected
-                                                  ? const Color(
-                                                      0xFF8B4049)
+                                                  ? const Color(0xFF8B4049)
                                                   : chipBg,
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                      14),
+                                                  BorderRadius.circular(14),
                                               border: isSelected
                                                   ? null
                                                   : Border.all(
                                                       color: Colors.black
                                                           .withValues(
-                                                              alpha:
-                                                                  0.06)),
+                                                              alpha: 0.06)),
                                               boxShadow: isSelected
                                                   ? [
                                                       BoxShadow(
                                                         color: const Color(
                                                                 0xFF8B4049)
                                                             .withValues(
-                                                                alpha:
-                                                                    0.25),
+                                                                alpha: 0.25),
                                                         blurRadius: 8,
                                                         offset:
-                                                            const Offset(
-                                                                0, 3),
+                                                            const Offset(0, 3),
                                                       )
                                                     ]
                                                   : null,
@@ -523,14 +500,12 @@ class _ItemCustomizationModalState
                                               children: [
                                                 Text(
                                                   opt.name,
-                                                  style:
-                                                      GoogleFonts.dmSans(
+                                                  style: GoogleFonts.dmSans(
                                                     color: isSelected
                                                         ? AppColors.white
                                                         : textPrimary,
                                                     fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.w700,
+                                                    fontWeight: FontWeight.w700,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 2),
@@ -539,8 +514,7 @@ class _ItemCustomizationModalState
                                                       ? CurrencyFormatter
                                                           .format(price)
                                                       : '+${CurrencyFormatter.format(opt.priceDelta)}',
-                                                  style:
-                                                      GoogleFonts.dmSans(
+                                                  style: GoogleFonts.dmSans(
                                                     color: isSelected
                                                         ? AppColors.white
                                                             .withValues(
@@ -549,8 +523,7 @@ class _ItemCustomizationModalState
                                                             .withValues(
                                                                 alpha: 0.5),
                                                     fontSize: 12,
-                                                    fontWeight:
-                                                        FontWeight.w600,
+                                                    fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
                                               ],
@@ -571,8 +544,7 @@ class _ItemCustomizationModalState
                             Text(
                               'SIZE',
                               style: GoogleFonts.dmSans(
-                                color:
-                                    textPrimary.withValues(alpha: 0.4),
+                                color: textPrimary.withValues(alpha: 0.4),
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 1.5,
@@ -580,51 +552,41 @@ class _ItemCustomizationModalState
                             ),
                             const SizedBox(height: 12),
                             Row(
-                              children: List.generate(
-                                  _variants.length, (i) {
+                              children: List.generate(_variants.length, (i) {
                                 final v = _variants[i];
-                                final isSelected =
-                                    i == _selectedVariantIndex;
-                                final price = widget.item.basePrice +
-                                    v.priceDelta;
+                                final isSelected = i == _selectedVariantIndex;
+                                final price =
+                                    widget.item.basePrice + v.priceDelta;
                                 return Expanded(
                                   child: GestureDetector(
-                                    onTap: () => setState(() =>
-                                        _selectedVariantIndex = i),
+                                    onTap: () => setState(
+                                        () => _selectedVariantIndex = i),
                                     child: AnimatedContainer(
-                                      duration: const Duration(
-                                          milliseconds: 200),
+                                      duration:
+                                          const Duration(milliseconds: 200),
                                       margin: EdgeInsets.only(
-                                          right: i <
-                                                  _variants.length - 1
+                                          right: i < _variants.length - 1
                                               ? 10
                                               : 0),
-                                      padding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 14),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 14),
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? const Color(0xFF8B4049)
                                             : chipBg,
-                                        borderRadius:
-                                            BorderRadius.circular(14),
+                                        borderRadius: BorderRadius.circular(14),
                                         border: isSelected
                                             ? null
                                             : Border.all(
                                                 color: Colors.black
-                                                    .withValues(
-                                                        alpha: 0.06)),
+                                                    .withValues(alpha: 0.06)),
                                         boxShadow: isSelected
                                             ? [
                                                 BoxShadow(
-                                                  color: const Color(
-                                                          0xFF8B4049)
-                                                      .withValues(
-                                                          alpha: 0.25),
+                                                  color: const Color(0xFF8B4049)
+                                                      .withValues(alpha: 0.25),
                                                   blurRadius: 8,
-                                                  offset:
-                                                      const Offset(
-                                                          0, 3),
+                                                  offset: const Offset(0, 3),
                                                 ),
                                               ]
                                             : null,
@@ -638,25 +600,20 @@ class _ItemCustomizationModalState
                                                   ? AppColors.white
                                                   : textPrimary,
                                               fontSize: 14,
-                                              fontWeight:
-                                                  FontWeight.w700,
+                                              fontWeight: FontWeight.w700,
                                             ),
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
-                                            CurrencyFormatter.format(
-                                                price),
+                                            CurrencyFormatter.format(price),
                                             style: GoogleFonts.dmSans(
                                               color: isSelected
                                                   ? AppColors.white
-                                                      .withValues(
-                                                          alpha: 0.7)
-                                                  : textPrimary
-                                                      .withValues(
-                                                          alpha: 0.5),
+                                                      .withValues(alpha: 0.7)
+                                                  : textPrimary.withValues(
+                                                      alpha: 0.5),
                                               fontSize: 12,
-                                              fontWeight:
-                                                  FontWeight.w600,
+                                              fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                         ],
@@ -671,8 +628,8 @@ class _ItemCustomizationModalState
 
                           // ── Modifier Groups ───────────────────────────
                           if (_modifierGroups.isNotEmpty)
-                            ..._modifierGroups.entries.map(
-                                (entry) => _buildModifierGroup(
+                            ..._modifierGroups.entries
+                                .map((entry) => _buildModifierGroup(
                                       entry.key,
                                       entry.value,
                                       textPrimary,
@@ -684,8 +641,7 @@ class _ItemCustomizationModalState
                           Text(
                             'QUANTITY',
                             style: GoogleFonts.dmSans(
-                              color:
-                                  textPrimary.withValues(alpha: 0.4),
+                              color: textPrimary.withValues(alpha: 0.4),
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 1.5,
@@ -704,15 +660,13 @@ class _ItemCustomizationModalState
                               children: [
                                 IconButton(
                                   onPressed: _quantity > 1
-                                      ? () => setState(
-                                          () => _quantity--)
+                                      ? () => setState(() => _quantity--)
                                       : null,
                                   icon: Icon(
                                     Icons.remove_rounded,
                                     color: _quantity > 1
                                         ? const Color(0xFF8B4049)
-                                        : textPrimary.withValues(
-                                            alpha: 0.2),
+                                        : textPrimary.withValues(alpha: 0.2),
                                   ),
                                 ),
                                 Padding(
@@ -720,8 +674,7 @@ class _ItemCustomizationModalState
                                       horizontal: 20),
                                   child: Text(
                                     '$_quantity',
-                                    style:
-                                        GoogleFonts.dmSans(
+                                    style: GoogleFonts.dmSans(
                                       color: textPrimary,
                                       fontSize: 24,
                                       fontWeight: FontWeight.w800,
@@ -729,8 +682,7 @@ class _ItemCustomizationModalState
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: () =>
-                                      setState(() => _quantity++),
+                                  onPressed: () => setState(() => _quantity++),
                                   icon: const Icon(
                                     Icons.add_rounded,
                                     color: Color(0xFF8B4049),
@@ -746,8 +698,7 @@ class _ItemCustomizationModalState
                           Text(
                             'SPECIAL INSTRUCTIONS',
                             style: GoogleFonts.dmSans(
-                              color:
-                                  textPrimary.withValues(alpha: 0.4),
+                              color: textPrimary.withValues(alpha: 0.4),
                               fontSize: 11,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 1.5,
@@ -764,19 +715,16 @@ class _ItemCustomizationModalState
                             decoration: InputDecoration(
                               hintText: 'e.g. No onions, extra sauce',
                               hintStyle: GoogleFonts.dmSans(
-                                color: textPrimary.withValues(
-                                    alpha: 0.3),
+                                color: textPrimary.withValues(alpha: 0.3),
                                 fontSize: 14,
                               ),
                               filled: true,
                               fillColor: chipBg,
                               border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(16),
                                 borderSide: BorderSide.none,
                               ),
-                              contentPadding:
-                                  const EdgeInsets.all(16),
+                              contentPadding: const EdgeInsets.all(16),
                             ),
                           ),
 
@@ -813,8 +761,7 @@ class _ItemCustomizationModalState
                           Text(
                             'Total',
                             style: GoogleFonts.dmSans(
-                              color:
-                                  textPrimary.withValues(alpha: 0.5),
+                              color: textPrimary.withValues(alpha: 0.5),
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -837,33 +784,26 @@ class _ItemCustomizationModalState
                           child: ElevatedButton(
                             onPressed: _addOrUpdateCart,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color(0xFF8B4049),
+                              backgroundColor: const Color(0xFF8B4049),
                               foregroundColor: AppColors.white,
                               shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(18),
+                                borderRadius: BorderRadius.circular(18),
                               ),
                               elevation: 0,
                             ),
                             child: Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
                                   _isUpdateMode
                                       ? Icons.edit_rounded
-                                      : Icons
-                                          .add_shopping_cart_rounded,
+                                      : Icons.add_shopping_cart_rounded,
                                   size: 20,
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  _isUpdateMode
-                                      ? 'Update Cart'
-                                      : 'Add to Cart',
-                                  style:
-                                      GoogleFonts.dmSans(
+                                  _isUpdateMode ? 'Update Cart' : 'Add to Cart',
+                                  style: GoogleFonts.dmSans(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -907,8 +847,7 @@ class _ItemCustomizationModalState
         const SizedBox(height: 8),
         ...modifiers.map((mod) {
           final globalIndex = _allModifiers.indexOf(mod);
-          final isChecked =
-              _selectedModifierIndices.contains(globalIndex);
+          final isChecked = _selectedModifierIndices.contains(globalIndex);
           return Container(
             margin: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
@@ -918,10 +857,8 @@ class _ItemCustomizationModalState
               borderRadius: BorderRadius.circular(14),
               border: isChecked
                   ? Border.all(
-                      color: const Color(0xFF8B4049)
-                          .withValues(alpha: 0.2))
-                  : Border.all(
-                      color: Colors.black.withValues(alpha: 0.04)),
+                      color: const Color(0xFF8B4049).withValues(alpha: 0.2))
+                  : Border.all(color: Colors.black.withValues(alpha: 0.04)),
             ),
             child: CheckboxListTile(
               value: isChecked,
@@ -955,8 +892,7 @@ class _ItemCustomizationModalState
                 borderRadius: BorderRadius.circular(6),
               ),
               controlAffinity: ListTileControlAffinity.leading,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),

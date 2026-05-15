@@ -94,10 +94,8 @@ class VoidRefundNotifier extends Notifier<VoidRefundState> {
           .sortByOrderedAtDesc()
           .findAll();
 
-      final voidable =
-          all.where((o) => o.status == 'completed').toList();
-      final refundable =
-          all.where((o) => o.status == 'completed').toList();
+      final voidable = all.where((o) => o.status == 'completed').toList();
+      final refundable = all.where((o) => o.status == 'completed').toList();
       final history = all
           .where((o) => o.status == 'voided' || o.status == 'refunded')
           .toList();
@@ -139,8 +137,7 @@ class VoidRefundNotifier extends Notifier<VoidRefundState> {
           .findAll();
 
       for (final admin in admins) {
-        if (admin.pinHash != null &&
-            PinHelper.verifyPin(pin, admin.pinHash!)) {
+        if (admin.pinHash != null && PinHelper.verifyPin(pin, admin.pinHash!)) {
           return admin;
         }
       }

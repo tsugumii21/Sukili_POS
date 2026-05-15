@@ -12,10 +12,9 @@ class AppTextStyles {
   static Color _textPrimary(BuildContext context) =>
       _isDark(context) ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
-  static Color _textSecondary(BuildContext context) =>
-      _isDark(context)
-          ? AppColors.textSecondaryDark
-          : AppColors.textSecondaryLight;
+  static Color _textSecondary(BuildContext context) => _isDark(context)
+      ? AppColors.textSecondaryDark
+      : AppColors.textSecondaryLight;
 
   // ── Splash — DM Serif Display (splash screen only) ───────────────────────
 

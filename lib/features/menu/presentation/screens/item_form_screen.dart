@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/services/supabase_service.dart';
+import '../../../../core/utils/image_compress_helper.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -34,7 +35,6 @@ class ItemFormScreen extends ConsumerStatefulWidget {
 }
 
 class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
-
   // ── Page controller ───────────────────────────────────────────────────────
   final _pageCtrl = PageController();
   int _step = 0;
@@ -90,16 +90,16 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
     // Parse variant groups
     for (final g in item.variantGroupsJson) {
       try {
-        _variantGroups
-            .add(VariantGroupDraft.fromJson(jsonDecode(g) as Map<String, dynamic>));
+        _variantGroups.add(
+            VariantGroupDraft.fromJson(jsonDecode(g) as Map<String, dynamic>));
       } catch (_) {}
     }
 
     // Parse modifiers
     for (final m in item.modifiersJson) {
       try {
-        _modifiers.add(
-            ModifierDraft.fromJson(jsonDecode(m) as Map<String, dynamic>));
+        _modifiers
+            .add(ModifierDraft.fromJson(jsonDecode(m) as Map<String, dynamic>));
       } catch (_) {}
     }
   }
@@ -180,8 +180,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
 
   Future<void> _save() async {
     FocusScope.of(context).unfocus();
-    final price =
-        double.tryParse(_priceCtrl.text.replaceAll(',', '')) ?? 0;
+    final price = double.tryParse(_priceCtrl.text.replaceAll(',', '')) ?? 0;
     if (price < 0) {
       _showError('Price cannot be negative.');
       return;
@@ -198,10 +197,14 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
       // Upload image if a new local file was picked
       String? finalImageUrl = _imageUrl;
       if (_localImageFile != null) {
-        final bytes = await _localImageFile!.readAsBytes();
-        final name = _localImageFile!.path.split('/').last;
+        final compressed =
+            await ImageCompressHelper.compressMenuItemImage(_localImageFile!);
+        final bytes = await compressed.readAsBytes();
+        final name = compressed.path.split('/').last;
         finalImageUrl =
             await SupabaseService.instance.uploadMenuImage(bytes, name);
+        await ImageCompressHelper.deleteTempFile(compressed);
+
         if (finalImageUrl == null && mounted) {
           _showError(
               'Image upload failed. Check your Supabase "menu-items" bucket.');
@@ -246,8 +249,8 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
 
   void _showError(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(msg,
-          style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
+      content:
+          Text(msg, style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
       backgroundColor: AppColors.errorLight,
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -284,9 +287,7 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
         child: Column(
           children: [
             _StepIndicator(
-                current: _step,
-                total: _totalSteps,
-                labels: stepLabels),
+                current: _step, total: _totalSteps, labels: stepLabels),
             Expanded(
               child: PageView(
                 controller: _pageCtrl,
@@ -295,13 +296,11 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
                   _Step1Category(
                     selectedTopId: _topCategoryId,
                     selectedSubId: _subCategoryId,
-                    onTopChanged: (id) =>
-                        setState(() {
-                          _topCategoryId = id;
-                          _subCategoryId = null;
-                        }),
-                    onSubChanged: (id) =>
-                        setState(() => _subCategoryId = id),
+                    onTopChanged: (id) => setState(() {
+                      _topCategoryId = id;
+                      _subCategoryId = null;
+                    }),
+                    onSubChanged: (id) => setState(() => _subCategoryId = id),
                   ),
                   _Step2BasicInfo(
                     formKey: _step2Key,
@@ -309,16 +308,14 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
                     descCtrl: _descCtrl,
                     imageUrl: _imageUrl,
                     localImageFile: _localImageFile,
-                    onImagePicked: (file) =>
-                        setState(() {
-                          _localImageFile = file;
-                          _imageUrl = null;
-                        }),
-                    onImageRemoved: () =>
-                        setState(() {
-                          _localImageFile = null;
-                          _imageUrl = null;
-                        }),
+                    onImagePicked: (file) => setState(() {
+                      _localImageFile = file;
+                      _imageUrl = null;
+                    }),
+                    onImageRemoved: () => setState(() {
+                      _localImageFile = null;
+                      _imageUrl = null;
+                    }),
                   ),
                   _Step3Pricing(
                     priceCtrl: _priceCtrl,
@@ -329,10 +326,8 @@ class _ItemFormScreenState extends ConsumerState<ItemFormScreen> {
                   _Step4Availability(
                     isAvailable: _isAvailable,
                     isFavorite: _isFavorite,
-                    onAvailableChanged: (v) =>
-                        setState(() => _isAvailable = v),
-                    onFavoriteChanged: (v) =>
-                        setState(() => _isFavorite = v),
+                    onAvailableChanged: (v) => setState(() => _isAvailable = v),
+                    onFavoriteChanged: (v) => setState(() => _isFavorite = v),
                   ),
                 ],
               ),
@@ -367,8 +362,8 @@ class _StepIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding:
-          const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.md),
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.md),
       child: Row(
         children: List.generate(total, (i) {
           final isActive = i == current;
@@ -485,9 +480,7 @@ class _Step1Category extends ConsumerWidget {
         allCats.where((c) => c.category.parentId == null).toList();
     final subCats = selectedTopId == null
         ? <CategoryWithCount>[]
-        : allCats
-            .where((c) => c.category.parentId == selectedTopId)
-            .toList();
+        : allCats.where((c) => c.category.parentId == selectedTopId).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -508,11 +501,9 @@ class _Step1Category extends ConsumerWidget {
             textPrimary: textPrimary,
             onSelect: (id) => onTopChanged(id),
             onCreateNew: () async {
-              final name = await _showCreateCategoryDialog(
-                  context, ref, null);
+              final name = await _showCreateCategoryDialog(context, ref, null);
               if (name != null && context.mounted) {
-                final newId =
-                    await _createCategory(context, ref, name, null);
+                final newId = await _createCategory(context, ref, name, null);
                 if (newId != null) onTopChanged(newId);
               }
             },
@@ -544,8 +535,8 @@ class _Step1Category extends ConsumerWidget {
                 final name = await _showCreateCategoryDialog(
                     context, ref, selectedTopId);
                 if (name != null && context.mounted) {
-                  final newId = await _createCategory(
-                      context, ref, name, selectedTopId);
+                  final newId =
+                      await _createCategory(context, ref, name, selectedTopId);
                   if (newId != null) onSubChanged(newId);
                 }
               },
@@ -568,8 +559,7 @@ class _Step1Category extends ConsumerWidget {
       builder: (dialogCtx) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return AlertDialog(
-          backgroundColor:
-              isDark ? AppColors.surfaceDark : AppColors.white,
+          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.white,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(
@@ -584,8 +574,7 @@ class _Step1Category extends ConsumerWidget {
                     ? AppColors.textPrimaryDark
                     : AppColors.textPrimaryLight),
             decoration: InputDecoration(
-              hintText:
-                  parentId == null ? 'e.g. Beverages' : 'e.g. Coffee',
+              hintText: parentId == null ? 'e.g. Beverages' : 'e.g. Coffee',
               hintStyle: GoogleFonts.dmSans(
                   color: isDark
                       ? AppColors.textSecondaryDark
@@ -659,6 +648,7 @@ class _CategoryGrid extends ConsumerWidget {
   final String? emptyText;
   final bool allowNone;
   final String? noneLabel;
+
   /// Called with the deleted category's syncId so parent can clear selection.
   final ValueChanged<String>? onDeleted;
 
@@ -667,10 +657,8 @@ class _CategoryGrid extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
-        backgroundColor:
-            isDark ? AppColors.surfaceDark : AppColors.white,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text('Delete "${cat.category.name}"?',
             style: AppTextStyles.bodySemiBold(context)),
         content: Text(
@@ -690,16 +678,13 @@ class _CategoryGrid extends ConsumerWidget {
             onPressed: () => Navigator.pop(dialogCtx, true),
             child: Text('Delete',
                 style: GoogleFonts.dmSans(
-                    color: AppColors.errorLight,
-                    fontWeight: FontWeight.w700)),
+                    color: AppColors.errorLight, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
     );
     if (confirmed == true) {
-      await ref
-          .read(categoryProvider.notifier)
-          .softDelete(cat.category);
+      await ref.read(categoryProvider.notifier).softDelete(cat.category);
       onDeleted?.call(cat.category.syncId);
     }
   }
@@ -770,6 +755,7 @@ class _CatChip extends StatelessWidget {
   final Color textPrimary;
   final VoidCallback onTap;
   final bool isCreate;
+
   /// When non-null, a small delete icon is shown on the chip.
   final VoidCallback? onDelete;
 
@@ -787,13 +773,12 @@ class _CatChip extends StatelessWidget {
     } else if (isCreate) {
       bg = Colors.transparent;
       textColor = _maroon;
-      border = Border.all(
-          color: _maroon.withValues(alpha: 0.5), width: 1.5);
+      border = Border.all(color: _maroon.withValues(alpha: 0.5), width: 1.5);
     } else {
       bg = cardBg;
       textColor = textPrimary;
-      border = Border.all(
-          color: Colors.black.withValues(alpha: 0.12), width: 1);
+      border =
+          Border.all(color: Colors.black.withValues(alpha: 0.12), width: 1);
     }
 
     return GestureDetector(
@@ -824,8 +809,7 @@ class _CatChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (emoji != null) ...[
-              Text(emoji!,
-                  style: GoogleFonts.dmSans(fontSize: 16)),
+              Text(emoji!, style: GoogleFonts.dmSans(fontSize: 16)),
               const SizedBox(width: 6),
             ],
             Text(
@@ -833,9 +817,8 @@ class _CatChip extends StatelessWidget {
               style: GoogleFonts.dmSans(
                 color: textColor,
                 fontSize: 14,
-                fontWeight: isSelected || isCreate
-                    ? FontWeight.w700
-                    : FontWeight.w500,
+                fontWeight:
+                    isSelected || isCreate ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
             if (onDelete != null) ...[
@@ -940,76 +923,76 @@ class _Step2BasicInfo extends StatelessWidget {
           children: [
             // ── Image picker ────────────────────────────────────────────
             _SectionLabel(
-                label: 'Item Photo', sub: 'Tap to pick from gallery (max 15 MB)', context: context),
+                label: 'Item Photo',
+                sub: 'Tap to pick from gallery (max 15 MB)',
+                context: context),
             const SizedBox(height: AppSpacing.sm),
             GestureDetector(
               onTap: () => _pickImage(context),
               child: AspectRatio(
                 aspectRatio: 1.0,
                 child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: cardBg,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.12)
-                        : Colors.black.withValues(alpha: 0.10),
-                    width: 1.2,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: cardBg,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : Colors.black.withValues(alpha: 0.10),
+                      width: 1.2,
+                    ),
                   ),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: hasImage
-                    ? Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          localImageFile != null
-                              ? Image.file(localImageFile!,
-                                  fit: BoxFit.cover)
-                              : Image.network(imageUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      _imagePlaceholder(
-                                          isDark, hintColor)),
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: GestureDetector(
-                              onTap: onImageRemoved,
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.5),
-                                  shape: BoxShape.circle,
+                  clipBehavior: Clip.antiAlias,
+                  child: hasImage
+                      ? Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            localImageFile != null
+                                ? Image.file(localImageFile!, fit: BoxFit.cover)
+                                : Image.network(imageUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        _imagePlaceholder(isDark, hintColor)),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: GestureDetector(
+                                onTap: onImageRemoved,
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.5),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.close_rounded,
+                                      color: Colors.white, size: 16),
                                 ),
-                                child: const Icon(Icons.close_rounded,
-                                    color: Colors.white, size: 16),
                               ),
                             ),
-                          ),
-                          Positioned(
-                            bottom: 8,
-                            right: 8,
-                            child: GestureDetector(
-                              onTap: () => _pickImage(context),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.5),
-                                  borderRadius: BorderRadius.circular(8),
+                            Positioned(
+                              bottom: 8,
+                              right: 8,
+                              child: GestureDetector(
+                                onTap: () => _pickImage(context),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.5),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text('Change',
+                                      style: GoogleFonts.dmSans(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600)),
                                 ),
-                                child: Text('Change',
-                                    style: GoogleFonts.dmSans(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600)),
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                    : _imagePlaceholder(isDark, hintColor),
+                          ],
+                        )
+                      : _imagePlaceholder(isDark, hintColor),
                 ),
               ),
             ),
@@ -1052,15 +1035,12 @@ class _Step2BasicInfo extends StatelessWidget {
   Widget _imagePlaceholder(bool isDark, Color hintColor) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.add_photo_alternate_outlined,
-              size: 48, color: hintColor),
+          Icon(Icons.add_photo_alternate_outlined, size: 48, color: hintColor),
           const SizedBox(height: 12),
           Text(
             'Tap to add photo',
             style: GoogleFonts.dmSans(
-                color: hintColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w600),
+                color: hintColor, fontSize: 14, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 4),
           Text(
@@ -1106,14 +1086,15 @@ class _Step3PricingState extends State<_Step3Pricing> {
         children: [
           // ── Base price ─────────────────────────────────────────────
           _SectionLabel(
-              label: 'Base Price', sub: 'Starting price before options', context: context),
+              label: 'Base Price',
+              sub: 'Starting price before options',
+              context: context),
           const SizedBox(height: AppSpacing.sm),
           AppTextField(
             controller: widget.priceCtrl,
             label: 'Base Price (₱)',
             hint: '0.00',
-            keyboardType:
-                const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
             prefixIcon: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text('₱',
@@ -1139,15 +1120,14 @@ class _Step3PricingState extends State<_Step3Pricing> {
               TextButton.icon(
                 onPressed: () {
                   setState(() {
-                    widget.variantGroups.add(VariantGroupDraft(
-                        groupName: '', options: []));
+                    widget.variantGroups
+                        .add(VariantGroupDraft(groupName: '', options: []));
                   });
                   widget.onChanged();
                 },
                 icon: const Icon(Icons.add_rounded, size: 18),
                 label: Text('Add Group',
-                    style:
-                        GoogleFonts.dmSans(fontWeight: FontWeight.w700)),
+                    style: GoogleFonts.dmSans(fontWeight: FontWeight.w700)),
                 style: TextButton.styleFrom(
                     foregroundColor: const Color(0xFF8B4049)),
               ),
@@ -1157,8 +1137,7 @@ class _Step3PricingState extends State<_Step3Pricing> {
             'Customer picks ONE option from each group. '
             'The option\'s price is added to the base price.',
             style: GoogleFonts.dmSans(
-                color: textPrimary.withValues(alpha: 0.5),
-                fontSize: 12),
+                color: textPrimary.withValues(alpha: 0.5), fontSize: 12),
           ),
           const SizedBox(height: AppSpacing.sm),
           ...List.generate(widget.variantGroups.length, (gi) {
@@ -1200,8 +1179,7 @@ class _Step3PricingState extends State<_Step3Pricing> {
                 },
                 icon: const Icon(Icons.add_rounded, size: 18),
                 label: Text('Add',
-                    style:
-                        GoogleFonts.dmSans(fontWeight: FontWeight.w700)),
+                    style: GoogleFonts.dmSans(fontWeight: FontWeight.w700)),
                 style: TextButton.styleFrom(
                     foregroundColor: const Color(0xFF8B4049)),
               ),
@@ -1227,8 +1205,7 @@ class _Step3PricingState extends State<_Step3Pricing> {
               child: Text(
                 'No add-ons yet.',
                 style: GoogleFonts.dmSans(
-                    color: textPrimary.withValues(alpha: 0.35),
-                    fontSize: 13),
+                    color: textPrimary.withValues(alpha: 0.35), fontSize: 13),
               ),
             ),
           const SizedBox(height: AppSpacing.lg),
@@ -1313,8 +1290,7 @@ class _VariantGroupEditorState extends State<_VariantGroupEditor> {
                         color: textPrimary.withValues(alpha: 0.35),
                         fontSize: 13),
                     border: InputBorder.none,
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 4),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
                     isDense: true,
                   ),
                 ),
@@ -1450,8 +1426,7 @@ class _VariantOptionRowState extends State<_VariantOptionRow> {
               decoration: InputDecoration(
                 hintText: 'Option name (e.g. Small)',
                 hintStyle: GoogleFonts.dmSans(
-                    color: textPrimary.withValues(alpha: 0.35),
-                    fontSize: 12),
+                    color: textPrimary.withValues(alpha: 0.35), fontSize: 12),
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding:
@@ -1475,14 +1450,12 @@ class _VariantOptionRowState extends State<_VariantOptionRow> {
               decoration: InputDecoration(
                 hintText: '0',
                 hintStyle: GoogleFonts.dmSans(
-                    color: textPrimary.withValues(alpha: 0.35),
-                    fontSize: 12),
+                    color: textPrimary.withValues(alpha: 0.35), fontSize: 12),
                 border: InputBorder.none,
                 isDense: true,
                 prefixText: '+₱ ',
                 prefixStyle: GoogleFonts.dmSans(
-                    color: textPrimary.withValues(alpha: 0.6),
-                    fontSize: 13),
+                    color: textPrimary.withValues(alpha: 0.6), fontSize: 13),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               ),
@@ -1541,8 +1514,7 @@ class _ModifierRowState extends State<_ModifierRow> {
   }
 
   void _notify() => widget.onChanged(ModifierDraft(
-      groupName:
-          _groupCtrl.text.isEmpty ? 'Add-ons' : _groupCtrl.text,
+      groupName: _groupCtrl.text.isEmpty ? 'Add-ons' : _groupCtrl.text,
       name: _nameCtrl.text,
       priceDelta: double.tryParse(_priceCtrl.text) ?? 0));
 
@@ -1555,8 +1527,7 @@ class _ModifierRowState extends State<_ModifierRow> {
     final borderColor = isDark
         ? Colors.white.withValues(alpha: 0.15)
         : Colors.black.withValues(alpha: 0.15);
-    final fieldBg =
-        isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
+    final fieldBg = isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -1585,8 +1556,8 @@ class _ModifierRowState extends State<_ModifierRow> {
                         fontSize: 12),
                     border: InputBorder.none,
                     isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 8),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   ),
                 ),
               ),
@@ -1608,8 +1579,7 @@ class _ModifierRowState extends State<_ModifierRow> {
                 child: TextField(
                   controller: _nameCtrl,
                   onChanged: (_) => _notify(),
-                  style: GoogleFonts.dmSans(
-                      color: textPrimary, fontSize: 13),
+                  style: GoogleFonts.dmSans(color: textPrimary, fontSize: 13),
                   decoration: InputDecoration(
                     hintText: 'Add-on name',
                     hintStyle: GoogleFonts.dmSans(
@@ -1628,14 +1598,12 @@ class _ModifierRowState extends State<_ModifierRow> {
                 child: TextField(
                   controller: _priceCtrl,
                   onChanged: (_) => _notify(),
-                  keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r'[0-9.]'))
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
                   ],
-                  style: GoogleFonts.dmSans(
-                      color: textPrimary, fontSize: 13),
+                  style: GoogleFonts.dmSans(color: textPrimary, fontSize: 13),
                   textAlign: TextAlign.right,
                   decoration: InputDecoration(
                     hintText: '0',
@@ -1648,8 +1616,8 @@ class _ModifierRowState extends State<_ModifierRow> {
                     prefixStyle: GoogleFonts.dmSans(
                         color: textPrimary.withValues(alpha: 0.6),
                         fontSize: 13),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 10),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                   ),
                 ),
               ),
@@ -1747,9 +1715,7 @@ class _ToggleRow extends StatelessWidget {
         children: [
           Icon(icon,
               size: 22,
-              color: value
-                  ? _maroon
-                  : textSecondary.withValues(alpha: 0.5)),
+              color: value ? _maroon : textSecondary.withValues(alpha: 0.5)),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
@@ -1761,8 +1727,8 @@ class _ToggleRow extends StatelessWidget {
                         fontSize: 15,
                         fontWeight: FontWeight.w600)),
                 Text(subtitle,
-                    style: GoogleFonts.dmSans(
-                        color: textSecondary, fontSize: 11)),
+                    style:
+                        GoogleFonts.dmSans(color: textSecondary, fontSize: 11)),
               ],
             ),
           ),
@@ -1817,15 +1783,13 @@ class _BottomNav extends StatelessWidget {
                     foregroundColor: const Color(0xFF8B4049),
                     side: BorderSide(
                         color: const Color(0xFF8B4049).withValues(alpha: 0.4)),
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14)),
                   ),
                   child: Text('Previous',
                       style: GoogleFonts.dmSans(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15)),
+                          fontWeight: FontWeight.w700, fontSize: 15)),
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -1837,9 +1801,7 @@ class _BottomNav extends StatelessWidget {
                 icon: isLastStep
                     ? Icons.check_rounded
                     : Icons.arrow_forward_rounded,
-                onPressed: isSaving
-                    ? null
-                    : (isLastStep ? onSave : onNext),
+                onPressed: isSaving ? null : (isLastStep ? onSave : onNext),
                 isLoading: isSaving,
               ),
             ),
@@ -1853,8 +1815,7 @@ class _BottomNav extends StatelessWidget {
 // ── Shared Helpers ────────────────────────────────────────────────────────────
 
 class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(
-      {required this.label, this.sub, required this.context});
+  const _SectionLabel({required this.label, this.sub, required this.context});
   final String label;
   final String? sub;
   final BuildContext context;
@@ -1868,9 +1829,8 @@ class _SectionLabel extends StatelessWidget {
         Text(
           label,
           style: GoogleFonts.dmSans(
-            color: isDark
-                ? AppColors.textPrimaryDark
-                : AppColors.textPrimaryLight,
+            color:
+                isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
             fontSize: 14,
             fontWeight: FontWeight.w700,
           ),

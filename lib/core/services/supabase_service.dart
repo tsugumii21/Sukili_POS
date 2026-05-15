@@ -67,10 +67,8 @@ class SupabaseService {
 
   Future<void> softDelete(String table, String syncId) async {
     try {
-      await client
-          .from(table)
-          .update({SupabaseConstants.isDeleted: true})
-          .eq(SupabaseConstants.syncId, syncId);
+      await client.from(table).update({SupabaseConstants.isDeleted: true}).eq(
+          SupabaseConstants.syncId, syncId);
     } catch (e) {
       throw DatabaseException('Failed to soft delete in Supabase: $e');
     }
@@ -93,8 +91,7 @@ class SupabaseService {
       final ext = fileName.contains('.')
           ? fileName.split('.').last.toLowerCase()
           : 'jpg';
-      final storagePath =
-          '${DateTime.now().millisecondsSinceEpoch}_$fileName';
+      final storagePath = '${DateTime.now().millisecondsSinceEpoch}_$fileName';
       await client.storage.from('menu-items').uploadBinary(
             storagePath,
             bytes is Uint8List ? bytes : Uint8List.fromList(bytes),

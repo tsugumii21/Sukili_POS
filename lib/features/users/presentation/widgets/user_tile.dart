@@ -32,8 +32,7 @@ class UserTile extends ConsumerWidget {
     final textSecondary =
         isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
 
-    final initial =
-        user.name.isNotEmpty ? user.name[0].toUpperCase() : '?';
+    final initial = user.name.isNotEmpty ? user.name[0].toUpperCase() : '?';
     final isCashier = user.role == 'cashier';
 
     return Container(
@@ -206,8 +205,7 @@ class _ActiveToggle extends ConsumerWidget {
     final isActive = user.status == 'active';
     return Switch.adaptive(
       value: isActive,
-      onChanged: (_) =>
-          ref.read(usersProvider.notifier).toggleStatus(user),
+      onChanged: (_) => ref.read(usersProvider.notifier).toggleStatus(user),
       activeThumbColor: const Color(0xFF8B4049),
       activeTrackColor: const Color(0xFF8B4049).withValues(alpha: 0.3),
       inactiveThumbColor: Colors.grey.shade400,

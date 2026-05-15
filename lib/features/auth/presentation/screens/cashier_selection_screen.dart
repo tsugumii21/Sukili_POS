@@ -58,8 +58,10 @@ class _CashierSelectionScreenState
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSecondary = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final textPrimary =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textSecondary =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
 
     return Scaffold(
       backgroundColor: bg,
@@ -133,7 +135,10 @@ class _CashierSelectionScreenState
                   ),
                 ],
               ),
-            ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.05, end: 0),
+            )
+                .animate()
+                .fadeIn(duration: 400.ms, delay: 100.ms)
+                .slideY(begin: 0.05, end: 0),
 
             const SizedBox(height: AppSpacing.xl),
 
@@ -161,7 +166,8 @@ class _CashierSelectionScreenState
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.md,
                           ),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             crossAxisSpacing: AppSpacing.md,
                             mainAxisSpacing: AppSpacing.md,
@@ -195,19 +201,23 @@ class _CashierSelectionScreenState
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: textSecondary.withValues(alpha: 0.1)),
+                  border:
+                      Border.all(color: textSecondary.withValues(alpha: 0.1)),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: TextButton(
                   onPressed: () => context.push(RouteConstants.adminLogin),
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.admin_panel_settings_outlined, size: 18, color: textSecondary),
+                      Icon(Icons.admin_panel_settings_outlined,
+                          size: 18, color: textSecondary),
                       const SizedBox(width: 8),
                       Text(
                         'Admin Portal',

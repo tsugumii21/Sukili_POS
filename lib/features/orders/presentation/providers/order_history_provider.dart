@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../../shared/isar_collections/order_collection.dart';
 import '../../../../shared/providers/isar_provider.dart';
+import '../../../../shared/providers/store_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -49,11 +50,9 @@ class OrderFilter {
           ? this.paymentMethod
           : paymentMethod as String?,
       status: status == _sentinel ? this.status : status as String?,
-      startDate: startDate == _sentinel
-          ? this.startDate
-          : startDate as DateTime?,
-      endDate:
-          endDate == _sentinel ? this.endDate : endDate as DateTime?,
+      startDate:
+          startDate == _sentinel ? this.startDate : startDate as DateTime?,
+      endDate: endDate == _sentinel ? this.endDate : endDate as DateTime?,
     );
   }
 
@@ -111,15 +110,25 @@ class OrderHistoryNotifier extends Notifier<OrderHistoryState> {
 
   @override
   OrderHistoryState build() {
-    Future.microtask(_loadAll);
+    final storeId = ref.watch(currentStoreIdProvider);
+    if (storeId.isEmpty) return const OrderHistoryState(isLoading: false);
+
+    _init(storeId);
     return const OrderHistoryState(isLoading: true);
+  }
+
+  void _init(String storeId) {
+    Future.microtask(() => _loadAll(storeId));
   }
 
   // ── Public API ─────────────────────────────────────────────────────────────
 
   Future<void> refresh() async {
+    final storeId = ref.read(currentStoreIdProvider);
+    if (storeId.isEmpty) return;
+
     state = state.copyWith(isLoading: true);
-    await _loadAll();
+    await _loadAll(storeId);
   }
 
   void loadMore() {
@@ -219,18 +228,16 @@ class OrderHistoryNotifier extends Notifier<OrderHistoryState> {
 
   // ── Internal helpers ───────────────────────────────────────────────────────
 
-  Future<void> _loadAll() async {
+  Future<void> _loadAll(String storeId) async {
     try {
       final db = ref.read(isarProvider);
-      final cashierId =
-          ref.read(authProvider).selectedCashier?.syncId;
+      final cashierId = ref.read(authProvider).selectedCashier?.syncId;
 
-      // Load ALL non-deleted orders — the screen is already behind the cashier
-      // auth gate. We then optionally narrow by cashierId in-memory so that
-      // any mismatch (e.g. syncId casing, seeded data) doesn't silently
-      // produce an empty list.
+      // Load ALL non-deleted orders for THIS store.
       final allOrders = await db.orderCollections
           .filter()
+          .storeIdEqualTo(storeId)
+          .and()
           .isDeletedEqualTo(false)
           .findAll();
 
@@ -239,8 +246,7 @@ class OrderHistoryNotifier extends Notifier<OrderHistoryState> {
       // after a completed payment.
       List<OrderCollection> fetched;
       if (cashierId != null && cashierId.isNotEmpty) {
-        final byMe =
-            allOrders.where((o) => o.cashierId == cashierId).toList();
+        final byMe = allOrders.where((o) => o.cashierId == cashierId).toList();
         fetched = byMe.isNotEmpty ? byMe : allOrders;
       } else {
         fetched = allOrders;
@@ -265,9 +271,7 @@ class OrderHistoryNotifier extends Notifier<OrderHistoryState> {
     final filtered = _cached.where((o) {
       // Search by order number
       if (f.searchQuery.isNotEmpty &&
-          !o.orderNumber
-              .toLowerCase()
-              .contains(f.searchQuery.toLowerCase())) {
+          !o.orderNumber.toLowerCase().contains(f.searchQuery.toLowerCase())) {
         return false;
       }
       // Payment method

@@ -24,8 +24,7 @@ class ErrorStateWidget extends StatelessWidget {
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final secondaryText =
         isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-    final errorColor =
-        isDark ? AppColors.errorDark : AppColors.errorLight;
+    final errorColor = isDark ? AppColors.errorDark : AppColors.errorLight;
 
     return Center(
       child: Padding(

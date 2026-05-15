@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';import 'package:go_router/go_router.dart';import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
+import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/isar_collections/order_collection.dart';
+import '../../../../shared/widgets/app_card.dart';
 import '../providers/void_refund_provider.dart';
 import '../widgets/admin_pin_dialog.dart';
 import '../widgets/refund_sheet.dart';
-import '../../../../shared/widgets/app_card.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // VoidRefundScreen — 3-tab view: Void Orders | Refunds | History
@@ -61,7 +64,8 @@ class _VoidRefundScreenState extends ConsumerState<VoidRefundScreen>
     final primary = isDark ? AppColors.primaryDark : AppColors.primaryLight;
     final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
     final border = isDark ? AppColors.borderDark : AppColors.primaryLight;
-    final textSecondary = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final textSecondary =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
 
     // Show error snackbar if present
     ref.listen<VoidRefundState>(voidRefundProvider, (_, next) {
@@ -69,11 +73,11 @@ class _VoidRefundScreenState extends ConsumerState<VoidRefundScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!,
-                style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white)),
+                style: AppTextStyles.bodySemiBold(context)
+                    .copyWith(color: Colors.white)),
             backgroundColor: AppColors.errorLight,
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: AppRadius.mediumBR),
+            shape: RoundedRectangleBorder(borderRadius: AppRadius.mediumBR),
           ),
         );
         ref.read(voidRefundProvider.notifier).clearError();
@@ -87,8 +91,15 @@ class _VoidRefundScreenState extends ConsumerState<VoidRefundScreen>
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 20),
-          onPressed: () => context.pop(),
+          icon: Icon(Icons.arrow_back_ios_new_rounded,
+              color: textPrimary, size: 20),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(RouteConstants.adminHome);
+            }
+          },
         ),
         title: Text(
           'Voids & Refunds',
@@ -100,13 +111,17 @@ class _VoidRefundScreenState extends ConsumerState<VoidRefundScreen>
           child: Container(
             decoration: BoxDecoration(
               color: Colors.transparent,
-              border: Border(bottom: BorderSide(color: border.withValues(alpha: 0.5), width: 1)),
+              border: Border(
+                  bottom: BorderSide(
+                      color: border.withValues(alpha: 0.5), width: 1)),
             ),
             child: TabBar(
               controller: _tabCtrl,
               tabs: _tabs,
-              labelStyle: AppTextStyles.bodySemiBold(context).copyWith(color: textPrimary),
-              unselectedLabelStyle: AppTextStyles.body(context).copyWith(color: textSecondary),
+              labelStyle: AppTextStyles.bodySemiBold(context)
+                  .copyWith(color: textPrimary),
+              unselectedLabelStyle:
+                  AppTextStyles.body(context).copyWith(color: textSecondary),
               labelColor: textPrimary,
               unselectedLabelColor: textSecondary,
               indicatorColor: accent,
@@ -225,14 +240,12 @@ class _OrdersTabState extends ConsumerState<_OrdersTab> {
         // ── Sort row (History tab only) ─────────────────────────────────
         if (widget.sortable)
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 GestureDetector(
-                  onTap: () =>
-                      setState(() => _newestFirst = !_newestFirst),
+                  onTap: () => setState(() => _newestFirst = !_newestFirst),
                   child: Row(
                     children: [
                       Icon(
@@ -260,8 +273,7 @@ class _OrdersTabState extends ConsumerState<_OrdersTab> {
         Expanded(
           child: RefreshIndicator(
             color: maroon,
-            backgroundColor:
-                isDark ? AppColors.surfaceDark : Colors.white,
+            backgroundColor: isDark ? AppColors.surfaceDark : Colors.white,
             onRefresh: () async {
               // Provider auto-refreshes via watchLazy — force a UI rebuild
               ref.invalidate(voidRefundProvider);
@@ -316,7 +328,7 @@ class _OrderRow extends ConsumerWidget {
     final error = isDark ? AppColors.errorDark : AppColors.errorLight;
     final warning = isDark ? AppColors.warningDark : AppColors.warningLight;
     final borderCol = isDark ? AppColors.borderDark : AppColors.primaryLight;
-    
+
     Color actionColor;
     if (mode == _TabMode.history) {
       actionColor = order.status.toLowerCase() == 'voided' ? error : warning;
@@ -329,7 +341,8 @@ class _OrderRow extends ConsumerWidget {
 
     return AppCard(
       padding: EdgeInsets.zero,
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+      margin: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md, vertical: AppSpacing.xs),
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -338,15 +351,15 @@ class _OrderRow extends ConsumerWidget {
             Container(
               width: 3,
               decoration: BoxDecoration(
-                color: mode == _TabMode.history 
-                    ? actionColor 
-                    : error,
-                borderRadius: const BorderRadius.horizontal(left: AppRadius.small),
+                color: mode == _TabMode.history ? actionColor : error,
+                borderRadius:
+                    const BorderRadius.horizontal(left: AppRadius.small),
               ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                 child: Row(
                   children: [
                     // Order info
@@ -357,7 +370,8 @@ class _OrderRow extends ConsumerWidget {
                         children: [
                           Text(
                             order.orderNumber,
-                            style: AppTextStyles.bodySemiBold(context).copyWith(color: textPrimary),
+                            style: AppTextStyles.bodySemiBold(context)
+                                .copyWith(color: textPrimary),
                           ),
                           const SizedBox(height: 2),
                           Text(
@@ -374,7 +388,8 @@ class _OrderRow extends ConsumerWidget {
                       children: [
                         Text(
                           CurrencyFormatter.format(order.totalAmount),
-                          style: AppTextStyles.bodyMedium(context).copyWith(color: accent),
+                          style: AppTextStyles.bodyMedium(context)
+                              .copyWith(color: accent),
                         ),
                         const SizedBox(height: 4),
                         _buildActionButton(context, ref, actionColor),
@@ -390,7 +405,8 @@ class _OrderRow extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionButton(BuildContext context, WidgetRef ref, Color actionColor) {
+  Widget _buildActionButton(
+      BuildContext context, WidgetRef ref, Color actionColor) {
     if (mode == _TabMode.history) {
       return Container(
         height: 32,
@@ -403,7 +419,8 @@ class _OrderRow extends ConsumerWidget {
         ),
         child: Text(
           _capitalize(order.status),
-          style: AppTextStyles.captionMedium(context).copyWith(color: actionColor),
+          style:
+              AppTextStyles.captionMedium(context).copyWith(color: actionColor),
         ),
       );
     }
@@ -412,7 +429,8 @@ class _OrderRow extends ConsumerWidget {
     final label = isVoid ? 'Void' : 'Refund';
 
     return GestureDetector(
-      onTap: () => isVoid ? _handleVoid(context, ref) : _handleRefund(context, ref),
+      onTap: () =>
+          isVoid ? _handleVoid(context, ref) : _handleRefund(context, ref),
       child: Container(
         height: 32,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -424,7 +442,8 @@ class _OrderRow extends ConsumerWidget {
         ),
         child: Text(
           label,
-          style: AppTextStyles.captionMedium(context).copyWith(color: actionColor),
+          style:
+              AppTextStyles.captionMedium(context).copyWith(color: actionColor),
         ),
       ),
     );
@@ -461,7 +480,8 @@ class _OrderRow extends ConsumerWidget {
         SnackBar(
           content: Text(
             ok ? '${order.orderNumber} voided successfully.' : 'Void failed.',
-            style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white),
+            style: AppTextStyles.bodySemiBold(context)
+                .copyWith(color: Colors.white),
           ),
           backgroundColor: ok ? AppColors.successLight : AppColors.errorLight,
           behavior: SnackBarBehavior.floating,
@@ -476,21 +496,17 @@ class _OrderRow extends ConsumerWidget {
     return showDialog<String>(
       context: context,
       builder: (dialogCtx) {
-        final isDark =
-            Theme.of(dialogCtx).brightness == Brightness.dark;
+        final isDark = Theme.of(dialogCtx).brightness == Brightness.dark;
         final dialogBg =
             isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
-        final textPrimary = isDark
-            ? AppColors.textPrimaryDark
-            : AppColors.textPrimaryLight;
-        final textSecondary = isDark
-            ? AppColors.textSecondaryDark
-            : AppColors.textSecondaryLight;
+        final textPrimary =
+            isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+        final textSecondary =
+            isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
 
         return AlertDialog(
           backgroundColor: dialogBg,
-          shape:
-              RoundedRectangleBorder(borderRadius: AppRadius.largeBR),
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.largeBR),
           title: Text(
             'Void Reason',
             style: AppTextStyles.h3(context),
@@ -502,12 +518,10 @@ class _OrderRow extends ConsumerWidget {
             style: AppTextStyles.body(context),
             decoration: InputDecoration(
               hintText: 'Enter void reason (required)',
-              hintStyle: AppTextStyles.body(context).copyWith(
-                  color: textSecondary),
+              hintStyle:
+                  AppTextStyles.body(context).copyWith(color: textSecondary),
               filled: true,
-              fillColor: isDark
-                  ? AppColors.cardDark
-                  : AppColors.cardLight,
+              fillColor: isDark ? AppColors.cardDark : AppColors.cardLight,
               border: OutlineInputBorder(
                 borderRadius: AppRadius.mediumBR,
                 borderSide: BorderSide.none,
@@ -519,7 +533,8 @@ class _OrderRow extends ConsumerWidget {
             TextButton(
               onPressed: () => Navigator.of(dialogCtx).pop(null),
               child: Text('Cancel',
-                  style: AppTextStyles.bodySemiBold(context).copyWith(color: textSecondary)),
+                  style: AppTextStyles.bodySemiBold(context)
+                      .copyWith(color: textSecondary)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -531,11 +546,11 @@ class _OrderRow extends ConsumerWidget {
                 backgroundColor: AppColors.errorLight,
                 foregroundColor: Colors.white,
                 elevation: 0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: AppRadius.mediumBR),
+                shape: RoundedRectangleBorder(borderRadius: AppRadius.mediumBR),
               ),
               child: Text('Confirm Void',
-                  style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white)),
+                  style: AppTextStyles.bodySemiBold(context)
+                      .copyWith(color: Colors.white)),
             ),
           ],
         );
@@ -578,10 +593,10 @@ class _OrderRow extends ConsumerWidget {
             ok
                 ? '${order.orderNumber} refunded ${CurrencyFormatter.format(result.amount)}.'
                 : 'Refund failed.',
-            style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white),
+            style: AppTextStyles.bodySemiBold(context)
+                .copyWith(color: Colors.white),
           ),
-          backgroundColor:
-              ok ? AppColors.successLight : AppColors.errorLight,
+          backgroundColor: ok ? AppColors.successLight : AppColors.errorLight,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: AppRadius.mediumBR),
         ),
@@ -612,9 +627,8 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final textSecondary =
         isDark ? AppColors.textSecondaryDark : const Color(0xFF9E9E9E);
-    final iconColor = isDark
-        ? AppColors.surfaceDarkElevated
-        : const Color(0xFFE0D0C0);
+    final iconColor =
+        isDark ? AppColors.surfaceDarkElevated : const Color(0xFFE0D0C0);
 
     return Center(
       child: Padding(
@@ -636,7 +650,8 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
             Text(
               subtitle,
-              style: AppTextStyles.captionMedium(context).copyWith(color: textSecondary),
+              style: AppTextStyles.captionMedium(context)
+                  .copyWith(color: textSecondary),
               textAlign: TextAlign.center,
             ),
           ],

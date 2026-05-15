@@ -6,6 +6,7 @@ import 'package:isar_community/isar.dart';
 import '../../../../shared/isar_collections/menu_item_collection.dart';
 import '../../../../shared/isar_collections/order_collection.dart';
 import '../../../../shared/providers/isar_provider.dart';
+import '../../../../shared/providers/store_provider.dart';
 
 /// Analyzes the last [_lookbackOrders] completed orders and returns the
 /// most-frequently-ordered [MenuItemCollection] records (top 8), sorted by
@@ -13,25 +14,33 @@ import '../../../../shared/providers/isar_provider.dart';
 ///
 /// Only returns items that are still available and not deleted, so the list
 /// is always actionable on the New Order screen.
-class QuickPicksNotifier
-    extends AsyncNotifier<List<MenuItemCollection>> {
+class QuickPicksNotifier extends AsyncNotifier<List<MenuItemCollection>> {
   static const int _lookbackOrders = 50;
   static const int _maxResults = 8;
 
   @override
-  Future<List<MenuItemCollection>> build() => _compute();
-
-  Future<void> refresh() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(_compute);
+  Future<List<MenuItemCollection>> build() {
+    final storeId = ref.watch(currentStoreIdProvider);
+    if (storeId.isEmpty) return Future.value([]);
+    return _compute(storeId);
   }
 
-  Future<List<MenuItemCollection>> _compute() async {
+  Future<void> refresh() async {
+    final storeId = ref.read(currentStoreIdProvider);
+    if (storeId.isEmpty) return;
+
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() => _compute(storeId));
+  }
+
+  Future<List<MenuItemCollection>> _compute(String storeId) async {
     final db = ref.read(isarProvider);
 
-    // ── Step 1: Load recent orders ──────────────────────────────────────────
+    // ── Step 1: Load recent orders for THIS store ───────────────────────────
     final allOrders = await db.orderCollections
         .filter()
+        .storeIdEqualTo(storeId)
+        .and()
         .isDeletedEqualTo(false)
         .findAll();
 
@@ -65,9 +74,11 @@ class QuickPicksNotifier
       ..sort((a, b) => b.value.compareTo(a.value));
     final topIds = sorted.take(_maxResults).map((e) => e.key).toList();
 
-    // ── Step 4: Fetch live MenuItemCollection records ────────────────────────
+    // ── Step 4: Fetch live MenuItemCollection records for THIS store ─────────
     final allItems = await db.menuItemCollections
         .filter()
+        .storeIdEqualTo(storeId)
+        .and()
         .isAvailableEqualTo(true)
         .and()
         .isDeletedEqualTo(false)

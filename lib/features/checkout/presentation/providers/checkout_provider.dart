@@ -5,6 +5,7 @@ import '../../../../shared/providers/isar_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../orders/data/repositories/order_repository_impl.dart';
 import '../../../orders/presentation/providers/order_provider.dart';
+import '../../../../shared/providers/store_provider.dart';
 
 // ── Payment Method ────────────────────────────────────────────────────────────
 
@@ -138,7 +139,10 @@ class CheckoutNotifier extends Notifier<CheckoutState> {
           ? state.amountEntered
           : orderState.total;
 
+      final storeId = ref.read(currentStoreIdProvider);
+
       final savedOrder = await repo.saveOrder(
+        storeId: storeId,
         orderState: orderState,
         cashierId: cashier.syncId,
         cashierName: cashier.name,

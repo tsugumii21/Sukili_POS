@@ -65,7 +65,8 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
   SyncQueueCollection _syncEntry(
       String table, String syncId, Map<String, dynamic> payload) {
     return SyncQueueCollection()
-      ..operationId = '${table}_${syncId}_${DateTime.now().millisecondsSinceEpoch}'
+      ..operationId =
+          '${table}_${syncId}_${DateTime.now().millisecondsSinceEpoch}'
       ..tableName = table
       ..recordSyncId = syncId
       ..operation = 'insert'
@@ -116,7 +117,10 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
     });
     await isar.writeTxn(() => isar.syncQueueCollections.put(entry));
 
-    setState(() { _isLoading = false; _currentStep = 2; });
+    setState(() {
+      _isLoading = false;
+      _currentStep = 2;
+    });
   }
 
   Future<void> _finishSetup() async {
@@ -133,7 +137,8 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
       ..syncId = syncId
       ..storeId = store.syncId
       ..name = _catNameCtrl.text.trim()
-      ..description = _catDescCtrl.text.trim().isEmpty ? null : _catDescCtrl.text.trim()
+      ..description =
+          _catDescCtrl.text.trim().isEmpty ? null : _catDescCtrl.text.trim()
       ..sortOrder = 1
       ..isActive = true
       ..createdAt = now
@@ -165,33 +170,49 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
     final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
-    final textSec = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final textSec =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
 
     return Scaffold(
       backgroundColor: bg,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+        backgroundColor:
+            isDark ? AppColors.primaryDark : AppColors.primaryLight,
         elevation: 0,
         scrolledUnderElevation: 0,
         automaticallyImplyLeading: false,
-        title: Text('Store Setup', style: AppTextStyles.h3(context).copyWith(color: Colors.white)),
+        title: Text('Store Setup',
+            style: AppTextStyles.h3(context).copyWith(color: Colors.white)),
       ),
       body: SafeArea(
         child: Column(
           children: [
             // ── Progress bar ─────────────────────────────────────────
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.lg),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md, vertical: AppSpacing.lg),
               child: Row(
                 children: [
-                  _StepDot(step: 1, current: _currentStep, label: 'Add Cashier', accent: accent, textSec: textSec),
+                  _StepDot(
+                      step: 1,
+                      current: _currentStep,
+                      label: 'Add Cashier',
+                      accent: accent,
+                      textSec: textSec),
                   Expanded(
                     child: Container(
                       height: 2,
-                      color: _currentStep >= 2 ? accent : (isDark ? AppColors.cardDark : AppColors.cardLight),
+                      color: _currentStep >= 2
+                          ? accent
+                          : (isDark ? AppColors.cardDark : AppColors.cardLight),
                     ),
                   ),
-                  _StepDot(step: 2, current: _currentStep, label: 'Add Category', accent: accent, textSec: textSec),
+                  _StepDot(
+                      step: 2,
+                      current: _currentStep,
+                      label: 'Add Category',
+                      accent: accent,
+                      textSec: textSec),
                 ],
               ),
             ),
@@ -202,7 +223,9 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: AnimatedSwitcher(
                   duration: AppDuration.medium,
-                  child: _currentStep == 1 ? _buildStep1(context, textSec) : _buildStep2(context, textSec),
+                  child: _currentStep == 1
+                      ? _buildStep1(context, textSec)
+                      : _buildStep2(context, textSec),
                 ),
               ),
             ),
@@ -224,7 +247,9 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                     child: AppPrimaryButton(
                       label: _currentStep == 1 ? 'Next' : 'Finish Setup',
                       isLoading: _isLoading,
-                      onPressed: _isLoading ? null : (_currentStep == 1 ? _nextStep : _finishSetup),
+                      onPressed: _isLoading
+                          ? null
+                          : (_currentStep == 1 ? _nextStep : _finishSetup),
                     ),
                   ),
                 ],
@@ -252,8 +277,10 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
               AppTextField(
                 controller: _cashierNameCtrl,
                 label: 'Cashier Name *',
-                prefixIcon: Icon(Icons.person_outline, color: textSec, size: 20),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Name is required' : null,
+                prefixIcon:
+                    Icon(Icons.person_outline, color: textSec, size: 20),
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Name is required' : null,
               ),
               Divider(color: textSec.withValues(alpha: 0.1)),
               AppTextField(
@@ -263,8 +290,10 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                 keyboardType: TextInputType.number,
                 obscureText: true,
                 validator: (v) {
-                  if (v == null || v.length != 4) return 'PIN must be exactly 4 digits';
-                  if (!RegExp(r'^\d{4}$').hasMatch(v)) return 'PIN must be digits only';
+                  if (v == null || v.length != 4)
+                    return 'PIN must be exactly 4 digits';
+                  if (!RegExp(r'^\d{4}$').hasMatch(v))
+                    return 'PIN must be digits only';
                   return null;
                 },
               ),
@@ -275,7 +304,8 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                 prefixIcon: Icon(Icons.pin_outlined, color: textSec, size: 20),
                 keyboardType: TextInputType.number,
                 obscureText: true,
-                validator: (v) => v != _pinCtrl.text ? 'PINs do not match' : null,
+                validator: (v) =>
+                    v != _pinCtrl.text ? 'PINs do not match' : null,
               ),
             ]),
           ).animate().fadeIn(duration: 400.ms),
@@ -301,8 +331,11 @@ class _SetupWizardScreenState extends State<SetupWizardScreen> {
                 controller: _catNameCtrl,
                 label: 'Category Name *',
                 hint: 'e.g. Beverages, Food, Snacks',
-                prefixIcon: Icon(Icons.category_outlined, color: textSec, size: 20),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Category name is required' : null,
+                prefixIcon:
+                    Icon(Icons.category_outlined, color: textSec, size: 20),
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'Category name is required'
+                    : null,
               ),
               Divider(color: textSec.withValues(alpha: 0.1)),
               AppTextField(

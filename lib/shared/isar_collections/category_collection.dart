@@ -31,4 +31,3 @@ class CategoryCollection {
   late bool isSynced;
   late bool isDeleted;
 }
-

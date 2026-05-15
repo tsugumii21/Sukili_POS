@@ -38,8 +38,7 @@ class OrderTile extends StatelessWidget {
         isDark ? AppColors.textPrimaryDark : const Color(0xFF1A1A1A);
     final textSecondary =
         isDark ? AppColors.textSecondaryDark : const Color(0xFF6B6B6B);
-    final totalColor =
-        isDark ? AppColors.accentDark : AppColors.accentLight;
+    final totalColor = isDark ? AppColors.accentDark : AppColors.accentLight;
 
     final statusColor = _statusColor(order.status);
     final payIcon = _paymentIcon(order.paymentMethod);
@@ -53,9 +52,8 @@ class OrderTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: cardBg,
           borderRadius: BorderRadius.circular(16),
-          border: isDark
-              ? Border.all(color: AppColors.borderDark, width: 1)
-              : null,
+          border:
+              isDark ? Border.all(color: AppColors.borderDark, width: 1) : null,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha(isDark ? 40 : 25),
@@ -95,9 +93,8 @@ class OrderTile extends StatelessWidget {
               const SizedBox(height: 10),
               Divider(
                 height: 1,
-                color: isDark
-                    ? AppColors.borderDark
-                    : Colors.black.withAlpha(12),
+                color:
+                    isDark ? AppColors.borderDark : Colors.black.withAlpha(12),
               ),
               const SizedBox(height: 10),
 

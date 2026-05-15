@@ -3,6 +3,7 @@ import 'package:isar_community/isar.dart';
 import '../../../../core/services/isar_service.dart';
 import '../../../../shared/isar_collections/category_collection.dart';
 import '../../../../shared/isar_collections/menu_item_collection.dart';
+import '../../../../shared/providers/store_provider.dart';
 
 /// MenuState holds categories, filtered items, and the active filters.
 class MenuState {
@@ -31,7 +32,9 @@ class MenuState {
     return MenuState(
       categories: categories ?? this.categories,
       items: items ?? this.items,
-      selectedCategoryId: clearCategory ? null : (selectedCategoryId ?? this.selectedCategoryId),
+      selectedCategoryId: clearCategory
+          ? null
+          : (selectedCategoryId ?? this.selectedCategoryId),
       searchQuery: searchQuery ?? this.searchQuery,
       isLoading: isLoading ?? this.isLoading,
     );
@@ -43,22 +46,26 @@ class MenuState {
 class MenuNotifier extends Notifier<MenuState> {
   @override
   MenuState build() {
-    _loadInitialData();
+    final storeId = ref.watch(currentStoreIdProvider);
+    if (storeId.isEmpty) return const MenuState(isLoading: false);
+
+    _loadInitialData(storeId);
     return const MenuState();
   }
 
   IsarService get _isar => IsarService.instance;
 
-  Future<void> _loadInitialData() async {
+  Future<void> _loadInitialData(String storeId) async {
     final categories = await _isar.isar.categoryCollections
         .filter()
+        .storeIdEqualTo(storeId)
         .isActiveEqualTo(true)
         .and()
         .isDeletedEqualTo(false)
         .sortBySortOrder()
         .findAll();
 
-    final items = await _loadFilteredItems(null, '');
+    final items = await _loadFilteredItems(storeId, null, '');
 
     state = state.copyWith(
       categories: categories,
@@ -69,11 +76,13 @@ class MenuNotifier extends Notifier<MenuState> {
 
   /// Loads items from Isar, optionally filtered by category and search.
   Future<List<MenuItemCollection>> _loadFilteredItems(
+    String storeId,
     String? categoryId,
     String search,
   ) async {
     var query = _isar.isar.menuItemCollections
         .filter()
+        .storeIdEqualTo(storeId)
         .isDeletedEqualTo(false);
 
     if (categoryId != null) {
@@ -92,8 +101,12 @@ class MenuNotifier extends Notifier<MenuState> {
 
   /// Called when the cashier taps a category pill.
   Future<void> selectCategory(String? categoryId) async {
+    final storeId = ref.read(currentStoreIdProvider);
+    if (storeId.isEmpty) return;
+
     state = state.copyWith(isLoading: true);
-    final items = await _loadFilteredItems(categoryId, state.searchQuery);
+    final items =
+        await _loadFilteredItems(storeId, categoryId, state.searchQuery);
     state = state.copyWith(
       selectedCategoryId: categoryId,
       clearCategory: categoryId == null,
@@ -104,7 +117,11 @@ class MenuNotifier extends Notifier<MenuState> {
 
   /// Called as the cashier types in the search bar.
   Future<void> updateSearch(String query) async {
-    final items = await _loadFilteredItems(state.selectedCategoryId, query);
+    final storeId = ref.read(currentStoreIdProvider);
+    if (storeId.isEmpty) return;
+
+    final items =
+        await _loadFilteredItems(storeId, state.selectedCategoryId, query);
     state = state.copyWith(
       searchQuery: query,
       items: items,

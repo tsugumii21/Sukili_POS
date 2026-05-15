@@ -18,6 +18,7 @@ class OrderRepositoryImpl {
 
   /// Saves a completed order to Isar and enqueues it for Supabase sync.
   Future<OrderCollection> saveOrder({
+    required String storeId,
     required OrderState orderState,
     required String cashierId,
     required String cashierName,
@@ -29,7 +30,7 @@ class OrderRepositoryImpl {
   }) async {
     final now = DateTime.now();
     final syncId = _uuid.v4();
-    final orderNumber = await _generateOrderNumber(now);
+    final orderNumber = await _generateOrderNumber(now, storeId);
 
     final itemsJson = orderState.items
         .map((item) => jsonEncode({
@@ -50,6 +51,7 @@ class OrderRepositoryImpl {
 
     final order = OrderCollection()
       ..syncId = syncId
+      ..storeId = storeId
       ..orderNumber = orderNumber
       ..cashierId = cashierId
       ..cashierName = cashierName
@@ -91,14 +93,15 @@ class OrderRepositoryImpl {
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
-  /// Generates a sequential order number for the current day,
-  /// e.g. ORD-20260502-0001.
-  Future<String> _generateOrderNumber(DateTime now) async {
+  /// Generates a sequential order number for the current day for THIS store.
+  Future<String> _generateOrderNumber(DateTime now, String storeId) async {
     final startOfDay = DateTime(now.year, now.month, now.day);
     final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
 
     final count = await _isar.orderCollections
-        .where()
+        .filter()
+        .storeIdEqualTo(storeId)
+        .and()
         .orderedAtBetween(startOfDay, endOfDay)
         .count();
 
@@ -130,6 +133,7 @@ class OrderRepositoryImpl {
   String _orderPayload(OrderCollection order) {
     return jsonEncode({
       'sync_id': order.syncId,
+      'store_id': order.storeId,
       'order_number': order.orderNumber,
       'cashier_id': order.cashierId,
       'cashier_name': order.cashierName,

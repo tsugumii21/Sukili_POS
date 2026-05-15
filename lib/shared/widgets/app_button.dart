@@ -50,13 +50,15 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
                   ? bg.withValues(alpha: 0.5)
                   : bg,
               borderRadius: BorderRadius.circular(18), // Modern rounded corners
-              boxShadow: _isPressed ? [] : [
-                BoxShadow(
-                  color: bg.withValues(alpha: 0.2),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              boxShadow: _isPressed
+                  ? []
+                  : [
+                      BoxShadow(
+                        color: bg.withValues(alpha: 0.2),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
             ),
             child: Center(
               child: widget.isLoading
@@ -64,7 +66,8 @@ class _AppPrimaryButtonState extends State<AppPrimaryButton> {
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator.adaptive(
-                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(AppColors.white),
                         strokeWidth: 2.5,
                       ),
                     )
@@ -139,7 +142,8 @@ class _AppSecondaryButtonState extends State<AppSecondaryButton> {
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: AppColors.transparent,
-              border: Border.all(color: color.withValues(alpha: 0.2), width: 1.5),
+              border:
+                  Border.all(color: color.withValues(alpha: 0.2), width: 1.5),
               borderRadius: BorderRadius.circular(18),
             ),
             child: Center(

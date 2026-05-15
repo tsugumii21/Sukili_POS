@@ -43,4 +43,3 @@ class MenuItemCollection {
   late bool isSynced;
   late bool isDeleted;
 }
-

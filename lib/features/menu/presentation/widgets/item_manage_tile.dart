@@ -76,14 +76,16 @@ class ItemManageTile extends ConsumerWidget {
                         item.name,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: AppTextStyles.bodySemiBold(context).copyWith(color: textPrimary),
+                        style: AppTextStyles.bodySemiBold(context)
+                            .copyWith(color: textPrimary),
                       ),
                       const SizedBox(height: 2),
                       Row(
                         children: [
                           Text(
                             CurrencyFormatter.format(item.basePrice),
-                            style: AppTextStyles.captionMedium(context).copyWith(
+                            style:
+                                AppTextStyles.captionMedium(context).copyWith(
                               color: _maroon,
                             ),
                           ),
@@ -148,7 +150,6 @@ class ItemManageTile extends ConsumerWidget {
         .fadeIn(duration: 300.ms)
         .slideY(begin: 0.06, end: 0);
   }
-
 }
 
 // ── Thumbnail ─────────────────────────────────────────────────────────────────
@@ -165,9 +166,7 @@ class _Thumbnail extends StatelessWidget {
       height: 60,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: isDark
-            ? AppColors.surfaceDark
-            : AppColors.cardLight,
+        color: isDark ? AppColors.surfaceDark : AppColors.cardLight,
       ),
       child: Icon(
         Icons.restaurant_menu_rounded,
@@ -230,9 +229,8 @@ class _CategoryChip extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
           style: AppTextStyles.caption(context).copyWith(
-            color: isDark
-                ? AppColors.textSecondaryDark
-                : const Color(0xFF6B4B3E),
+            color:
+                isDark ? AppColors.textSecondaryDark : const Color(0xFF6B4B3E),
           ),
         ),
       );

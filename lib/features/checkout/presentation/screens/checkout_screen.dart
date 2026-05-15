@@ -58,12 +58,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     }
 
     final isCash = checkout.selectedMethod == PaymentMethod.cash;
-    final isNonCash =
-        checkout.selectedMethod != null && !isCash;
-    final change =
-        isCash && checkout.amountEntered > 0 && checkout.amountEntered >= order.total
-            ? checkout.amountEntered - order.total
-            : 0.0;
+    final isNonCash = checkout.selectedMethod != null && !isCash;
+    final change = isCash &&
+            checkout.amountEntered > 0 &&
+            checkout.amountEntered >= order.total
+        ? checkout.amountEntered - order.total
+        : 0.0;
     final isValidPayment = checkout.isPaymentValid(order.total);
 
     return Scaffold(
@@ -78,7 +78,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             color: textPrimary,
             size: 20,
           ),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(RouteConstants.cashierHome);
+            }
+          },
         ),
         title: Text(
           'Checkout',
@@ -111,10 +117,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     maroon: maroon,
                     textPrimary: textPrimary,
                     textSecondary: textSecondary,
-                  )
-                      .animate()
-                      .fadeIn(duration: 350.ms)
-                      .slideY(
+                  ).animate().fadeIn(duration: 350.ms).slideY(
                         begin: -0.08,
                         end: 0,
                         duration: 350.ms,
@@ -154,12 +157,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     children: PaymentMethod.values.map((method) {
                       return Expanded(
                         child: Padding(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: PaymentMethodCard(
                             method: method,
-                            isSelected:
-                                checkout.selectedMethod == method,
+                            isSelected: checkout.selectedMethod == method,
                             onTap: () => ref
                                 .read(checkoutProvider.notifier)
                                 .selectMethod(method),
@@ -220,8 +221,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   Future<void> _handleCompletePayment(BuildContext context) async {
-    final saved =
-        await ref.read(checkoutProvider.notifier).processPayment();
+    final saved = await ref.read(checkoutProvider.notifier).processPayment();
     if (saved != null && context.mounted) {
       context.go(RouteConstants.paymentSuccess);
     }
@@ -229,8 +229,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   void _showCancelDialog(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final dialogBg =
-        isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
+    final dialogBg = isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
     final textPrimary =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final textSecondary =
@@ -376,8 +375,7 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentColor =
-        isDark ? AppColors.accentDark : AppColors.accentLight;
+    final accentColor = isDark ? AppColors.accentDark : AppColors.accentLight;
 
     return Container(
       width: double.infinity,
@@ -462,8 +460,7 @@ class _SummaryRow extends StatelessWidget {
         ),
         Text(
           value,
-          style:
-              AppTextStyles.bodyMedium(context).copyWith(color: valueColor),
+          style: AppTextStyles.bodyMedium(context).copyWith(color: valueColor),
         ),
       ],
     );
@@ -497,7 +494,7 @@ class _CartItemTile extends ConsumerWidget {
       child: Row(
         children: [
           // Item details
-              Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -539,9 +536,8 @@ class _CartItemTile extends ConsumerWidget {
                 Text(
                   CurrencyFormatter.format(cartItem.subtotal),
                   style: AppTextStyles.bodyMedium(context).copyWith(
-                    color: isDark
-                        ? AppColors.accentDark
-                        : AppColors.accentLight,
+                    color:
+                        isDark ? AppColors.accentDark : AppColors.accentLight,
                   ),
                 ),
               ],
@@ -577,7 +573,8 @@ class _CartItemTile extends ConsumerWidget {
                     icon: Icons.remove_rounded,
                     onTap: () => ref
                         .read(orderProvider.notifier)
-                        .updateQuantity(cartItem.cartKey, cartItem.quantity - 1),
+                        .updateQuantity(
+                            cartItem.cartKey, cartItem.quantity - 1),
                     isDark: isDark,
                   ),
                   Padding(
@@ -595,7 +592,8 @@ class _CartItemTile extends ConsumerWidget {
                     icon: Icons.add_rounded,
                     onTap: () => ref
                         .read(orderProvider.notifier)
-                        .updateQuantity(cartItem.cartKey, cartItem.quantity + 1),
+                        .updateQuantity(
+                            cartItem.cartKey, cartItem.quantity + 1),
                     isDark: isDark,
                   ),
                 ],
@@ -629,8 +627,7 @@ class _StepBtn extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? AppColors.surfaceDark : Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border:
-              Border.all(color: Colors.black.withValues(alpha: 0.08)),
+          border: Border.all(color: Colors.black.withValues(alpha: 0.08)),
         ),
         child: Icon(icon, size: 16, color: const Color(0xFF8B4049)),
       ),
@@ -667,9 +664,7 @@ class _NonCashNote extends StatelessWidget {
             isGCash
                 ? Icons.account_balance_wallet_rounded
                 : Icons.payment_rounded,
-            color: isGCash
-                ? const Color(0xFF1565C0)
-                : const Color(0xFF7B1FA2),
+            color: isGCash ? const Color(0xFF1565C0) : const Color(0xFF7B1FA2),
             size: 22,
           ),
           const SizedBox(width: 12),
@@ -765,8 +760,7 @@ class _CashInputSection extends StatelessWidget {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color:
-                          AppColors.successLight.withValues(alpha: 0.12),
+                      color: AppColors.successLight.withValues(alpha: 0.12),
                       borderRadius: AppRadius.mediumBR,
                     ),
                     child: Row(
@@ -851,8 +845,7 @@ class _BottomActionBar extends StatelessWidget {
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
-              onPressed:
-                  isValidPayment && !isProcessing ? onComplete : null,
+              onPressed: isValidPayment && !isProcessing ? onComplete : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: maroon,
                 disabledBackgroundColor: maroon.withValues(alpha: 0.3),

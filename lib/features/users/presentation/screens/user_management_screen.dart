@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -80,21 +81,20 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
         icon: const Icon(Icons.person_add_rounded),
         label: Text(
           'Add User',
-          style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white),
+          style:
+              AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white),
         ),
       ).animate().slideY(begin: 0.3, end: 0, duration: 400.ms).fadeIn(),
       body: usersAsync.when(
         loading: () =>
             const Center(child: CircularProgressIndicator.adaptive()),
-        error: (e, _) =>
-            Center(child: Text('Error loading users: $e')),
+        error: (e, _) => Center(child: Text('Error loading users: $e')),
         data: (state) => Column(
           children: [
             // ── Filter chips ───────────────────────────────────────────
             _FilterChipsRow(
               selected: state.filter,
-              onChanged: (f) =>
-                  ref.read(usersProvider.notifier).setFilter(f),
+              onChanged: (f) => ref.read(usersProvider.notifier).setFilter(f),
             ),
             // ── User list ──────────────────────────────────────────────
             Expanded(
@@ -111,26 +111,35 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
     );
   }
 
-  AppBar _buildAppBar(
-      BuildContext context, Color textPrimary, bool isDark) {
+  AppBar _buildAppBar(BuildContext context, Color textPrimary, bool isDark) {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       leading: _showSearch
           ? IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 20),
+              icon: Icon(Icons.arrow_back_ios_new_rounded,
+                  color: textPrimary, size: 20),
               onPressed: _closeSearch,
             )
           : IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_rounded, color: textPrimary, size: 20),
-              onPressed: () => context.pop(),
+              icon: Icon(Icons.arrow_back_ios_new_rounded,
+                  color: textPrimary, size: 20),
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go(RouteConstants.adminHome);
+                }
+              },
             ),
       title: _showSearch
           ? TextField(
               controller: _searchCtrl,
               focusNode: _searchFocus,
               style: GoogleFonts.dmSans(
-                  color: textPrimary, fontSize: 16, fontWeight: FontWeight.w500),
+                  color: textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500),
               decoration: InputDecoration(
                 hintText: 'Search by name or email…',
                 hintStyle: GoogleFonts.dmSans(
@@ -139,8 +148,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                 ),
                 border: InputBorder.none,
               ),
-              onChanged: (q) =>
-                  ref.read(usersProvider.notifier).setSearch(q),
+              onChanged: (q) => ref.read(usersProvider.notifier).setSearch(q),
             )
           : Text(
               'User Management',
@@ -175,8 +183,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.people_outline_rounded,
-                size: 64,
-                color: textPrimary.withValues(alpha: 0.2)),
+                size: 64, color: textPrimary.withValues(alpha: 0.2)),
             const SizedBox(height: AppSpacing.md),
             Text(
               state.searchQuery.isNotEmpty
@@ -239,8 +246,8 @@ class _FilterChipsRow extends StatelessWidget {
       height: 44,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md, vertical: 4),
+        padding:
+            const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 4),
         children: _filters.map((entry) {
           final (filter, label) = entry;
           final isSelected = selected == filter;
@@ -250,13 +257,12 @@ class _FilterChipsRow extends StatelessWidget {
               onTap: () => onChanged(filter),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? _maroon
-                      : (isDark
-                          ? AppColors.cardDark
-                          : AppColors.cardLight),
+                      : (isDark ? AppColors.cardDark : AppColors.cardLight),
                   borderRadius: BorderRadius.circular(999),
                   boxShadow: isSelected
                       ? [

@@ -23,7 +23,8 @@ class CartItem {
   double get subtotal => unitPrice * quantity;
 
   /// Unique key to differentiate items with different variants/modifiers in the cart.
-  String get cartKey => '$itemSyncId|${variantName ?? ''}|${modifiers.join(',')}';
+  String get cartKey =>
+      '$itemSyncId|${variantName ?? ''}|${modifiers.join(',')}';
 
   CartItem copyWith({
     String? itemSyncId,

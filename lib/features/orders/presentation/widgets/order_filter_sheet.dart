@@ -66,16 +66,14 @@ class _OrderFilterSheetState extends State<OrderFilterSheet> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? const Color(0xFF2A1215) : const Color(0xFFFAF6F1);
-    final cardBg =
-        isDark ? const Color(0xFF3E2723) : const Color(0xFFF9F5F0);
+    final cardBg = isDark ? const Color(0xFF3E2723) : const Color(0xFFF9F5F0);
     final textPrimary = isDark ? Colors.white : const Color(0xFF1A1A1A);
-    final textSecondary =
-        isDark ? Colors.white70 : const Color(0xFF6B6B6B);
+    final textSecondary = isDark ? Colors.white70 : const Color(0xFF6B6B6B);
     const maroon = Color(0xFF8B4049);
 
     return Padding(
-      padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
         decoration: BoxDecoration(
           color: bg,
@@ -83,8 +81,7 @@ class _OrderFilterSheetState extends State<OrderFilterSheet> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -158,8 +155,10 @@ class _OrderFilterSheetState extends State<OrderFilterSheet> {
                 if (_startDate != null || _endDate != null) ...[
                   const SizedBox(height: 8),
                   GestureDetector(
-                    onTap: () =>
-                        setState(() { _startDate = null; _endDate = null; }),
+                    onTap: () => setState(() {
+                      _startDate = null;
+                      _endDate = null;
+                    }),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -177,8 +176,7 @@ class _OrderFilterSheetState extends State<OrderFilterSheet> {
 
                 // ── Payment Method ────────────────────────────────────────
                 _SectionLabel(
-                    label: 'Payment Method',
-                    textSecondary: textSecondary),
+                    label: 'Payment Method', textSecondary: textSecondary),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -190,8 +188,7 @@ class _OrderFilterSheetState extends State<OrderFilterSheet> {
                     return _FilterChip(
                       label: label,
                       isSelected: isSelected,
-                      onTap: () =>
-                          setState(() => _paymentMethod = value),
+                      onTap: () => setState(() => _paymentMethod = value),
                       maroon: maroon,
                       cardBg: cardBg,
                       textPrimary: textPrimary,
@@ -240,8 +237,8 @@ class _OrderFilterSheetState extends State<OrderFilterSheet> {
                         ),
                         child: Text(
                           'Clear All',
-                          style: GoogleFonts.dmSans(
-                              fontWeight: FontWeight.w600),
+                          style:
+                              GoogleFonts.dmSans(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -259,8 +256,8 @@ class _OrderFilterSheetState extends State<OrderFilterSheet> {
                         ),
                         child: Text(
                           'Apply Filter',
-                          style: GoogleFonts.dmSans(
-                              fontWeight: FontWeight.w600),
+                          style:
+                              GoogleFonts.dmSans(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -278,9 +275,8 @@ class _OrderFilterSheetState extends State<OrderFilterSheet> {
   // ── Actions ──────────────────────────────────────────────────────────────────
 
   Future<void> _pickDate({required bool isStart}) async {
-    final initial = isStart
-        ? (_startDate ?? DateTime.now())
-        : (_endDate ?? DateTime.now());
+    final initial =
+        isStart ? (_startDate ?? DateTime.now()) : (_endDate ?? DateTime.now());
 
     final picked = await showDatePicker(
       context: context,
@@ -400,8 +396,7 @@ class _DateButton extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon,
-                size: 16, color: hasValue ? maroon : textSecondary),
+            Icon(icon, size: 16, color: hasValue ? maroon : textSecondary),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -409,8 +404,7 @@ class _DateButton extends StatelessWidget {
                 style: GoogleFonts.dmSans(
                   fontSize: 12,
                   color: hasValue ? textPrimary : textSecondary,
-                  fontWeight:
-                      hasValue ? FontWeight.w600 : FontWeight.w400,
+                  fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -447,8 +441,7 @@ class _FilterChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? maroon.withAlpha(25) : cardBg,
           borderRadius: BorderRadius.circular(999),
@@ -461,8 +454,7 @@ class _FilterChip extends StatelessWidget {
           label,
           style: GoogleFonts.dmSans(
             fontSize: 13,
-            fontWeight:
-                isSelected ? FontWeight.w600 : FontWeight.w400,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
             color: isSelected ? maroon : textSecondary,
           ),
         ),

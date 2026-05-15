@@ -32,4 +32,3 @@ class UserCollection {
   late bool isSynced;
   late bool isDeleted;
 }
-

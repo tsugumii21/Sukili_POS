@@ -207,7 +207,8 @@ class _UserFormScreenState extends ConsumerState<UserFormScreen> {
   void _showSnack(String msg, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(msg, style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
+        content:
+            Text(msg, style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
         backgroundColor: color,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -301,7 +302,8 @@ class _UserFormScreenState extends ConsumerState<UserFormScreen> {
                       color: textPrimary.withValues(alpha: 0.4), size: 20),
                   textInputAction: TextInputAction.next,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Name is required';
+                    if (v == null || v.trim().isEmpty)
+                      return 'Name is required';
                     if (v.trim().length < 2) return 'Name is too short';
                     return null;
                   },
@@ -340,7 +342,9 @@ class _UserFormScreenState extends ConsumerState<UserFormScreen> {
                 if (_role == 'cashier') ...[
                   AppTextField(
                     controller: _pinCtrl,
-                    label: _isEdit ? 'New PIN (leave blank to keep)' : 'PIN (4 digits)',
+                    label: _isEdit
+                        ? 'New PIN (leave blank to keep)'
+                        : 'PIN (4 digits)',
                     hint: '••••',
                     obscureText: _obscurePin,
                     keyboardType: TextInputType.number,
@@ -361,13 +365,15 @@ class _UserFormScreenState extends ConsumerState<UserFormScreen> {
                     validator: (v) {
                       if (!_isEdit) {
                         if (v == null || v.isEmpty) return 'PIN is required';
-                        if (v.length != 4) return 'PIN must be exactly 4 digits';
+                        if (v.length != 4)
+                          return 'PIN must be exactly 4 digits';
                         if (!RegExp(r'^\d{4}$').hasMatch(v)) {
                           return 'PIN must be digits only';
                         }
                       } else {
                         if (v != null && v.isNotEmpty) {
-                          if (v.length != 4) return 'PIN must be exactly 4 digits';
+                          if (v.length != 4)
+                            return 'PIN must be exactly 4 digits';
                           if (!RegExp(r'^\d{4}$').hasMatch(v)) {
                             return 'PIN must be digits only';
                           }
@@ -417,7 +423,8 @@ class _UserFormScreenState extends ConsumerState<UserFormScreen> {
                 // ── Save button ───────────────────────────────────────────
                 AppPrimaryButton(
                   label: _isEdit ? 'Save Changes' : 'Add User',
-                  icon: _isEdit ? Icons.check_rounded : Icons.person_add_rounded,
+                  icon:
+                      _isEdit ? Icons.check_rounded : Icons.person_add_rounded,
                   onPressed: _isSaving ? null : _save,
                   isLoading: _isSaving,
                 ),
@@ -445,9 +452,8 @@ class _SectionHeader extends StatelessWidget {
     return Text(
       label,
       style: GoogleFonts.dmSans(
-        color: isDark
-            ? AppColors.textSecondaryDark
-            : AppColors.textSecondaryLight,
+        color:
+            isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
         fontSize: 12,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.5,

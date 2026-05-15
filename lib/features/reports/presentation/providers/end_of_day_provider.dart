@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar_community/isar.dart';
 
 import '../../../../shared/isar_collections/category_collection.dart';
-
 import '../../../../shared/isar_collections/order_collection.dart';
 import '../../../../shared/providers/isar_provider.dart';
+import '../../../../shared/providers/store_provider.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data models
@@ -83,7 +83,6 @@ class VoidRefundSummary {
   double get totalLoss => voidTotal + refundTotal;
 }
 
-
 /// Cash reconciliation data.
 class CashReconciliation {
   final double expectedCash;
@@ -94,8 +93,7 @@ class CashReconciliation {
     this.actualCash,
   });
 
-  double get difference =>
-      actualCash != null ? actualCash! - expectedCash : 0;
+  double get difference => actualCash != null ? actualCash! - expectedCash : 0;
   bool get isMatch => difference.abs() < 0.01;
 }
 
@@ -186,6 +184,8 @@ class EndOfDayState {
 class EndOfDayNotifier extends Notifier<EndOfDayState> {
   @override
   EndOfDayState build() {
+    // Watch storeId to reset state if store changes
+    ref.watch(currentStoreIdProvider);
     return EndOfDayState(reportDate: DateTime.now());
   }
 
@@ -193,23 +193,28 @@ class EndOfDayNotifier extends Notifier<EndOfDayState> {
 
   /// Generate the full end-of-day report from Isar data.
   Future<void> generateReport() async {
+    final storeId = ref.read(currentStoreIdProvider);
+    if (storeId.isEmpty) return;
+
     state = state.copyWith(isLoading: true);
 
     final now = DateTime.now();
     final dayStart = DateTime(now.year, now.month, now.day);
     final dayEnd = dayStart.add(const Duration(days: 1));
 
-    // ── Fetch today's orders ──────────────────────────────────────────────
+    // ── Fetch today's orders for THIS store ──────────────────────────────────
     final allOrders = await _isar.orderCollections
         .filter()
+        .storeIdEqualTo(storeId)
+        .and()
         .orderedAtBetween(dayStart, dayEnd, includeUpper: false)
+        .and()
         .isDeletedEqualTo(false)
         .findAll();
 
     final completedOrders =
         allOrders.where((o) => o.status == 'completed').toList();
-    final voidedOrders =
-        allOrders.where((o) => o.status == 'voided').toList();
+    final voidedOrders = allOrders.where((o) => o.status == 'voided').toList();
     final refundedOrders =
         allOrders.where((o) => o.status == 'refunded').toList();
 
@@ -239,7 +244,6 @@ class EndOfDayNotifier extends Notifier<EndOfDayState> {
     // ── Section 2: Top Selling Items ──────────────────────────────────────
     final revenueMap = <String, double>{};
     final qtyMap = <String, int>{};
-    final itemCategoryMap = <String, String>{};
 
     for (final order in completedOrders) {
       for (final jsonStr in order.orderItemsJson) {
@@ -249,13 +253,9 @@ class EndOfDayNotifier extends Notifier<EndOfDayState> {
             final name = parsed['name'] as String? ?? 'Unknown';
             final price = (parsed['totalPrice'] as num?)?.toDouble() ?? 0;
             final qty = (parsed['quantity'] as num?)?.toInt() ?? 1;
-            final catId = parsed['categoryId'] as String? ?? '';
 
             revenueMap[name] = (revenueMap[name] ?? 0) + price;
             qtyMap[name] = (qtyMap[name] ?? 0) + qty;
-            if (catId.isNotEmpty) {
-              itemCategoryMap[name] = catId;
-            }
           }
         } catch (_) {
           // Fallback: try regex parse for older format
@@ -268,8 +268,7 @@ class EndOfDayNotifier extends Notifier<EndOfDayState> {
 
           if (nameMatch != null) {
             final name = nameMatch.group(1)!;
-            final price =
-                double.tryParse(priceMatch?.group(1) ?? '0') ?? 0;
+            final price = double.tryParse(priceMatch?.group(1) ?? '0') ?? 0;
             final qty = int.tryParse(qtyMatch?.group(1) ?? '1') ?? 1;
             revenueMap[name] = (revenueMap[name] ?? 0) + price;
             qtyMap[name] = (qtyMap[name] ?? 0) + qty;
@@ -287,9 +286,14 @@ class EndOfDayNotifier extends Notifier<EndOfDayState> {
         .toList()
       ..sort((a, b) => b.quantity.compareTo(a.quantity));
 
-    // ── Section 3: Category Performance ───────────────────────────────────
-    final categories =
-        await _isar.categoryCollections.filter().isDeletedEqualTo(false).findAll();
+    // ── Section 3: Category Performance for THIS store ────────────────────
+    final categories = await _isar.categoryCollections
+        .filter()
+        .storeIdEqualTo(storeId)
+        .and()
+        .isDeletedEqualTo(false)
+        .findAll();
+
     final catNameMap = <String, String>{};
     for (final c in categories) {
       catNameMap[c.syncId] = c.name;
@@ -328,8 +332,7 @@ class EndOfDayNotifier extends Notifier<EndOfDayState> {
       ..sort((a, b) => b.totalRevenue.compareTo(a.totalRevenue));
 
     // ── Section 4: Voids & Refunds ────────────────────────────────────────
-    final voidTotal =
-        voidedOrders.fold<double>(0, (s, o) => s + o.totalAmount);
+    final voidTotal = voidedOrders.fold<double>(0, (s, o) => s + o.totalAmount);
     final refundTotal = refundedOrders.fold<double>(
         0, (s, o) => s + (o.refundAmount ?? o.totalAmount));
 
@@ -339,7 +342,6 @@ class EndOfDayNotifier extends Notifier<EndOfDayState> {
       refundCount: refundedOrders.length,
       refundTotal: refundTotal,
     );
-
 
     // ── Section 6: Cash Reconciliation ────────────────────────────────────
     final expectedCash = completedOrders
@@ -390,5 +392,4 @@ class _PayAgg {
 // ─────────────────────────────────────────────────────────────────────────────
 
 final endOfDayProvider =
-    NotifierProvider<EndOfDayNotifier, EndOfDayState>(
-        () => EndOfDayNotifier());
+    NotifierProvider<EndOfDayNotifier, EndOfDayState>(() => EndOfDayNotifier());

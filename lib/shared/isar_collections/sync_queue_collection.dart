@@ -29,4 +29,3 @@ class SyncQueueCollection {
   DateTime? lastAttemptAt;
   DateTime? completedAt;
 }
-

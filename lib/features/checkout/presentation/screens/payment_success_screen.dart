@@ -8,12 +8,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/constants/route_constants.dart';
-import '../../../../core/services/printer_service.dart';
+import '../../../../shared/providers/store_provider.dart';
+import '../../../../core/utils/receipt_helper.dart';
+import '../providers/checkout_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
-import '../providers/checkout_provider.dart';
 
 /// PaymentSuccessScreen — celebrates a completed payment with an animated
 /// checkmark, an order summary card, and print/navigation actions.
@@ -85,25 +86,25 @@ class PaymentSuccessScreen extends ConsumerWidget {
           // Scrollable content
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md, AppSpacing.lg, AppSpacing.md, AppSpacing.md,
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                AppSpacing.lg,
+                AppSpacing.md,
+                AppSpacing.md,
               ),
               child: Column(
                 children: [
                   // ── Confetti + checkmark ─────────────────────────────────
                   _buildCheckmarkSection(),
-                  const SizedBox(height: AppSpacing.md),
+                  SizedBox(height: AppSpacing.md),
 
                   // ── Title ────────────────────────────────────────────────
                   Text(
                     'Payment Successful!',
-                    style: AppTextStyles.h1(context)
-                        .copyWith(color: Colors.white),
+                    style:
+                        AppTextStyles.h1(context).copyWith(color: Colors.white),
                     textAlign: TextAlign.center,
-                  )
-                      .animate()
-                      .fadeIn(duration: 400.ms, delay: 500.ms)
-                      .slideY(
+                  ).animate().fadeIn(duration: 400.ms, delay: 500.ms).slideY(
                         begin: 0.2,
                         end: 0,
                         duration: 400.ms,
@@ -119,11 +120,9 @@ class PaymentSuccessScreen extends ConsumerWidget {
                     style: AppTextStyles.caption(context).copyWith(
                       color: Colors.white.withValues(alpha: 0.75),
                     ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 400.ms, delay: 650.ms),
+                  ).animate().fadeIn(duration: 400.ms, delay: 650.ms),
 
-                  const SizedBox(height: AppSpacing.xl),
+                  SizedBox(height: AppSpacing.xl),
 
                   // ── Order summary card ───────────────────────────────────
                   _OrderSummaryCard(order: order)
@@ -137,7 +136,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
                         curve: Curves.easeOut,
                       ),
 
-                  const SizedBox(height: AppSpacing.xl),
+                  SizedBox(height: AppSpacing.xl),
                 ],
               ),
             ),
@@ -197,9 +196,7 @@ class PaymentSuccessScreen extends ConsumerWidget {
               color: Colors.white.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
-          )
-              .animate(onPlay: (c) => c.repeat(reverse: true))
-              .scale(
+          ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
                 begin: const Offset(0.95, 0.95),
                 end: const Offset(1.05, 1.05),
                 duration: 1200.ms,
@@ -253,80 +250,78 @@ class PaymentSuccessScreen extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-              // Print Receipt — primary: white filled button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: OutlinedButton.icon(
-                  onPressed: () => _onPrintReceipt(context, ref, order),
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: _maroon,
-                    side: BorderSide.none,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: AppRadius.largeBR,
-                    ),
-                  ),
-                  icon: const Icon(Icons.print_rounded, size: 20),
-                  label: Text(
-                    'Print Receipt',
-                    style: AppTextStyles.bodySemiBold(context)
-                        .copyWith(color: _maroon),
-                  ),
+          // Print Receipt — primary: white filled button
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: OutlinedButton.icon(
+              onPressed: () => _onPrintReceipt(context, ref, order),
+              style: OutlinedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: _maroon,
+                side: BorderSide.none,
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppRadius.largeBR,
                 ),
               ),
+              icon: const Icon(Icons.print_rounded, size: 20),
+              label: Text(
+                'Print Receipt',
+                style: AppTextStyles.bodySemiBold(context)
+                    .copyWith(color: _maroon),
+              ),
+            ),
+          ),
 
-              const SizedBox(height: AppSpacing.sm),
+          SizedBox(height: AppSpacing.sm),
 
-              // New Order — secondary: white outlined button
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    ref.read(checkoutProvider.notifier).reset();
-                    context.go(RouteConstants.cashierHome);
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      final router = GoRouter.of(context);
-                      router.push(RouteConstants.newOrder);
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shadowColor: Colors.transparent,
-                    side: const BorderSide(
-                        color: Colors.white54, width: 1.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: AppRadius.largeBR,
-                    ),
-                  ),
-                  icon: const Icon(Icons.add_shopping_cart_rounded,
-                      size: 20),
-                  label: Text(
-                    'New Order',
-                    style: AppTextStyles.bodyMedium(context)
-                        .copyWith(color: Colors.white),
-                  ),
+          // New Order — secondary: white outlined button
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                ref.read(checkoutProvider.notifier).reset();
+                context.go(RouteConstants.cashierHome);
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final router = GoRouter.of(context);
+                  router.push(RouteConstants.newOrder);
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                side: const BorderSide(color: Colors.white54, width: 1.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppRadius.largeBR,
                 ),
               ),
-
-              const SizedBox(height: 4),
-
-              // Back to Home — text button
-              TextButton(
-                onPressed: () {
-                  ref.read(checkoutProvider.notifier).reset();
-                  context.go(RouteConstants.cashierHome);
-                },
-                child: Text(
-                  'Back to Home',
-                  style: AppTextStyles.caption(context).copyWith(
-                    color: Colors.white.withValues(alpha: 0.75),
-                  ),
-                ),
+              icon: const Icon(Icons.add_shopping_cart_rounded, size: 20),
+              label: Text(
+                'New Order',
+                style: AppTextStyles.bodyMedium(context)
+                    .copyWith(color: Colors.white),
               ),
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
+          // Back to Home — text button
+          TextButton(
+            onPressed: () {
+              ref.read(checkoutProvider.notifier).reset();
+              context.go(RouteConstants.cashierHome);
+            },
+            child: Text(
+              'Back to Home',
+              style: AppTextStyles.caption(context).copyWith(
+                color: Colors.white.withValues(alpha: 0.75),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -337,27 +332,26 @@ class PaymentSuccessScreen extends ConsumerWidget {
     WidgetRef ref,
     dynamic order,
   ) async {
-    final printer = ref.read(printerServiceProvider);
-    final success = await printer.printReceipt(order);
+    final store = ref.read(currentStoreProvider).value;
 
-    if (!context.mounted) return;
+    if (store == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: Store data not found.')),
+      );
+      return;
+    }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          success
-              ? 'Receipt printed successfully!'
-              : 'No printer connected. Receipt saved.',
-          style: GoogleFonts.dmSans(fontWeight: FontWeight.w500),
-        ),
-        backgroundColor:
-            success ? AppColors.successLight : AppColors.warningLight,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(AppSpacing.md),
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    try {
+      await ReceiptHelper.printReceipt(
+        order: order,
+        store: store,
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Printing failed: $e')),
+      );
+    }
   }
 
   // ── Sparkle decoration helpers ────────────────────────────────────────────
@@ -413,7 +407,7 @@ class _OrderSummaryCard extends StatelessWidget {
         children: [
           // Card header
           Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.all(AppSpacing.md),
             decoration: const BoxDecoration(
               color: Color(0xFFF0E8DC),
               borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -450,7 +444,7 @@ class _OrderSummaryCard extends StatelessWidget {
           ),
 
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.all(AppSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -475,20 +469,19 @@ class _OrderSummaryCard extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: AppSpacing.sm),
+                SizedBox(height: AppSpacing.sm),
                 const Divider(height: 1, color: Color(0xFFE8D5C4)),
-                const SizedBox(height: AppSpacing.sm),
+                SizedBox(height: AppSpacing.sm),
 
                 // Items
                 ...items.map((item) {
                   final name = (item['itemName'] as String?) ?? '';
                   final variant = item['variantName'] as String?;
                   final qty = (item['quantity'] as int?) ?? 1;
-                  final subtotal =
-                      ((item['subtotal'] as num?) ?? 0).toDouble();
+                  final subtotal = ((item['subtotal'] as num?) ?? 0).toDouble();
                   final mods = (item['modifiers'] as List?)
-                      ?.map((e) => e.toString())
-                      .toList() ??
+                          ?.map((e) => e.toString())
+                          .toList() ??
                       [];
 
                   return Padding(
@@ -511,14 +504,12 @@ class _OrderSummaryCard extends StatelessWidget {
                                   mods.join(' · '),
                                   style: AppTextStyles.caption(context)
                                       .copyWith(
-                                          color:
-                                              AppColors.textSecondaryLight),
+                                          color: AppColors.textSecondaryLight),
                                 ),
                               Text(
                                 'x$qty',
-                                style: AppTextStyles.caption(context)
-                                    .copyWith(
-                                        color: AppColors.textSecondaryLight),
+                                style: AppTextStyles.caption(context).copyWith(
+                                    color: AppColors.textSecondaryLight),
                               ),
                             ],
                           ),
@@ -534,7 +525,7 @@ class _OrderSummaryCard extends StatelessWidget {
                 }),
 
                 const Divider(height: 1, color: Color(0xFFE8D5C4)),
-                const SizedBox(height: AppSpacing.sm),
+                SizedBox(height: AppSpacing.sm),
 
                 // Totals
                 _CardRow(
@@ -550,15 +541,14 @@ class _OrderSummaryCard extends StatelessWidget {
                   ),
                 _CardRow(
                   label: 'Total',
-                  value:
-                      CurrencyFormatter.format(order.totalAmount as double),
+                  value: CurrencyFormatter.format(order.totalAmount as double),
                   bold: true,
                   valueColor: AppColors.accentLight,
                 ),
 
-                const SizedBox(height: AppSpacing.xs),
+                SizedBox(height: AppSpacing.xs),
                 const Divider(height: 1, color: Color(0xFFE8D5C4)),
-                const SizedBox(height: AppSpacing.sm),
+                SizedBox(height: AppSpacing.sm),
 
                 // Payment
                 _CardRow(
@@ -567,14 +557,14 @@ class _OrderSummaryCard extends StatelessWidget {
                 ),
                 _CardRow(
                   label: 'Amount Paid',
-                  value: CurrencyFormatter.format(
-                      order.amountTendered as double),
+                  value:
+                      CurrencyFormatter.format(order.amountTendered as double),
                 ),
                 if ((order.changeAmount as double) > 0)
                   _CardRow(
                     label: 'Change',
-                    value: CurrencyFormatter.format(
-                        order.changeAmount as double),
+                    value:
+                        CurrencyFormatter.format(order.changeAmount as double),
                     valueColor: AppColors.successLight,
                     bold: true,
                   ),
@@ -627,10 +617,10 @@ class _CardRow extends StatelessWidget {
           Text(
             value,
             style: bold
-                ? AppTextStyles.bodySemiBold(context).copyWith(
-                    color: valueColor ?? AppColors.textPrimaryLight)
-                : AppTextStyles.bodyMedium(context).copyWith(
-                    color: valueColor ?? AppColors.textPrimaryLight),
+                ? AppTextStyles.bodySemiBold(context)
+                    .copyWith(color: valueColor ?? AppColors.textPrimaryLight)
+                : AppTextStyles.bodyMedium(context)
+                    .copyWith(color: valueColor ?? AppColors.textPrimaryLight),
           ),
         ],
       ),

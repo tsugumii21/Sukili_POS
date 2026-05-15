@@ -167,8 +167,8 @@ class _AdminPinDialogState extends State<AdminPinDialog>
                       color: maroon.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.lock_rounded,
-                        color: maroon, size: 26),
+                    child:
+                        const Icon(Icons.lock_rounded, color: maroon, size: 26),
                   ).animate().scale(
                         begin: const Offset(0.8, 0.8),
                         duration: 300.ms,
@@ -213,22 +213,17 @@ class _AdminPinDialogState extends State<AdminPinDialog>
                       children: List.generate(_maxLength, (i) {
                         final filled = i < _pin.length;
                         return Container(
-                          margin:
-                              const EdgeInsets.symmetric(horizontal: 10),
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
                           width: 16,
                           height: 16,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: filled
-                                ? (_hasError
-                                    ? AppColors.errorLight
-                                    : maroon)
+                                ? (_hasError ? AppColors.errorLight : maroon)
                                 : Colors.transparent,
                             border: Border.all(
                               color: filled
-                                  ? (_hasError
-                                      ? AppColors.errorLight
-                                      : maroon)
+                                  ? (_hasError ? AppColors.errorLight : maroon)
                                   : textPrimary.withValues(alpha: 0.2),
                               width: 2,
                             ),
@@ -246,7 +241,8 @@ class _AdminPinDialogState extends State<AdminPinDialog>
                             padding: const EdgeInsets.only(top: 10),
                             child: Text(
                               _errorText,
-                              style: AppTextStyles.captionMedium(context).copyWith(
+                              style:
+                                  AppTextStyles.captionMedium(context).copyWith(
                                 color: AppColors.errorLight,
                               ),
                             ),
@@ -308,18 +304,14 @@ class _PinKeypad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final btnBg = isDark
-        ? AppColors.surfaceDarkElevated
-        : AppColors.cardLight;
+    final btnBg = isDark ? AppColors.surfaceDarkElevated : AppColors.cardLight;
 
     return Padding(
-      padding:
-          const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: Column(
         children: _keys.map((row) {
           return Padding(
-            padding:
-                const EdgeInsets.only(bottom: AppSpacing.xs),
+            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: row.map((key) {
@@ -328,8 +320,7 @@ class _PinKeypad extends StatelessWidget {
                 final isDel = key == 'del';
                 return Expanded(
                   child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: _KeyButton(
                       label: key,
                       isDel: isDel,
@@ -337,9 +328,7 @@ class _PinKeypad extends StatelessWidget {
                       maroon: maroon,
                       textPrimary: textPrimary,
                       enabled: !isVerifying,
-                      onTap: isDel
-                          ? onDelete
-                          : () => onDigit(key),
+                      onTap: isDel ? onDelete : () => onDigit(key),
                     ),
                   ),
                 );
@@ -378,9 +367,7 @@ class _KeyButton extends StatelessWidget {
       child: Container(
         height: 60,
         decoration: BoxDecoration(
-          color: enabled
-              ? btnBg
-              : btnBg.withValues(alpha: 0.5),
+          color: enabled ? btnBg : btnBg.withValues(alpha: 0.5),
           borderRadius: AppRadius.mediumBR,
         ),
         alignment: Alignment.center,

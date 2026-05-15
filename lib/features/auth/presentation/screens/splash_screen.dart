@@ -90,9 +90,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   Container(
                     width: 140, // Container size
                     height: 140,
-                    padding: const EdgeInsets.all(32), // Padding to make the internal logo smaller
+                    padding: const EdgeInsets.all(
+                        32), // Padding to make the internal logo smaller
                     decoration: BoxDecoration(
-                      color: AppColors.primaryLightVariant, // Cream background for the box
+                      color: AppColors
+                          .primaryLightVariant, // Cream background for the box
                       borderRadius: BorderRadius.circular(40), // Curved edges
                       boxShadow: [
                         BoxShadow(
@@ -110,7 +112,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   )
                       .animate()
                       .fadeIn(duration: 1200.ms, curve: Curves.easeInQuad)
-                      .scaleXY(begin: 0.8, end: 1.0, duration: 1200.ms, curve: Curves.easeOutBack),
+                      .scaleXY(
+                          begin: 0.8,
+                          end: 1.0,
+                          duration: 1200.ms,
+                          curve: Curves.easeOutBack),
 
                   const SizedBox(height: 54),
 
@@ -123,10 +129,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                       fontWeight: FontWeight.w800,
                       letterSpacing: -1.5,
                     ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 800.ms, delay: 600.ms)
-                      .slideY(begin: 0.1, end: 0, duration: 800.ms, delay: 600.ms),
+                  ).animate().fadeIn(duration: 800.ms, delay: 600.ms).slideY(
+                      begin: 0.1, end: 0, duration: 800.ms, delay: 600.ms),
 
                   const SizedBox(height: 4),
 
@@ -139,9 +143,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                       fontWeight: FontWeight.w500,
                       letterSpacing: 0.2,
                     ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 800.ms, delay: 1200.ms),
+                  ).animate().fadeIn(duration: 800.ms, delay: 1200.ms),
                 ],
               ),
             ),
@@ -165,12 +167,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                         width: 12,
                         height: 3,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryLightVariant.withValues(alpha: 0.4),
+                          color: AppColors.primaryLightVariant
+                              .withValues(alpha: 0.4),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                      )
-                          .animate(onPlay: (c) => c.repeat())
-                          .moveX(begin: -12, end: 48, duration: 1500.ms, curve: Curves.easeInOutSine),
+                      ).animate(onPlay: (c) => c.repeat()).moveX(
+                          begin: -12,
+                          end: 48,
+                          duration: 1500.ms,
+                          curve: Curves.easeInOutSine),
                     ],
                   ),
                 ),

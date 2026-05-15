@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/isar_collections/order_collection.dart';
 import '../providers/order_history_provider.dart';
@@ -20,12 +21,10 @@ class OrderHistoryScreen extends ConsumerStatefulWidget {
   const OrderHistoryScreen({super.key});
 
   @override
-  ConsumerState<OrderHistoryScreen> createState() =>
-      _OrderHistoryScreenState();
+  ConsumerState<OrderHistoryScreen> createState() => _OrderHistoryScreenState();
 }
 
-class _OrderHistoryScreenState
-    extends ConsumerState<OrderHistoryScreen> {
+class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
   final _scrollController = ScrollController();
   final _searchController = TextEditingController();
   bool _showSearch = false;
@@ -96,15 +95,19 @@ class _OrderHistoryScreenState
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded,
               color: textPrimary, size: 20),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(RouteConstants.cashierHome);
+            }
+          },
         ),
         actions: [
           // Search toggle
           IconButton(
             icon: Icon(
-              _showSearch
-                  ? Icons.search_off_rounded
-                  : Icons.search_rounded,
+              _showSearch ? Icons.search_off_rounded : Icons.search_rounded,
               color: textPrimary,
             ),
             tooltip: _showSearch ? 'Hide search' : 'Search',
@@ -112,9 +115,7 @@ class _OrderHistoryScreenState
               setState(() => _showSearch = !_showSearch);
               if (!_showSearch) {
                 _searchController.clear();
-                ref
-                    .read(orderHistoryProvider.notifier)
-                    .updateSearch('');
+                ref.read(orderHistoryProvider.notifier).updateSearch('');
               }
             },
           ),
@@ -148,8 +149,8 @@ class _OrderHistoryScreenState
             icon: Icon(Icons.ios_share_rounded, color: textPrimary),
             tooltip: 'Export to Excel',
             color: surface,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             onSelected: (id) => _handleExport(context, id),
             itemBuilder: (_) => _exportOptions
                 .map(
@@ -157,8 +158,8 @@ class _OrderHistoryScreenState
                     value: o.id,
                     child: Text(
                       o.label,
-                      style: GoogleFonts.dmSans(
-                          color: textPrimary, fontSize: 14),
+                      style:
+                          GoogleFonts.dmSans(color: textPrimary, fontSize: 14),
                     ),
                   ),
                 )
@@ -178,14 +179,12 @@ class _OrderHistoryScreenState
                     child: TextField(
                       controller: _searchController,
                       autofocus: true,
-                      style:
-                          GoogleFonts.dmSans(color: textPrimary),
+                      style: GoogleFonts.dmSans(color: textPrimary),
                       decoration: InputDecoration(
                         hintText: 'Search by order number…',
-                        hintStyle:
-                            GoogleFonts.dmSans(color: textSecondary),
-                        prefixIcon: Icon(Icons.search_rounded,
-                            color: textSecondary),
+                        hintStyle: GoogleFonts.dmSans(color: textSecondary),
+                        prefixIcon:
+                            Icon(Icons.search_rounded, color: textSecondary),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
                                 icon: Icon(Icons.clear_rounded,
@@ -225,8 +224,7 @@ class _OrderHistoryScreenState
           Expanded(
             child: histState.isLoading
                 ? const Center(
-                    child: CircularProgressIndicator(
-                        color: Color(0xFF8B4049)))
+                    child: CircularProgressIndicator(color: Color(0xFF8B4049)))
                 : RefreshIndicator(
                     color: maroon,
                     backgroundColor: surface,
@@ -236,10 +234,8 @@ class _OrderHistoryScreenState
                         ? _EmptyState()
                         : ListView.builder(
                             controller: _scrollController,
-                            physics:
-                                const AlwaysScrollableScrollPhysics(),
-                            padding:
-                                const EdgeInsets.only(top: 8, bottom: 24),
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.only(top: 8, bottom: 24),
                             itemCount: histState.orders.length +
                                 (histState.isLoadingMore ? 1 : 0),
                             itemBuilder: (context, index) {
@@ -257,25 +253,21 @@ class _OrderHistoryScreenState
                                   ),
                                 );
                               }
-                              final order =
-                                  histState.orders[index];
+                              final order = histState.orders[index];
                               return OrderTile(
                                 order: order,
-                                onTap: () => OrderDetailSheet.show(
-                                    context, order),
+                                onTap: () =>
+                                    OrderDetailSheet.show(context, order),
                               )
                                   .animate()
                                   .fadeIn(
-                                    delay: Duration(
-                                        milliseconds: index * 50),
-                                    duration:
-                                        const Duration(milliseconds: 250),
+                                    delay: Duration(milliseconds: index * 50),
+                                    duration: const Duration(milliseconds: 250),
                                   )
                                   .slideY(
                                     begin: 0.08,
                                     end: 0,
-                                    duration:
-                                        const Duration(milliseconds: 250),
+                                    duration: const Duration(milliseconds: 250),
                                   );
                             },
                           ),
@@ -352,8 +344,7 @@ class _OrderHistoryScreenState
               style: GoogleFonts.dmSans()),
           backgroundColor: const Color(0xFF8B4049),
           behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
       return;
@@ -375,13 +366,11 @@ class _OrderHistoryScreenState
         ]),
         duration: const Duration(seconds: 10),
         behavior: SnackBarBehavior.floating,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
 
-    final path =
-        await notifier.exportToExcel(toExport, sheetLabel: sheetLabel);
+    final path = await notifier.exportToExcel(toExport, sheetLabel: sheetLabel);
 
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -398,8 +387,7 @@ class _OrderHistoryScreenState
           backgroundColor: const Color(0xFF2E7D32),
           duration: const Duration(seconds: 5),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
     } else {
@@ -409,8 +397,7 @@ class _OrderHistoryScreenState
               style: GoogleFonts.dmSans()),
           backgroundColor: const Color(0xFF8B4049),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
     }
@@ -442,12 +429,10 @@ class _ActiveFiltersRow extends ConsumerWidget {
       chips.add(_capitalize(filter.status!));
     }
     if (filter.startDate != null || filter.endDate != null) {
-      final start = filter.startDate != null
-          ? _dateFmt.format(filter.startDate!)
-          : '…';
-      final end = filter.endDate != null
-          ? _dateFmt.format(filter.endDate!)
-          : '…';
+      final start =
+          filter.startDate != null ? _dateFmt.format(filter.startDate!) : '…';
+      final end =
+          filter.endDate != null ? _dateFmt.format(filter.endDate!) : '…';
       chips.add('$start – $end');
     }
 
@@ -485,16 +470,13 @@ class _ActiveFiltersRow extends ConsumerWidget {
             ),
           ),
           GestureDetector(
-            onTap: () =>
-                ref.read(orderHistoryProvider.notifier).clearFilter(),
+            onTap: () => ref.read(orderHistoryProvider.notifier).clearFilter(),
             child: Padding(
               padding: const EdgeInsets.only(left: 8),
               child: Text(
                 'Clear',
                 style: GoogleFonts.dmSans(
-                    fontSize: 12,
-                    color: maroon,
-                    fontWeight: FontWeight.w600),
+                    fontSize: 12, color: maroon, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -528,8 +510,7 @@ class _EmptyState extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.receipt_long_outlined,
-                      size: 80, color: iconColor)
+              Icon(Icons.receipt_long_outlined, size: 80, color: iconColor)
                   .animate()
                   .scale(begin: const Offset(0.8, 0.8)),
               const SizedBox(height: 16),
@@ -544,8 +525,7 @@ class _EmptyState extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'Orders you complete will appear here.',
-                style: GoogleFonts.dmSans(
-                    fontSize: 13, color: textSecondary),
+                style: GoogleFonts.dmSans(fontSize: 13, color: textSecondary),
                 textAlign: TextAlign.center,
               ),
             ],

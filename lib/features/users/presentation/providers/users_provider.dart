@@ -6,6 +6,7 @@ import '../../../../core/services/isar_service.dart';
 import '../../../../core/services/sync_service.dart';
 import '../../../../core/utils/pin_helper.dart';
 import '../../../../shared/isar_collections/user_collection.dart';
+import '../../../../shared/providers/store_provider.dart';
 
 /// Filter options for the user list.
 enum UsersFilter { all, cashiers, admins, active, inactive }
@@ -73,38 +74,38 @@ class UsersNotifier extends Notifier<AsyncValue<UsersState>> {
 
   @override
   AsyncValue<UsersState> build() {
-    _init();
+    final storeId = ref.watch(currentStoreIdProvider);
+    if (storeId.isEmpty) return const AsyncValue.data(UsersState(allUsers: []));
+
+    _init(storeId);
     return const AsyncValue.loading();
   }
 
   IsarService get _isar => IsarService.instance;
 
-  void _init() {
-    Future.microtask(_loadUsers);
-    _isar.isar.userCollections.watchLazy().listen((_) => _loadUsers());
+  void _init(String storeId) {
+    Future.microtask(() => _loadUsers(storeId));
+    _isar.isar.userCollections.watchLazy().listen((_) => _loadUsers(storeId));
   }
 
   // ── Data Loading ────────────────────────────────────────────────────────────
 
-  Future<void> _loadUsers() async {
+  Future<void> _loadUsers(String storeId) async {
     try {
       final current = state.asData?.value;
-      // Filter by cashier role (indexed) + isDeleted check in Dart,
-      // then a second pass for admins. isDeleted is not indexed.
-      final cashiers = await _isar.isar.userCollections
+
+      final users = await _isar.isar.userCollections
           .filter()
-          .roleEqualTo('cashier')
+          .storeIdEqualTo(storeId)
+          .and()
+          .isDeletedEqualTo(false)
           .findAll();
-      final admins = await _isar.isar.userCollections
-          .filter()
-          .roleEqualTo('admin')
-          .findAll();
-      final users = [...cashiers, ...admins]
-          .where((u) => !u.isDeleted)
-          .toList();
-      users.sort((a, b) => a.name.compareTo(b.name));
+
+      final sortedUsers = List<UserCollection>.from(users)
+        ..sort((a, b) => a.name.compareTo(b.name));
+
       state = AsyncValue.data(UsersState(
-        allUsers: users,
+        allUsers: sortedUsers,
         filter: current?.filter ?? UsersFilter.all,
         searchQuery: current?.searchQuery ?? '',
       ));
@@ -113,7 +114,10 @@ class UsersNotifier extends Notifier<AsyncValue<UsersState>> {
     }
   }
 
-  Future<void> refresh() => _loadUsers();
+  Future<void> refresh() {
+    final storeId = ref.read(currentStoreIdProvider);
+    return _loadUsers(storeId);
+  }
 
   // ── Filter / Search ─────────────────────────────────────────────────────────
 
@@ -129,6 +133,25 @@ class UsersNotifier extends Notifier<AsyncValue<UsersState>> {
     state = AsyncValue.data(current.copyWith(searchQuery: query));
   }
 
+  // ── Validation ──────────────────────────────────────────────────────────────
+
+  /// Checks if a PIN is already taken by another user in THIS store.
+  Future<bool> checkPinExists(String pinHash, {String? excludeSyncId}) async {
+    final storeId = ref.read(currentStoreIdProvider);
+    var query = _isar.isar.userCollections
+        .filter()
+        .storeIdEqualTo(storeId)
+        .pinHashEqualTo(pinHash)
+        .isDeletedEqualTo(false);
+
+    if (excludeSyncId != null) {
+      query = query.and().not().syncIdEqualTo(excludeSyncId);
+    }
+
+    final existing = await query.findFirst();
+    return existing != null;
+  }
+
   // ── Create ──────────────────────────────────────────────────────────────────
 
   Future<void> createUser({
@@ -138,10 +161,14 @@ class UsersNotifier extends Notifier<AsyncValue<UsersState>> {
     String? pin,
     String status = 'active',
   }) async {
+    final storeId = ref.read(currentStoreIdProvider);
+    if (storeId.isEmpty) throw Exception('No active store');
+
     final now = DateTime.now();
     final syncId = _uuid.v4();
     final user = UserCollection()
       ..syncId = syncId
+      ..storeId = storeId
       ..name = name.trim()
       ..email = email.trim().toLowerCase()
       ..role = role
@@ -263,6 +290,7 @@ class UsersNotifier extends Notifier<AsyncValue<UsersState>> {
 
   Map<String, dynamic> _toPayload(UserCollection u) => {
         'sync_id': u.syncId,
+        'store_id': u.storeId,
         'name': u.name,
         'email': u.email,
         'pin_hash': u.pinHash,
@@ -276,7 +304,6 @@ class UsersNotifier extends Notifier<AsyncValue<UsersState>> {
 }
 
 /// Provider for the User Management data.
-final usersProvider =
-    NotifierProvider<UsersNotifier, AsyncValue<UsersState>>(
+final usersProvider = NotifierProvider<UsersNotifier, AsyncValue<UsersState>>(
   UsersNotifier.new,
 );

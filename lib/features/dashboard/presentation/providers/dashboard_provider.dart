@@ -49,7 +49,8 @@ class DashboardNotifier extends Notifier<AsyncValue<DashboardData>> {
           .statusEqualTo('completed')
           .findAll();
 
-      final salesTotal = todayOrders.fold<double>(0, (sum, order) => sum + order.totalAmount);
+      final salesTotal =
+          todayOrders.fold<double>(0, (sum, order) => sum + order.totalAmount);
 
       // 2. Favorites
       final favorites = await _isar.isar.menuItemCollections
@@ -82,6 +83,7 @@ class DashboardNotifier extends Notifier<AsyncValue<DashboardData>> {
 }
 
 /// Provider for the Dashboard data.
-final dashboardProvider = NotifierProvider<DashboardNotifier, AsyncValue<DashboardData>>(
+final dashboardProvider =
+    NotifierProvider<DashboardNotifier, AsyncValue<DashboardData>>(
   DashboardNotifier.new,
 );

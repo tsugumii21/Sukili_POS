@@ -7,6 +7,7 @@ import '../../../../core/services/isar_service.dart';
 import '../../../../core/services/sync_service.dart';
 import '../../../../shared/isar_collections/category_collection.dart';
 import '../../../../shared/isar_collections/menu_item_collection.dart';
+import '../../../../shared/providers/store_provider.dart';
 
 /// In-memory draft for a single option within a variant group.
 /// e.g. {name: "Small", priceDelta: 0} or {name: "Hot", priceDelta: 0}
@@ -26,8 +27,7 @@ class VariantOptionDraft {
 
   VariantOptionDraft copyWith({String? name, double? priceDelta}) =>
       VariantOptionDraft(
-          name: name ?? this.name,
-          priceDelta: priceDelta ?? this.priceDelta);
+          name: name ?? this.name, priceDelta: priceDelta ?? this.priceDelta);
 }
 
 /// In-memory draft for a named variant group (e.g. "Size", "Temperature").
@@ -101,6 +101,7 @@ class ModifierDraft {
 /// ItemManageState holds the full item list and current filter state.
 class ItemManageState {
   final List<CategoryCollection> categories;
+
   /// All non-deleted items (not filtered by category). Used for tab counts.
   final List<MenuItemCollection> allItems;
   final String? selectedCategoryId; // null = All
@@ -123,8 +124,9 @@ class ItemManageState {
       ItemManageState(
         categories: categories ?? this.categories,
         allItems: allItems ?? this.allItems,
-        selectedCategoryId:
-            clearCategory ? null : (selectedCategoryId ?? this.selectedCategoryId),
+        selectedCategoryId: clearCategory
+            ? null
+            : (selectedCategoryId ?? this.selectedCategoryId),
         searchQuery: searchQuery ?? this.searchQuery,
       );
 
@@ -152,21 +154,24 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
 
   @override
   AsyncValue<ItemManageState> build() {
-    _init();
+    final storeId = ref.watch(currentStoreIdProvider);
+    if (storeId.isEmpty) return const AsyncValue.loading();
+
+    _init(storeId);
     return const AsyncValue.loading();
   }
 
   IsarService get _isar => IsarService.instance;
 
-  void _init() {
-    Future.microtask(_load);
-    _isar.isar.menuItemCollections.watchLazy().listen((_) => _load());
-    _isar.isar.categoryCollections.watchLazy().listen((_) => _load());
+  void _init(String storeId) {
+    Future.microtask(() => _load(storeId));
+    _isar.isar.menuItemCollections.watchLazy().listen((_) => _load(storeId));
+    _isar.isar.categoryCollections.watchLazy().listen((_) => _load(storeId));
   }
 
   // ── Load ────────────────────────────────────────────────────────────────────
 
-  Future<void> _load() async {
+  Future<void> _load(String storeId) async {
     try {
       final current = state.asData?.value;
       final catId = current?.selectedCategoryId;
@@ -175,6 +180,7 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
       // Load categories (active, non-deleted, sorted)
       final categories = await _isar.isar.categoryCollections
           .filter()
+          .storeIdEqualTo(storeId)
           .isActiveEqualTo(true)
           .and()
           .isDeletedEqualTo(false)
@@ -184,6 +190,7 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
       // Load ALL non-deleted items for tab count accuracy
       final allItems = await _isar.isar.menuItemCollections
           .filter()
+          .storeIdEqualTo(storeId)
           .isDeletedEqualTo(false)
           .sortBySortOrder()
           .findAll();
@@ -199,7 +206,10 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
     }
   }
 
-  Future<void> refresh() => _load();
+  Future<void> refresh() {
+    final storeId = ref.read(currentStoreIdProvider);
+    return _load(storeId);
+  }
 
   // ── Filter ───────────────────────────────────────────────────────────────
 
@@ -267,6 +277,9 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
     List<VariantGroupDraft> variantGroups = const [],
     List<ModifierDraft> modifiers = const [],
   }) async {
+    final storeId = ref.read(currentStoreIdProvider);
+    if (storeId.isEmpty) throw Exception('No active store');
+
     final now = DateTime.now();
     final syncId = _uuid.v4();
 
@@ -278,21 +291,20 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
 
     final item = MenuItemCollection()
       ..syncId = syncId
+      ..storeId = storeId
       ..categoryId = categoryId
       ..name = name.trim()
       ..description =
           description?.trim().isNotEmpty == true ? description!.trim() : null
       ..basePrice = basePrice
-      ..imageUrl =
-          imageUrl?.trim().isNotEmpty == true ? imageUrl!.trim() : null
+      ..imageUrl = imageUrl?.trim().isNotEmpty == true ? imageUrl!.trim() : null
       ..isAvailable = isAvailable
       ..isFavorite = isFavorite
       ..sortOrder = nextOrder
       ..variantsJson = []
       ..variantGroupsJson =
           variantGroups.map((g) => jsonEncode(g.toJson())).toList()
-      ..modifiersJson =
-          modifiers.map((m) => jsonEncode(m.toJson())).toList()
+      ..modifiersJson = modifiers.map((m) => jsonEncode(m.toJson())).toList()
       ..createdAt = now
       ..updatedAt = now
       ..isSynced = false
@@ -329,8 +341,7 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
       ..basePrice = basePrice
       ..description =
           description?.trim().isNotEmpty == true ? description!.trim() : null
-      ..imageUrl =
-          imageUrl?.trim().isNotEmpty == true ? imageUrl!.trim() : null
+      ..imageUrl = imageUrl?.trim().isNotEmpty == true ? imageUrl!.trim() : null
       ..isAvailable = isAvailable
       ..isFavorite = isFavorite
       ..variantsJson = []
@@ -373,6 +384,7 @@ class ItemNotifier extends Notifier<AsyncValue<ItemManageState>> {
 
   Map<String, dynamic> _toPayload(MenuItemCollection i) => {
         'sync_id': i.syncId,
+        'store_id': i.storeId,
         'category_id': i.categoryId,
         'name': i.name,
         'description': i.description,

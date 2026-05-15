@@ -46,14 +46,11 @@ class VerifyEmailScreen extends StatelessWidget {
                     size: 52,
                     color: accent,
                   ),
-                )
-                    .animate()
-                    .fadeIn(duration: 600.ms)
-                    .scaleXY(
-                        begin: 0.8,
-                        end: 1.0,
-                        duration: 600.ms,
-                        curve: Curves.easeOutBack),
+                ).animate().fadeIn(duration: 600.ms).scaleXY(
+                    begin: 0.8,
+                    end: 1.0,
+                    duration: 600.ms,
+                    curve: Curves.easeOutBack),
 
                 const SizedBox(height: AppSpacing.lg),
 
@@ -128,6 +125,7 @@ class VerifyEmailScreen extends StatelessWidget {
       await SupabaseService.instance.auth.resend(
         type: sb.OtpType.signup,
         email: email,
+        emailRedirectTo: 'com.suklipos.sukli_pos://auth-callback',
       );
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

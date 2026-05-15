@@ -3,6 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -34,7 +36,13 @@ class CategoryManagementScreen extends ConsumerWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded,
               color: textPrimary, size: 20),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(RouteConstants.adminHome);
+            }
+          },
         ),
         title: Text('Categories', style: AppTextStyles.bodySemiBold(context)),
         centerTitle: true,
@@ -45,7 +53,8 @@ class CategoryManagementScreen extends ConsumerWidget {
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
         label: Text('Add Category',
-            style: AppTextStyles.bodySemiBold(context).copyWith(color: Colors.white)),
+            style: AppTextStyles.bodySemiBold(context)
+                .copyWith(color: Colors.white)),
       ).animate().slideY(begin: 0.3, end: 0, duration: 400.ms).fadeIn(),
       body: categoriesAsync.when(
         loading: () =>
@@ -59,10 +68,12 @@ class CategoryManagementScreen extends ConsumerWidget {
                 Icon(Icons.error_outline_rounded,
                     size: 48, color: AppColors.errorLight),
                 const SizedBox(height: AppSpacing.md),
-                Text('Failed to load categories', style: AppTextStyles.body(context)),
+                Text('Failed to load categories',
+                    style: AppTextStyles.body(context)),
                 const SizedBox(height: AppSpacing.sm),
                 TextButton(
-                  onPressed: () => ref.read(categoryProvider.notifier).refresh(),
+                  onPressed: () =>
+                      ref.read(categoryProvider.notifier).refresh(),
                   child: const Text('Retry'),
                 ),
               ],
@@ -77,8 +88,7 @@ class CategoryManagementScreen extends ConsumerWidget {
           }
 
           return RefreshIndicator(
-            onRefresh: () =>
-                ref.read(categoryProvider.notifier).refresh(),
+            onRefresh: () => ref.read(categoryProvider.notifier).refresh(),
             child: ReorderableListView.builder(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.md,
@@ -87,8 +97,9 @@ class CategoryManagementScreen extends ConsumerWidget {
                 AppSpacing.xxl + 80,
               ),
               itemCount: categories.length,
-              onReorder: (oldIndex, newIndex) =>
-                  ref.read(categoryProvider.notifier).reorder(oldIndex, newIndex),
+              onReorder: (oldIndex, newIndex) => ref
+                  .read(categoryProvider.notifier)
+                  .reorder(oldIndex, newIndex),
               proxyDecorator: (child, index, animation) => Material(
                 elevation: 8,
                 color: Colors.transparent,
@@ -101,8 +112,7 @@ class CategoryManagementScreen extends ConsumerWidget {
                 index: i,
                 onEdit: () =>
                     _showCategorySheet(context, ref, existing: categories[i]),
-                onDelete: () =>
-                    _confirmDelete(context, ref, categories[i]),
+                onDelete: () => _confirmDelete(context, ref, categories[i]),
               ),
             ),
           );
@@ -182,8 +192,8 @@ class CategoryManagementScreen extends ConsumerWidget {
                 style: GoogleFonts.dmSans(fontWeight: FontWeight.w600)),
             backgroundColor: AppColors.errorLight,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -274,8 +284,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final sheetBg =
-        isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
+    final sheetBg = isDark ? AppColors.surfaceDark : AppColors.backgroundLight;
     final textPrimary =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 

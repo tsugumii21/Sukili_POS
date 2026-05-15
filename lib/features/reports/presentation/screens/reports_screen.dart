@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/constants/route_constants.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -60,14 +63,13 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   }
 
   DateTimeRange _getDateRange() {
-    final start = DateTime(
-        _startDate.year, _startDate.month, _startDate.day);
+    final start = DateTime(_startDate.year, _startDate.month, _startDate.day);
     if (!_isRangeMode || _endDate == null) {
       return DateTimeRange(
           start: start, end: start.add(const Duration(days: 1)));
     }
-    final end = DateTime(
-        _endDate!.year, _endDate!.month, _endDate!.day, 23, 59, 59);
+    final end =
+        DateTime(_endDate!.year, _endDate!.month, _endDate!.day, 23, 59, 59);
     return DateTimeRange(start: start, end: end);
   }
 
@@ -139,9 +141,17 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         title: Text('Reports', style: AppTextStyles.h3(context)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+              color: isDark
+                  ? AppColors.textPrimaryDark
+                  : AppColors.textPrimaryLight,
               size: 20),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(RouteConstants.adminHome);
+            }
+          },
         ),
         actions: [
           IconButton(
@@ -344,8 +354,7 @@ class _ToggleOption extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon,
-                size: 14,
-                color: isSelected ? Colors.white : textSecondary),
+                size: 14, color: isSelected ? Colors.white : textSecondary),
             const SizedBox(width: 4),
             Text(
               label,
@@ -377,7 +386,9 @@ class _KpiGrid extends StatelessWidget {
 
     final highestSale = state.orders.isEmpty
         ? 0.0
-        : state.orders.map((o) => o.totalAmount).fold(0.0, (max, v) => v > max ? v : max);
+        : state.orders
+            .map((o) => o.totalAmount)
+            .fold(0.0, (max, v) => v > max ? v : max);
 
     final cards = [
       _KpiCardData(
@@ -390,13 +401,15 @@ class _KpiGrid extends StatelessWidget {
         icon: Icons.receipt_long_outlined,
         value: '${state.totalOrders}',
         label: 'Total Orders',
-        valueStyle: AppTextStyles.priceSmall(context).copyWith(color: textPrimary),
+        valueStyle:
+            AppTextStyles.priceSmall(context).copyWith(color: textPrimary),
       ),
       _KpiCardData(
         icon: Icons.trending_up_rounded,
         value: CurrencyFormatter.format(state.averageOrderValue),
         label: 'Average Order',
-        valueStyle: AppTextStyles.priceSmall(context).copyWith(color: textPrimary),
+        valueStyle:
+            AppTextStyles.priceSmall(context).copyWith(color: textPrimary),
       ),
       _KpiCardData(
         icon: Icons.workspace_premium_rounded,
@@ -416,9 +429,8 @@ class _KpiGrid extends StatelessWidget {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         children: cards.asMap().entries.map((e) {
-          return _KpiCard(data: e.value)
-              .animate()
-              .fadeIn(duration: 250.ms, delay: Duration(milliseconds: e.key * 60));
+          return _KpiCard(data: e.value).animate().fadeIn(
+              duration: 250.ms, delay: Duration(milliseconds: e.key * 60));
         }).toList(),
       ),
     );
@@ -626,8 +638,18 @@ class _RevenueChart extends StatelessWidget {
         return '${i + 1}';
       case ReportPeriod.year:
         const months = [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec'
         ];
         return i < months.length ? months[i] : '';
       case ReportPeriod.custom:
@@ -655,7 +677,9 @@ class _PaymentDonutChart extends StatelessWidget {
       case 'card':
         return isDark ? AppColors.secondaryDark : AppColors.secondaryLight;
       default:
-        return isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+        return isDark
+            ? AppColors.textSecondaryDark
+            : AppColors.textSecondaryLight;
     }
   }
 
@@ -676,7 +700,8 @@ class _PaymentDonutChart extends StatelessWidget {
             SizedBox(
               height: 150,
               child: Center(
-                child: Text('No data', style: AppTextStyles.captionSecondary(context)),
+                child: Text('No data',
+                    style: AppTextStyles.captionSecondary(context)),
               ),
             )
           else
@@ -706,9 +731,8 @@ class _PaymentDonutChart extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: breakdown.map((p) {
                       final color = _paymentColor(p.method, isDark);
-                      final accent = isDark
-                          ? AppColors.accentDark
-                          : AppColors.accentLight;
+                      final accent =
+                          isDark ? AppColors.accentDark : AppColors.accentLight;
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Row(
@@ -814,7 +838,8 @@ class _TopItemsChart extends StatelessWidget {
                             showTitles: true,
                             getTitlesWidget: (value, _) {
                               final idx = value.toInt();
-                              if (idx >= topItems.length) return const SizedBox();
+                              if (idx >= topItems.length)
+                                return const SizedBox();
                               final name = topItems[idx].name;
                               final label = name.length > 8
                                   ? '${name.substring(0, 8)}…'

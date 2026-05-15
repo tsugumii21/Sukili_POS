@@ -31,11 +31,13 @@ class _CashierCardState extends State<CashierCard> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.cardDark : AppColors.cardLight;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSecondary = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-    
+    final textPrimary =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textSecondary =
+        isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+
     // Modern gradient for avatar
-    final avatarGradient = isDark 
+    final avatarGradient = isDark
         ? const LinearGradient(colors: [Color(0xFF8B4049), Color(0xFF4A1F24)])
         : const LinearGradient(colors: [Color(0xFF8B4049), Color(0xFF6B2C33)]);
 
@@ -76,7 +78,8 @@ class _CashierCardState extends State<CashierCard> {
                   decoration: BoxDecoration(
                     gradient: avatarGradient,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 2),
+                    border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.1), width: 2),
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0xFF8B4049).withValues(alpha: 0.2),

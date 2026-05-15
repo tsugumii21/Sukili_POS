@@ -29,17 +29,20 @@ class SeedData {
       if (item.variantGroupsJson.isNotEmpty) continue;
 
       // Convert flat variants to a single "Size" group
-      final options = item.variantsJson.map((s) {
-        try {
-          final m = jsonDecode(s) as Map<String, dynamic>;
-          return <String, dynamic>{
-            'name': m['name'] ?? '',
-            'priceDelta': (m['priceDelta'] as num?)?.toDouble() ?? 0,
-          };
-        } catch (_) {
-          return null;
-        }
-      }).whereType<Map<String, dynamic>>().toList();
+      final options = item.variantsJson
+          .map((s) {
+            try {
+              final m = jsonDecode(s) as Map<String, dynamic>;
+              return <String, dynamic>{
+                'name': m['name'] ?? '',
+                'priceDelta': (m['priceDelta'] as num?)?.toDouble() ?? 0,
+              };
+            } catch (_) {
+              return null;
+            }
+          })
+          .whereType<Map<String, dynamic>>()
+          .toList();
 
       if (options.isEmpty) continue;
 
@@ -132,19 +135,21 @@ class SeedData {
           ('Food', '🍽️', 2),
           ('Snacks', '🍿', 3),
           ('Desserts', '🍰', 4),
-        ].map((data) => CategoryCollection()
-          ..syncId = _uuid.v4()
-          ..name = data.$1
-          ..iconEmoji = data.$2
-          ..sortOrder = data.$3
-          ..isActive = true
-          ..createdAt = now
-          ..updatedAt = now
-          ..isSynced = false
-          ..isDeleted = false).toList();
-        
+        ]
+            .map((data) => CategoryCollection()
+              ..syncId = _uuid.v4()
+              ..name = data.$1
+              ..iconEmoji = data.$2
+              ..sortOrder = data.$3
+              ..isActive = true
+              ..createdAt = now
+              ..updatedAt = now
+              ..isSynced = false
+              ..isDeleted = false)
+            .toList();
+
         await isar.categoryCollections.putAll(categories);
-        
+
         // 3. Seed Menu Items (Linked to Category syncId)
         final beveragesId = categories[0].syncId;
         final foodId = categories[1].syncId;
@@ -206,8 +211,13 @@ class SeedData {
               jsonEncode({"name": "Large", "priceDelta": 20}),
             ]
             ..modifiersJson = [
-              jsonEncode({"groupName": "Add-ons", "name": "Extra Rice", "priceDelta": 20}),
-              jsonEncode({"groupName": "Add-ons", "name": "Drinks", "priceDelta": 35}),
+              jsonEncode({
+                "groupName": "Add-ons",
+                "name": "Extra Rice",
+                "priceDelta": 20
+              }),
+              jsonEncode(
+                  {"groupName": "Add-ons", "name": "Drinks", "priceDelta": 35}),
             ]
             ..createdAt = now
             ..updatedAt = now
@@ -218,4 +228,3 @@ class SeedData {
     }
   }
 }
-

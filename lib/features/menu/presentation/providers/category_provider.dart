@@ -6,6 +6,7 @@ import '../../../../core/services/isar_service.dart';
 import '../../../../core/services/sync_service.dart';
 import '../../../../shared/isar_collections/category_collection.dart';
 import '../../../../shared/isar_collections/menu_item_collection.dart';
+import '../../../../shared/providers/store_provider.dart';
 
 /// Holds a category together with its menu-item count.
 class CategoryWithCount {
@@ -22,31 +23,34 @@ class CategoryWithCount {
 }
 
 /// CategoryNotifier manages CRUD + reorder for categories.
-class CategoryNotifier
-    extends Notifier<AsyncValue<List<CategoryWithCount>>> {
+class CategoryNotifier extends Notifier<AsyncValue<List<CategoryWithCount>>> {
   static const _uuid = Uuid();
 
   @override
   AsyncValue<List<CategoryWithCount>> build() {
-    _init();
+    final storeId = ref.watch(currentStoreIdProvider);
+    if (storeId.isEmpty) return const AsyncValue.data([]);
+
+    _init(storeId);
     return const AsyncValue.loading();
   }
 
   IsarService get _isar => IsarService.instance;
 
-  void _init() {
-    Future.microtask(_load);
-    _isar.isar.categoryCollections.watchLazy().listen((_) => _load());
-    _isar.isar.menuItemCollections.watchLazy().listen((_) => _load());
+  void _init(String storeId) {
+    Future.microtask(() => _load(storeId));
+    _isar.isar.categoryCollections.watchLazy().listen((_) => _load(storeId));
+    _isar.isar.menuItemCollections.watchLazy().listen((_) => _load(storeId));
   }
 
   // ── Load ────────────────────────────────────────────────────────────────────
 
-  Future<void> _load() async {
+  Future<void> _load(String storeId) async {
     try {
       // Two indexed-field queries (isActive=true / false) then merge.
       final active = await _isar.isar.categoryCollections
           .filter()
+          .storeIdEqualTo(storeId)
           .isActiveEqualTo(true)
           .and()
           .isDeletedEqualTo(false)
@@ -55,6 +59,7 @@ class CategoryNotifier
 
       final inactive = await _isar.isar.categoryCollections
           .filter()
+          .storeIdEqualTo(storeId)
           .isActiveEqualTo(false)
           .and()
           .isDeletedEqualTo(false)
@@ -69,6 +74,7 @@ class CategoryNotifier
       for (final cat in categories) {
         final items = await _isar.isar.menuItemCollections
             .filter()
+            .storeIdEqualTo(storeId)
             .categoryIdEqualTo(cat.syncId)
             .and()
             .isDeletedEqualTo(false)
@@ -82,7 +88,10 @@ class CategoryNotifier
     }
   }
 
-  Future<void> refresh() => _load();
+  Future<void> refresh() {
+    final storeId = ref.read(currentStoreIdProvider);
+    return _load(storeId);
+  }
 
   // ── Create ──────────────────────────────────────────────────────────────────
 
@@ -120,6 +129,9 @@ class CategoryNotifier
     String? description,
     String? parentId,
   }) async {
+    final storeId = ref.read(currentStoreIdProvider);
+    if (storeId.isEmpty) throw Exception('No active store');
+
     final now = DateTime.now();
     final syncId = _uuid.v4();
 
@@ -127,16 +139,20 @@ class CategoryNotifier
     final currentList = state.asData?.value ?? [];
     final nextOrder = currentList.isEmpty
         ? 1
-        : (currentList.map((c) => c.category.sortOrder).reduce(
-                (a, b) => a > b ? a : b) +
+        : (currentList
+                .map((c) => c.category.sortOrder)
+                .reduce((a, b) => a > b ? a : b) +
             1);
 
     final category = CategoryCollection()
       ..syncId = syncId
+      ..storeId = storeId
       ..parentId = parentId
       ..name = name.trim()
-      ..iconEmoji = iconEmoji?.trim().isNotEmpty == true ? iconEmoji!.trim() : null
-      ..description = description?.trim().isNotEmpty == true ? description!.trim() : null
+      ..iconEmoji =
+          iconEmoji?.trim().isNotEmpty == true ? iconEmoji!.trim() : null
+      ..description =
+          description?.trim().isNotEmpty == true ? description!.trim() : null
       ..sortOrder = nextOrder
       ..isActive = true
       ..createdAt = now
@@ -167,8 +183,10 @@ class CategoryNotifier
   }) async {
     category
       ..name = name.trim()
-      ..iconEmoji = iconEmoji?.trim().isNotEmpty == true ? iconEmoji!.trim() : null
-      ..description = description?.trim().isNotEmpty == true ? description!.trim() : null
+      ..iconEmoji =
+          iconEmoji?.trim().isNotEmpty == true ? iconEmoji!.trim() : null
+      ..description =
+          description?.trim().isNotEmpty == true ? description!.trim() : null
       ..isActive = isActive ?? category.isActive
       ..updatedAt = DateTime.now()
       ..isSynced = false;
@@ -246,8 +264,10 @@ class CategoryNotifier
 
   /// Returns true if the category has menu items (used to show a warning).
   Future<int> getItemCount(CategoryCollection category) async {
+    final storeId = ref.read(currentStoreIdProvider);
     final items = await _isar.isar.menuItemCollections
         .filter()
+        .storeIdEqualTo(storeId)
         .categoryIdEqualTo(category.syncId)
         .and()
         .isDeletedEqualTo(false)
@@ -276,6 +296,7 @@ class CategoryNotifier
 
   Map<String, dynamic> _toPayload(CategoryCollection c) => {
         'sync_id': c.syncId,
+        'store_id': c.storeId,
         'parent_id': c.parentId,
         'name': c.name,
         'description': c.description,
@@ -289,7 +310,7 @@ class CategoryNotifier
 }
 
 /// Provider for category management.
-final categoryProvider = NotifierProvider<CategoryNotifier,
-    AsyncValue<List<CategoryWithCount>>>(
+final categoryProvider =
+    NotifierProvider<CategoryNotifier, AsyncValue<List<CategoryWithCount>>>(
   CategoryNotifier.new,
 );

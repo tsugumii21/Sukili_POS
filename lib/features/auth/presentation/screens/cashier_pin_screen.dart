@@ -64,8 +64,7 @@ class _CashierPinScreenState extends ConsumerState<CashierPinScreen>
   }
 
   Future<void> _submitPin() async {
-    final success =
-        await ref.read(authProvider.notifier).verifyPin(_pin);
+    final success = await ref.read(authProvider.notifier).verifyPin(_pin);
 
     if (!mounted) return;
 
@@ -93,8 +92,7 @@ class _CashierPinScreenState extends ConsumerState<CashierPinScreen>
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final textSecondary =
         isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-    final avatarBg =
-        isDark ? AppColors.primaryDark : AppColors.accentLight;
+    final avatarBg = isDark ? AppColors.primaryDark : AppColors.accentLight;
 
     final cashier = ref.watch(authProvider).selectedCashier;
 
@@ -108,7 +106,11 @@ class _CashierPinScreenState extends ConsumerState<CashierPinScreen>
               color: textPrimary, size: 20),
           onPressed: () {
             ref.read(authProvider.notifier).clearSelection();
-            context.pop();
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(RouteConstants.cashierSelect);
+            }
           },
         ),
       ),
@@ -168,8 +170,8 @@ class _CashierPinScreenState extends ConsumerState<CashierPinScreen>
                     final shakeOffset = _shakeAnimation.value == 0
                         ? 0.0
                         : ((_shakeAnimation.value * 4).round() % 2 == 0
-                            ? 12.0
-                            : -12.0) *
+                                ? 12.0
+                                : -12.0) *
                             (1 - _shakeAnimation.value);
                     return Transform.translate(
                       offset: Offset(shakeOffset, 0),
@@ -191,9 +193,8 @@ class _CashierPinScreenState extends ConsumerState<CashierPinScreen>
                   Text(
                     'Incorrect PIN. Try again.',
                     style: GoogleFonts.dmSans(
-                      color: isDark
-                          ? AppColors.errorDark
-                          : AppColors.errorLight,
+                      color:
+                          isDark ? AppColors.errorDark : AppColors.errorLight,
                       fontSize: 13,
                     ),
                   ).animate().fadeIn(duration: 200.ms),

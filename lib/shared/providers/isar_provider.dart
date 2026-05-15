@@ -11,4 +11,3 @@ final isarServiceProvider = Provider<IsarService>((ref) {
 final isarProvider = Provider<Isar>((ref) {
   return ref.watch(isarServiceProvider).isar;
 });
-

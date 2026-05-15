@@ -35,18 +35,15 @@ class OrderDetailSheet extends ConsumerWidget {
     );
   }
 
-  static final _dateFmt =
-      DateFormat('MMMM dd, yyyy  •  hh:mm a');
+  static final _dateFmt = DateFormat('MMMM dd, yyyy  •  hh:mm a');
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? const Color(0xFF2A1215) : const Color(0xFFFAF6F1);
-    final cardBg =
-        isDark ? const Color(0xFF5D2832) : const Color(0xFFF0E8DC);
+    final cardBg = isDark ? const Color(0xFF5D2832) : const Color(0xFFF0E8DC);
     final textPrimary = isDark ? Colors.white : const Color(0xFF1A1A1A);
-    final textSecondary =
-        isDark ? Colors.white70 : const Color(0xFF6B6B6B);
+    final textSecondary = isDark ? Colors.white70 : const Color(0xFF6B6B6B);
     const maroon = Color(0xFF8B4049);
 
     final items = order.orderItemsJson
@@ -78,8 +75,7 @@ class OrderDetailSheet extends ConsumerWidget {
 
           // ── Header bar ────────────────────────────────────────────────
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
                 Expanded(
@@ -202,23 +198,18 @@ class OrderDetailSheet extends ConsumerWidget {
                           ),
                         ],
                         const SizedBox(height: 6),
-                        Divider(
-                            height: 1,
-                            color: textSecondary.withAlpha(40)),
+                        Divider(height: 1, color: textSecondary.withAlpha(40)),
                         const SizedBox(height: 6),
                         _SummaryRow(
                           label: 'Total',
-                          value:
-                              CurrencyFormatter.format(order.totalAmount),
+                          value: CurrencyFormatter.format(order.totalAmount),
                           textPrimary: maroon,
                           textSecondary: textSecondary,
                           isBold: true,
                           valueColor: maroon,
                         ),
                         const SizedBox(height: 10),
-                        Divider(
-                            height: 1,
-                            color: textSecondary.withAlpha(40)),
+                        Divider(height: 1, color: textSecondary.withAlpha(40)),
                         const SizedBox(height: 10),
                         _SummaryRow(
                           label: 'Payment',
@@ -229,16 +220,14 @@ class OrderDetailSheet extends ConsumerWidget {
                         const SizedBox(height: 6),
                         _SummaryRow(
                           label: 'Tendered',
-                          value: CurrencyFormatter.format(
-                              order.amountTendered),
+                          value: CurrencyFormatter.format(order.amountTendered),
                           textPrimary: textPrimary,
                           textSecondary: textSecondary,
                         ),
                         const SizedBox(height: 6),
                         _SummaryRow(
                           label: 'Change',
-                          value: CurrencyFormatter.format(
-                              order.changeAmount),
+                          value: CurrencyFormatter.format(order.changeAmount),
                           textPrimary: textPrimary,
                           textSecondary: textSecondary,
                         ),
@@ -256,8 +245,7 @@ class OrderDetailSheet extends ConsumerWidget {
                       icon: const Icon(Icons.print_rounded, size: 18),
                       label: Text(
                         'Reprint Receipt',
-                        style: GoogleFonts.dmSans(
-                            fontWeight: FontWeight.w600),
+                        style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
                       ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: maroon,
@@ -288,9 +276,8 @@ class OrderDetailSheet extends ConsumerWidget {
           success ? 'Receipt printed.' : 'No printer connected. Receipt saved.',
           style: GoogleFonts.dmSans(),
         ),
-        backgroundColor: success
-            ? const Color(0xFF2E7D32)
-            : const Color(0xFF8B4049),
+        backgroundColor:
+            success ? const Color(0xFF2E7D32) : const Color(0xFF8B4049),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -365,10 +352,8 @@ class _ItemRow extends StatelessWidget {
     final name = item['itemName']?.toString() ?? '';
     final variant = item['variantName']?.toString() ?? '';
     final qty = item['quantity'] ?? 0;
-    final unitPrice =
-        (item['unitPrice'] as num?)?.toDouble() ?? 0.0;
-    final subtotal =
-        (item['subtotal'] as num?)?.toDouble() ?? 0.0;
+    final unitPrice = (item['unitPrice'] as num?)?.toDouble() ?? 0.0;
+    final subtotal = (item['subtotal'] as num?)?.toDouble() ?? 0.0;
     final rawMods = item['modifiers'];
     final modifiers = rawMods is List && rawMods.isNotEmpty
         ? rawMods
@@ -408,8 +393,7 @@ class _ItemRow extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   '₱${unitPrice.toStringAsFixed(2)} × $qty',
-                  style: GoogleFonts.dmSans(
-                      fontSize: 12, color: textSecondary),
+                  style: GoogleFonts.dmSans(fontSize: 12, color: textSecondary),
                 ),
               ],
             ),
@@ -456,8 +440,7 @@ class _SummaryRow extends StatelessWidget {
         Text(value,
             style: GoogleFonts.dmSans(
               fontSize: isBold ? 15 : 13,
-              fontWeight:
-                  isBold ? FontWeight.w700 : FontWeight.w500,
+              fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
               color: valueColor ?? textPrimary,
             )),
       ],
@@ -486,9 +469,8 @@ class _StatusChipDetail extends StatelessWidget {
       default:
         color = const Color(0xFF546E7A);
     }
-    final label = status.isEmpty
-        ? status
-        : status[0].toUpperCase() + status.substring(1);
+    final label =
+        status.isEmpty ? status : status[0].toUpperCase() + status.substring(1);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),

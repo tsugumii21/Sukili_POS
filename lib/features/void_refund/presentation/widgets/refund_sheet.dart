@@ -122,7 +122,8 @@ class _RefundSheetState extends State<RefundSheet> {
             // ── Handle bar ───────────────────────────────────────────
             Center(
               child: Container(
-                margin: const EdgeInsets.only(top: AppSpacing.sm, bottom: AppSpacing.md),
+                margin: const EdgeInsets.only(
+                    top: AppSpacing.sm, bottom: AppSpacing.md),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
@@ -142,8 +143,8 @@ class _RefundSheetState extends State<RefundSheet> {
                     color: accent.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.receipt_long_rounded,
-                      color: accent, size: 20),
+                  child:
+                      Icon(Icons.receipt_long_rounded, color: accent, size: 20),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
@@ -164,239 +165,235 @@ class _RefundSheetState extends State<RefundSheet> {
               ],
             ),
 
-                const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.lg),
 
-                // ── Order summary card ────────────────────────────────────
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: cardBg,
-                    borderRadius: AppRadius.mediumBR,
+            // ── Order summary card ────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: cardBg,
+                borderRadius: AppRadius.mediumBR,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _SummaryPair(
+                    label: 'Cashier',
+                    value: widget.order.cashierName,
+                    textSecondary: textSecondary,
+                    textPrimary: textPrimary,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _SummaryPair(
-                        label: 'Cashier',
-                        value: widget.order.cashierName,
-                        textSecondary: textSecondary,
-                        textPrimary: textPrimary,
-                      ),
-                      Container(width: 1, height: 32, color: borderCol),
-                      _SummaryPair(
-                        label: 'Payment',
-                        value: _capitalize(widget.order.paymentMethod),
-                        textSecondary: textSecondary,
-                        textPrimary: textPrimary,
-                      ),
-                      Container(width: 1, height: 32, color: borderCol),
-                      _SummaryPair(
-                        label: 'Total',
-                        value: CurrencyFormatter.format(
-                            widget.order.totalAmount),
-                        textSecondary: textSecondary,
-                        textPrimary: accent,
-                        bold: true,
-                      ),
-                    ],
+                  Container(width: 1, height: 32, color: borderCol),
+                  _SummaryPair(
+                    label: 'Payment',
+                    value: _capitalize(widget.order.paymentMethod),
+                    textSecondary: textSecondary,
+                    textPrimary: textPrimary,
                   ),
+                  Container(width: 1, height: 32, color: borderCol),
+                  _SummaryPair(
+                    label: 'Total',
+                    value: CurrencyFormatter.format(widget.order.totalAmount),
+                    textSecondary: textSecondary,
+                    textPrimary: accent,
+                    bold: true,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.lg),
+
+            // ── Refund type toggle ────────────────────────────────────
+            _SectionLabel(label: 'REFUND TYPE', textSecondary: textSecondary),
+            Row(
+              children: [
+                _TypeBtn(
+                  label: 'Full Refund',
+                  amount: CurrencyFormatter.format(widget.order.totalAmount),
+                  selected: _type == RefundType.full,
+                  isDark: isDark,
+                  accent: accent,
+                  cardBg: cardBg,
+                  borderCol: borderCol,
+                  textPrimary: textPrimary,
+                  onTap: () => setState(() => _type = RefundType.full),
                 ),
-
-                const SizedBox(height: AppSpacing.lg),
-
-                // ── Refund type toggle ────────────────────────────────────
-                _SectionLabel(
-                    label: 'REFUND TYPE', textSecondary: textSecondary),
-                Row(
-                  children: [
-                    _TypeBtn(
-                      label: 'Full Refund',
-                      amount:
-                          CurrencyFormatter.format(widget.order.totalAmount),
-                      selected: _type == RefundType.full,
-                      isDark: isDark,
-                      accent: accent,
-                      cardBg: cardBg,
-                      borderCol: borderCol,
-                      textPrimary: textPrimary,
-                      onTap: () => setState(() => _type = RefundType.full),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    _TypeBtn(
-                      label: 'Partial Refund',
-                      amount: 'Enter amount',
-                      selected: _type == RefundType.partial,
-                      isDark: isDark,
-                      accent: accent,
-                      cardBg: cardBg,
-                      borderCol: borderCol,
-                      textPrimary: textPrimary,
-                      onTap: () => setState(() => _type = RefundType.partial),
-                    ),
-                  ],
-                ),
-
-                // ── Partial amount field (animated) ───────────────────────
-                AnimatedSize(
-                  duration: AppDuration.medium,
-                  curve: Curves.easeOut,
-                  child: _type == RefundType.partial
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: AppSpacing.md),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _SectionLabel(
-                                  label: 'REFUND AMOUNT',
-                                  textSecondary: textSecondary),
-                              TextFormField(
-                                controller: _amountCtrl,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp(r'[\d.]'))
-                                ],
-                                style:
-                                    AppTextStyles.body(context).copyWith(color: textPrimary),
-                                decoration: InputDecoration(
-                                  prefixText: '₱ ',
-                                  prefixStyle:
-                                      AppTextStyles.bodyMedium(context).copyWith(color: accent),
-                                  hintText: '0.00',
-                                  hintStyle: AppTextStyles.body(context).copyWith(color: textSecondary),
-                                  filled: true,
-                                  fillColor: cardBg,
-                                  border: OutlineInputBorder(
-                                    borderRadius: AppRadius.mediumBR,
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 14),
-                                ),
-                                validator: (v) {
-                                  if (_type == RefundType.full) return null;
-                                  final val = double.tryParse(
-                                      (v ?? '').replaceAll(',', ''));
-                                  if (val == null || val <= 0) {
-                                    return 'Enter a valid amount';
-                                  }
-                                  if (val > widget.order.totalAmount) {
-                                    return 'Cannot exceed order total';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ],
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
-
-                const SizedBox(height: AppSpacing.md),
-
-                // ── Reason field ──────────────────────────────────────────
-                _SectionLabel(
-                    label: 'REASON (REQUIRED)',
-                    textSecondary: textSecondary),
-                TextFormField(
-                  controller: _reasonCtrl,
-                  maxLines: 3,
-                  minLines: 2,
-                  style: AppTextStyles.body(context).copyWith(color: textPrimary),
-                  onChanged: (v) => setState(() {}),
-                  decoration: InputDecoration(
-                    hintText: 'e.g. Customer received wrong order',
-                    hintStyle:
-                        AppTextStyles.body(context).copyWith(color: textSecondary),
-                    filled: true,
-                    fillColor: cardBg,
-                    border: OutlineInputBorder(
-                      borderRadius: AppRadius.mediumBR,
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.all(AppSpacing.md),
-                  ),
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Reason is required'
-                      : null,
-                ),
-
-                const SizedBox(height: AppSpacing.lg),
-
-                // ── Summary line ──────────────────────────────────────────
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.08),
-                    borderRadius: AppRadius.mediumBR,
-                    border: Border.all(
-                        color: accent.withValues(alpha: 0.25)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline_rounded,
-                          size: 16, color: accent),
-                      const SizedBox(width: AppSpacing.xs),
-                      Expanded(
-                        child: Text(
-                          _type == RefundType.full
-                              ? 'Full refund of ${CurrencyFormatter.format(widget.order.totalAmount)} will be processed.'
-                              : 'Partial refund — amount will be confirmed after entry.',
-                          style: AppTextStyles.caption(context).copyWith(
-                            color: accent,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: AppSpacing.lg),
-
-                // ── Buttons ───────────────────────────────────────────────
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: _reasonCtrl.text.trim().isEmpty ? null : _confirm,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: accent,
-                      disabledBackgroundColor: accent.withValues(alpha: 0.4),
-                      foregroundColor: Colors.white,
-                      disabledForegroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: AppRadius.mediumBR),
-                    ),
-                    child: Text(
-                      'Continue to Admin Verification',
-                      style: AppTextStyles.bodyMedium(context).copyWith(color: Colors.white),
-                    ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(top: AppSpacing.xs, bottom: AppSpacing.md),
-                  child: Center(
-                    child: TextButton(
-                      onPressed: () => Navigator.of(context).pop(null),
-                      style: TextButton.styleFrom(
-                        foregroundColor: textSecondary,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: AppRadius.mediumBR),
-                      ),
-                      child: Text(
-                        'Cancel',
-                        style: AppTextStyles.bodyMedium(context).copyWith(color: textSecondary),
-                      ),
-                    ),
-                  ),
+                const SizedBox(width: AppSpacing.sm),
+                _TypeBtn(
+                  label: 'Partial Refund',
+                  amount: 'Enter amount',
+                  selected: _type == RefundType.partial,
+                  isDark: isDark,
+                  accent: accent,
+                  cardBg: cardBg,
+                  borderCol: borderCol,
+                  textPrimary: textPrimary,
+                  onTap: () => setState(() => _type = RefundType.partial),
                 ),
               ],
             ),
-          ),
-        );
+
+            // ── Partial amount field (animated) ───────────────────────
+            AnimatedSize(
+              duration: AppDuration.medium,
+              curve: Curves.easeOut,
+              child: _type == RefundType.partial
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: AppSpacing.md),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _SectionLabel(
+                              label: 'REFUND AMOUNT',
+                              textSecondary: textSecondary),
+                          TextFormField(
+                            controller: _amountCtrl,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[\d.]'))
+                            ],
+                            style: AppTextStyles.body(context)
+                                .copyWith(color: textPrimary),
+                            decoration: InputDecoration(
+                              prefixText: '₱ ',
+                              prefixStyle: AppTextStyles.bodyMedium(context)
+                                  .copyWith(color: accent),
+                              hintText: '0.00',
+                              hintStyle: AppTextStyles.body(context)
+                                  .copyWith(color: textSecondary),
+                              filled: true,
+                              fillColor: cardBg,
+                              border: OutlineInputBorder(
+                                borderRadius: AppRadius.mediumBR,
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 14),
+                            ),
+                            validator: (v) {
+                              if (_type == RefundType.full) return null;
+                              final val = double.tryParse(
+                                  (v ?? '').replaceAll(',', ''));
+                              if (val == null || val <= 0) {
+                                return 'Enter a valid amount';
+                              }
+                              if (val > widget.order.totalAmount) {
+                                return 'Cannot exceed order total';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+
+            const SizedBox(height: AppSpacing.md),
+
+            // ── Reason field ──────────────────────────────────────────
+            _SectionLabel(
+                label: 'REASON (REQUIRED)', textSecondary: textSecondary),
+            TextFormField(
+              controller: _reasonCtrl,
+              maxLines: 3,
+              minLines: 2,
+              style: AppTextStyles.body(context).copyWith(color: textPrimary),
+              onChanged: (v) => setState(() {}),
+              decoration: InputDecoration(
+                hintText: 'e.g. Customer received wrong order',
+                hintStyle:
+                    AppTextStyles.body(context).copyWith(color: textSecondary),
+                filled: true,
+                fillColor: cardBg,
+                border: OutlineInputBorder(
+                  borderRadius: AppRadius.mediumBR,
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.all(AppSpacing.md),
+              ),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Reason is required' : null,
+            ),
+
+            const SizedBox(height: AppSpacing.lg),
+
+            // ── Summary line ──────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.08),
+                borderRadius: AppRadius.mediumBR,
+                border: Border.all(color: accent.withValues(alpha: 0.25)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline_rounded, size: 16, color: accent),
+                  const SizedBox(width: AppSpacing.xs),
+                  Expanded(
+                    child: Text(
+                      _type == RefundType.full
+                          ? 'Full refund of ${CurrencyFormatter.format(widget.order.totalAmount)} will be processed.'
+                          : 'Partial refund — amount will be confirmed after entry.',
+                      style: AppTextStyles.caption(context).copyWith(
+                        color: accent,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.lg),
+
+            // ── Buttons ───────────────────────────────────────────────
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: _reasonCtrl.text.trim().isEmpty ? null : _confirm,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: accent,
+                  disabledBackgroundColor: accent.withValues(alpha: 0.4),
+                  foregroundColor: Colors.white,
+                  disabledForegroundColor: Colors.white,
+                  elevation: 0,
+                  shape:
+                      RoundedRectangleBorder(borderRadius: AppRadius.mediumBR),
+                ),
+                child: Text(
+                  'Continue to Admin Verification',
+                  style: AppTextStyles.bodyMedium(context)
+                      .copyWith(color: Colors.white),
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(
+                  top: AppSpacing.xs, bottom: AppSpacing.md),
+              child: Center(
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(null),
+                  style: TextButton.styleFrom(
+                    foregroundColor: textSecondary,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: AppRadius.mediumBR),
+                  ),
+                  child: Text(
+                    'Cancel',
+                    style: AppTextStyles.bodyMedium(context)
+                        .copyWith(color: textSecondary),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   String _capitalize(String s) =>
@@ -453,9 +450,10 @@ class _SummaryPair extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           value,
-          style: bold 
-            ? AppTextStyles.bodySemiBold(context).copyWith(color: textPrimary)
-            : AppTextStyles.bodySemiBold(context).copyWith(color: textPrimary),
+          style: bold
+              ? AppTextStyles.bodySemiBold(context).copyWith(color: textPrimary)
+              : AppTextStyles.bodySemiBold(context)
+                  .copyWith(color: textPrimary),
         ),
       ],
     );
@@ -511,9 +509,10 @@ class _TypeBtn extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 amount,
-                style: selected 
-                  ? AppTextStyles.captionMedium(context).copyWith(color: Colors.white.withValues(alpha: 0.8))
-                  : AppTextStyles.captionSecondary(context),
+                style: selected
+                    ? AppTextStyles.captionMedium(context)
+                        .copyWith(color: Colors.white.withValues(alpha: 0.8))
+                    : AppTextStyles.captionSecondary(context),
               ),
             ],
           ),

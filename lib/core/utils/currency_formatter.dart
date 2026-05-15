@@ -24,7 +24,8 @@ class CurrencyFormatter {
   static double parse(String value) {
     if (value.isEmpty) return 0.0;
     try {
-      final clean = value.replaceAll(AppConstants.currencySymbol, '').replaceAll(',', '');
+      final clean =
+          value.replaceAll(AppConstants.currencySymbol, '').replaceAll(',', '');
       return double.parse(clean.trim());
     } catch (_) {
       return 0.0;

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// Includes specifics for both Beige Light and Maroon Dark modes.
 class AppColors {
   // --- LIGHT MODE ---
-  
+
   // Primaries
   static const Color primaryLight = Color(0xFFE8D5C4);
   static const Color primaryLightVariant = Color(0xFFF5E6D3);
@@ -35,29 +35,29 @@ class AppColors {
 
   // --- DARK MODE --- Dark Slate + Maroon Accent
 
-  static const Color backgroundDark       = Color(0xFF0F1117);
-  static const Color backgroundDarkDeep   = Color(0xFF090B0E);
-  static const Color surfaceDark          = Color(0xFF1C1F2A);
-  static const Color surfaceDarkElevated  = Color(0xFF252836);
-  static const Color cardDark             = Color(0xFF1C1F2A);
-  static const Color borderDark           = Color(0xFF2E3347);
+  static const Color backgroundDark = Color(0xFF0F1117);
+  static const Color backgroundDarkDeep = Color(0xFF090B0E);
+  static const Color surfaceDark = Color(0xFF1C1F2A);
+  static const Color surfaceDarkElevated = Color(0xFF252836);
+  static const Color cardDark = Color(0xFF1C1F2A);
+  static const Color borderDark = Color(0xFF2E3347);
 
-  static const Color primaryDark          = Color(0xFF1C1F2A);
-  static const Color primaryDarkVariant   = Color(0xFF252836);
-  static const Color accentDark           = Color(0xFFC4455A);
-  static const Color accentDarkLight      = Color(0xFFE8738A);
-  static const Color secondaryDark        = Color(0xFF8B92A8);
+  static const Color primaryDark = Color(0xFF1C1F2A);
+  static const Color primaryDarkVariant = Color(0xFF252836);
+  static const Color accentDark = Color(0xFFC4455A);
+  static const Color accentDarkLight = Color(0xFFE8738A);
+  static const Color secondaryDark = Color(0xFF8B92A8);
 
-  static const Color textPrimaryDark      = Color(0xFFF0F2F5);
-  static const Color textSecondaryDark    = Color(0xFF8B92A8);
-  static const Color textDisabledDark     = Color(0xFF4A5068);
+  static const Color textPrimaryDark = Color(0xFFF0F2F5);
+  static const Color textSecondaryDark = Color(0xFF8B92A8);
+  static const Color textDisabledDark = Color(0xFF4A5068);
 
-  static const Color successDark          = Color(0xFF4CAF82);
-  static const Color warningDark          = Color(0xFFF0A04B);
-  static const Color errorDark            = Color(0xFFE85A6F);
+  static const Color successDark = Color(0xFF4CAF82);
+  static const Color warningDark = Color(0xFFF0A04B);
+  static const Color errorDark = Color(0xFFE85A6F);
 
   // --- HELPERS ---
-  
+
   static const Color transparent = Colors.transparent;
   static const Color white = Colors.white;
 
